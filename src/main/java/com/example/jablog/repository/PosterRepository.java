@@ -3,11 +3,10 @@ package com.example.jablog.repository;
 import com.example.jablog.entity.PostBase;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,36 +20,26 @@ public class PosterRepository {
 
     final private SessionFactory sessionFactory;
 
-    public long save(PostBase postBase, MultipartFile file){
+    @Transactional
+    public long save(PostBase postBase, MultipartFile file, String bucket){
 
         Session session = sessionFactory.openSession();
-        Transaction trs = null;
 
         try {
-
-            trs = session.beginTransaction();
-            postBase.setPicture(savePicture(file));
+            savePicture(file, bucket);
             session.persist(postBase);
-            trs.commit();
-            return postBase.getId();
-
-        } catch (Exception e) {
-            if (trs!=null)
-                trs.rollback();
-
+            session.flush();
         } finally {
             session.close();
         }
-
-        throw new RuntimeException("error of save image");
+        return postBase.getId();
     }
 
-    private @NonNull String savePicture(MultipartFile pic){
+    private void savePicture(MultipartFile pic, String bucket){
 
         if (pic.isEmpty())
-            return "placeholder";
+            throw new RuntimeException("cannot upload image");
 
-        String bucket = "images";
         String name = "["+pic.getOriginalFilename()+"]["+System.currentTimeMillis()+"]";
 
         try {
@@ -63,7 +52,5 @@ public class PosterRepository {
         } catch (Exception e) {
             throw new RuntimeException("error of save image");
         }
-
-        return "http://localhost:9000/" + bucket + "/" + name;
     }
 }

@@ -40,25 +40,27 @@ public class Poster {
     @PostMapping(value = "/{boardName}/", consumes = "multipart/form-data")
     public String thread(@PathVariable String boardName, @Valid @RequestPart("post") Post post, @RequestPart("image") @NonNull MultipartFile file){
         chekFile(file);
+
+        if (file.isEmpty())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "dosent upload image");
+
         long ifOfPost = posterService.thread(post, file, boardName);
 
         return "redirect:/"+boardName+"/"+ifOfPost;
     }
 
     @PostMapping(value = "/{boardName}/{threadID}/", consumes = "multipart/form-data")
-    public String post(@PathVariable String boardName, @PathVariable int threadID,
+    public String post(@PathVariable String boardName, @PathVariable long threadID,
                        @Valid @RequestPart("post") Post post, @RequestPart(value = "image", required = false) MultipartFile file){
         chekFile(file);
 
-        int ifOfPost = posterService.post(post, file, boardName, threadID);
+        long ifOfPost = posterService.post(post, file, threadID);
 
         return "redirect:/"+boardName+"/"+ifOfPost;
     }
 
     private void chekFile(MultipartFile file){
         String fileType = file.getContentType();
-        if (file.isEmpty())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "dosent upload image");
         if (file.getSize()>maxImageSize)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "file is too big");
         if (!fileType.equals("image/png") && !fileType.equals("image/jpeg") && !fileType.equals("image/jpg") && !fileType.equals("image/gif"))

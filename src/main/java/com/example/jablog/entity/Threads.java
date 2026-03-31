@@ -20,7 +20,7 @@ import java.util.List;
 public class Threads extends PostBase {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="board")
+    @JoinColumn(name="board", referencedColumnName = "name")
     private Board board;
 
     @OneToMany(mappedBy = "thread", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
