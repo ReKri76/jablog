@@ -1,10 +1,7 @@
 package com.example.jablog.controllers;
 
+import com.example.jablog.DTO.Post;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,19 +17,6 @@ import org.springframework.web.server.ResponseStatusException;
 public class Poster {
 
     final long maxImageSize = 1024*1024*10-1;
-
-    @Setter
-    @Getter
-    public static class Post {
-
-        @Size(max = 127, message = "head too long")
-        private String head;
-
-        @NotBlank
-        @Size(max=4095, message = "body too long")
-        private String body;
-
-    }
 
     @Autowired
     private PosterService posterService;

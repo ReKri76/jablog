@@ -10,6 +10,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import com.example.jablog.DTO.Post;
 
 @Service
 public class PosterService {
@@ -22,7 +23,7 @@ public class PosterService {
     private EntityManager entityManager;
 
 
-    public long thread(Poster.@NonNull Post post, MultipartFile file, String board){
+    public long thread(@NonNull Post post, MultipartFile file, String board){
 
         if (post.getHead().isEmpty())
             post.setHead(post.getBody().substring(0,120));
@@ -45,7 +46,7 @@ public class PosterService {
         return idOfThread;
     }
 
-    public long post(Poster.@NonNull Post post, MultipartFile file, long threadId){
+    public long post(@NonNull Post post, MultipartFile file, long threadId){
 
         if (post.getHead().isEmpty())
             post.setHead(post.getBody().substring(0,120));
