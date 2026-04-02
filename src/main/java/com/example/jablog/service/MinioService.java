@@ -1,5 +1,6 @@
 package com.example.jablog.service;
 
+import com.example.jablog.DTO.Picture;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import lombok.RequiredArgsConstructor;
@@ -13,20 +14,14 @@ public class MinioService {
 
     private final MinioClient minioClient;
 
-    public void savePicture(@NonNull MultipartFile pic, String bucket){
-
-        if (pic.isEmpty())
-            throw new RuntimeException("cannot upload image");
-
-        String name = "["+pic.getOriginalFilename()+"]["+System.currentTimeMillis()+"]";
-
+    public void savePicture(@NonNull Picture pic, String bucket){
         try {
-            minioClient.putObject(PutObjectArgs.builder().
-                    bucket(bucket).
-                    object(name).
-                    stream(pic.getInputStream(), pic.getSize(), 10*1024*1024).
-                    contentType(pic.getContentType()).
-                    build());
+            minioClient.putObject(PutObjectArgs.builder()
+                    .bucket(bucket)
+                    .object(pic.getName())
+                    .stream(pic.getInputStream(), pic.getSize(), 10*1024*1024)
+                    .contentType(pic.getContentType())
+                    .build());
         } catch (Exception e) {
             throw new RuntimeException("error of save image");
         }

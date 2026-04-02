@@ -1,5 +1,6 @@
 package com.example.jablog.service;
 
+import com.example.jablog.DTO.Picture;
 import com.example.jablog.entity.Board;
 import com.example.jablog.entity.Posts;
 import com.example.jablog.entity.Threads;
@@ -9,7 +10,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import com.example.jablog.DTO.Post;
 
 @Service
@@ -23,7 +23,7 @@ public class PosterService {
     private final MinioService minioService;
 
     @Transactional
-    public long thread(@NonNull Post post, MultipartFile file, String board){
+    public long thread(@NonNull Post post, Picture file, String board){
 
         if (post.getHead().isEmpty())
             post.setHead(post.getBody().substring(0,Math.min(120, post.getBody().length())));
@@ -34,12 +34,11 @@ public class PosterService {
 
         minioService.savePicture(file, bucket);
 
-        final String name = "http://localhost:9000/"+bucket+"/["+file.getOriginalFilename()+"]["+System.currentTimeMillis()+"]";
+        final String name = "http://localhost:9000/"+bucket+"/"+file.getName();
 
         final Threads threads = new Threads();
         threads.setContent(post.getBody());
         threads.setHeader(post.getHead());
-        threads.setBoard(entityManager.getReference(Board.class, board));
         threads.setPicture(name);
         threads.setBoard(boardRef);
 
@@ -49,14 +48,14 @@ public class PosterService {
     }
 
     @Transactional
-    public long post(@NonNull Post post, MultipartFile file, long threadId){
+    public long post(@NonNull Post post, Picture file, long threadId){
 
         if (post.getHead().isEmpty())
             post.setHead(post.getBody().substring(0,Math.min(120, post.getBody().length())));
 
         minioService.savePicture(file, bucket);
 
-        final String name = "http://localhost:9000/"+bucket+"/["+file.getOriginalFilename()+"]["+System.currentTimeMillis()+"]";
+        final String name = "http://localhost:9000/"+bucket+"/"+file.getName();
 
         final Posts posts = new Posts();
         posts.setContent(post.getBody());

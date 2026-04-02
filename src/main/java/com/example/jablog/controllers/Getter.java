@@ -1,10 +1,9 @@
 package com.example.jablog.controllers;
 
-import com.example.jablog.entity.Board;
-import com.example.jablog.entity.Posts;
-import com.example.jablog.entity.Threads;
+import com.example.jablog.DTO.PostWithPicture;
 import com.example.jablog.service.GetterService;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,38 +19,26 @@ public class Getter {
     private final GetterService getterService;
 
     @GetMapping("/{boardName}")
-    public String board(@PathVariable String boardName, @RequestParam(defaultValue = "0") int page, Model model){
+    public String board(@PathVariable String boardName, @RequestParam(defaultValue = "0") int page, @NonNull Model model){
 
-        LinkedList<Threads> threads = getterService.board(boardName, page);
-
-        threads.forEach(thread ->
-                model.addAttribute(Long.toString(thread.getId()), thread)
-        );
-
+        LinkedList<PostWithPicture> threads = getterService.board(boardName, page);
+        model.addAttribute("threads", threads);
         return "board";
     }
 
     @GetMapping("/{threadId}")
-    public String thread(@PathVariable long threadId, Model model){
+    public String thread(@PathVariable long threadId, @NonNull Model model){
 
-        LinkedList<Posts> posts = getterService.thread(threadId);
-
-        posts.forEach(post ->
-                model.addAttribute(Long.toString(post.getId()), post)
-        );
-
+        LinkedList<PostWithPicture> posts = getterService.thread(threadId);
+        model.addAttribute("posts", posts);
         return "thread";
     }
 
     @GetMapping("/")
-    public String start(Model model){
+    public String start(@NonNull Model model){
 
-        LinkedList<Board> boards = getterService.start();
-
-        boards.forEach(board->
-            model.addAttribute(board.getName(), board)
-        );
-
+        LinkedList<String> boards = getterService.start();
+        model.addAttribute("boards", boards);
         return "index";
     }
 }
