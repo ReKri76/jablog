@@ -16,31 +16,34 @@ import com.example.jablog.DTO.Post;
 @RequiredArgsConstructor
 public class PosterService {
 
-    String bucket = "images";
+    private final String bucket = "images";
 
-    PosterRepository posterRepository;
+    private final PosterRepository posterRepository;
     private final EntityManager entityManager;
+    private final MinioService minioService;
 
     @Transactional
     public long thread(@NonNull Post post, MultipartFile file, String board){
 
         if (post.getHead().isEmpty())
-            post.setHead(post.getBody().substring(0,120));
+            post.setHead(post.getBody().substring(0,Math.min(120, post.getBody().length())));
 
-        Board boardRef = entityManager.unwrap(org.hibernate.Session.class)
+        final Board boardRef = entityManager.unwrap(org.hibernate.Session.class)
                 .bySimpleNaturalId(Board.class)
                 .getReference(board);
 
-        String name = "http://localhost:9000["+file.getOriginalFilename()+"]["+System.currentTimeMillis()+"]";
+        minioService.savePicture(file, bucket);
 
-        Threads threads = new Threads();
+        final String name = "http://localhost:9000/"+bucket+"/["+file.getOriginalFilename()+"]["+System.currentTimeMillis()+"]";
+
+        final Threads threads = new Threads();
         threads.setContent(post.getBody());
         threads.setHeader(post.getHead());
         threads.setBoard(entityManager.getReference(Board.class, board));
         threads.setPicture(name);
         threads.setBoard(boardRef);
 
-        long idOfThread = posterRepository.save(threads, file, bucket);
+        final long idOfThread = posterRepository.save(threads);
 
         return idOfThread;
     }
@@ -49,18 +52,19 @@ public class PosterService {
     public long post(@NonNull Post post, MultipartFile file, long threadId){
 
         if (post.getHead().isEmpty())
-            post.setHead(post.getBody().substring(0,120));
+            post.setHead(post.getBody().substring(0,Math.min(120, post.getBody().length())));
 
-        String name = "http://localhost:9000["+file.getOriginalFilename()+"]["+System.currentTimeMillis()+"]";
+        minioService.savePicture(file, bucket);
 
-        Posts posts = new Posts();
+        final String name = "http://localhost:9000/"+bucket+"/["+file.getOriginalFilename()+"]["+System.currentTimeMillis()+"]";
+
+        final Posts posts = new Posts();
         posts.setContent(post.getBody());
         posts.setHeader(post.getHead());
         posts.setThread(entityManager.getReference(Threads.class, threadId));
         posts.setPicture(name);
 
-
-        long idOfThread = posterRepository.save(posts, file, bucket);
+        final long idOfThread = posterRepository.save(posts);
 
         return idOfThread;
     }

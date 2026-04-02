@@ -4,7 +4,6 @@ import com.example.jablog.DTO.Post;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +17,9 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 public class Poster {
 
-    final long maxImageSize = 1024*1024*10-1;
+    final public static long maxImageSize = 1024*1024*10-1;
 
-    private PosterService posterService;
+    private final PosterService posterService;
 
     @PostMapping(value = "/{boardName}/", consumes = "multipart/form-data")
     public String thread(@PathVariable String boardName, @Valid @RequestPart("post") Post post, @RequestPart("image") @NonNull MultipartFile file){
@@ -44,7 +43,7 @@ public class Poster {
         return "redirect:/"+boardName+"/"+ifOfPost;
     }
 
-    private void chekFile(MultipartFile file){
+    private void chekFile(@NonNull MultipartFile file){
         String fileType = file.getContentType();
         if (file.getSize()>maxImageSize)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "file is too big");

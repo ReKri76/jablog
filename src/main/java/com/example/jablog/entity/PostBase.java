@@ -17,13 +17,13 @@ public abstract class PostBase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "header", length = 200, nullable = false)
+    @Column(name = "header", length = 200, nullable = false, updatable = false)
     private String header;
 
-    @Column(name = "content")
+    @Column(name = "content", updatable = false)
     private String content;
 
-    @Column(name = "picture")
+    @Column(name = "picture", updatable = false)
     private String picture;
 
     @CreationTimestamp

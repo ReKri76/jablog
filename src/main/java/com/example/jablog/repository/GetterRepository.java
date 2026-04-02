@@ -1,22 +1,54 @@
 package com.example.jablog.repository;
 
 import com.example.jablog.entity.Board;
-import jakarta.transaction.Transactional;
+import com.example.jablog.entity.Posts;
+import com.example.jablog.entity.Threads;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 
 import java.util.LinkedList;
+import java.util.List;
 
 @Repository
+@RequiredArgsConstructor
 public class GetterRepository {
 
-    SessionFactory sessionFactory;
+    private final SessionFactory sessionFactory;
+    private final static int limitOfPagination = 10;
 
-    @Transactional
-    public  LinkedList<Board> start (){
+    public LinkedList<Board> start(){
 
-        Session session = sessionFactory.openSession();
-        LinkedList<Board> result = session.createQuery("from board", Board.class).getResultList();
+        Session session = sessionFactory.getCurrentSession();
+        List<Board> result = session.createQuery("from board", Board.class).getResultList();
+
+        return new LinkedList<Board>(result);
+    }
+
+   public LinkedList<Threads> board(String boardName, int page){
+
+       Session session = sessionFactory.getCurrentSession();
+       String hql = "from Threads t where t.board = :boardName order by t.id desc";
+
+       List<Threads> threads = session.createQuery(hql, Threads.class)
+               .setParameter("boardName", boardName)
+               .setFirstResult(limitOfPagination)
+               .setMaxResults(limitOfPagination*(page+1))
+               .getResultList();
+
+       return new LinkedList<Threads>(threads);
+   }
+
+    public LinkedList<Posts> thread(long threadId){
+
+        Session session = sessionFactory.getCurrentSession();
+        String hql = "from Posts p where p.thread = :threadId";
+
+        List<Posts> posts = session.createQuery(hql, Posts.class)
+                .setParameter("threadId", threadId)
+                .getResultList();
+
+        return new LinkedList<Posts>(posts);
     }
 }
