@@ -1,28 +1,27 @@
 package com.example.jablog.service;
 
-import com.example.jablog.controllers.Poster;
 import com.example.jablog.entity.Board;
 import com.example.jablog.entity.Posts;
 import com.example.jablog.entity.Threads;
 import com.example.jablog.repository.PosterRepository;
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.example.jablog.DTO.Post;
 
 @Service
+@RequiredArgsConstructor
 public class PosterService {
 
     String bucket = "images";
 
-    @Autowired
     PosterRepository posterRepository;
-    @Autowired
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
-
+    @Transactional
     public long thread(@NonNull Post post, MultipartFile file, String board){
 
         if (post.getHead().isEmpty())
@@ -46,6 +45,7 @@ public class PosterService {
         return idOfThread;
     }
 
+    @Transactional
     public long post(@NonNull Post post, MultipartFile file, long threadId){
 
         if (post.getHead().isEmpty())

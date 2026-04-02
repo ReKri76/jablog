@@ -2,6 +2,7 @@ package com.example.jablog.controllers;
 
 import com.example.jablog.DTO.Post;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,11 +15,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Controller
 @RequestMapping("/poster")
+@RequiredArgsConstructor
 public class Poster {
 
     final long maxImageSize = 1024*1024*10-1;
 
-    @Autowired
     private PosterService posterService;
 
     @PostMapping(value = "/{boardName}/", consumes = "multipart/form-data")
