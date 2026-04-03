@@ -6,6 +6,7 @@ import com.example.jablog.entity.Threads;
 import com.example.jablog.repository.Deleter;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +19,9 @@ import java.util.ArrayDeque;
 public class Cleaner {
 
     private final Deleter deleter;
-    private final Logger logger;
-    private final long deltaPost = Duration.ofDays(14).getSeconds();
-    private final long deltaThread = Duration.ofDays(7).getSeconds();
+    private final static Logger logger = (Logger) LoggerFactory.getLogger(Cleaner.class);
+    private final long deltaPost = Duration.ofDays(14).toMillis();
+    private final long deltaThread = Duration.ofDays(7).toMillis();
     private final MinioService minioService;
 
     @Scheduled(cron = "0 0 4 * * WED")

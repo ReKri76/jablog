@@ -19,7 +19,7 @@ public class Deleter {
 
     public ArrayDeque<Posts> posts(long delta) {
         Session session = sessionFactory.getCurrentSession();
-        final long expiredDate = Instant.now().getEpochSecond() - delta;
+        final long expiredDate = Instant.now().toEpochMilli() - delta;
 
         String selectHql = "from Posts p where p.createdAt < :expiredDate";
         List<Posts> posts = session.createQuery(selectHql, Posts.class)
@@ -36,7 +36,7 @@ public class Deleter {
 
     public ArrayDeque<Threads> threads(long delta){
         Session session = sessionFactory.getCurrentSession();
-        final long expiredDate = Instant.now().getEpochSecond() - delta;
+        final long expiredDate = Instant.now().toEpochMilli() - delta;
 
         String selectHql = "from Threads t where (select max(p.createdAt) from Posts where p.thread=t.id) < :expiredDate";
         List<Threads> threads = session.createQuery(selectHql, Threads.class)

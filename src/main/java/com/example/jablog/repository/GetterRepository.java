@@ -33,8 +33,8 @@ public class GetterRepository {
 
        List<Threads> threads = session.createQuery(hql, Threads.class)
                .setParameter("boardName", boardName)
-               .setFirstResult(page)
-               .setMaxResults(limitOfPagination*page)
+               .setFirstResult(page*limitOfPagination)
+               .setMaxResults(limitOfPagination)
                .getResultList();
 
        return new ArrayDeque<Threads>(threads);
