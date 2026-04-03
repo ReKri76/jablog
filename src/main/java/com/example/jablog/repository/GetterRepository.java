@@ -21,7 +21,7 @@ public class GetterRepository {
     public LinkedList<Board> start(){
 
         Session session = sessionFactory.getCurrentSession();
-        List<Board> result = session.createQuery("from board", Board.class).getResultList();
+        List<Board> result = session.createQuery("from Board", Board.class).getResultList();
 
         return new LinkedList<Board>(result);
     }
