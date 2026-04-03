@@ -10,8 +10,8 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name="threads")
@@ -24,5 +24,5 @@ public class Threads extends PostBase {
     private Board board;
 
     @OneToMany(mappedBy = "thread", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Posts> posts = new ArrayList<Posts>();
+    private Set<Posts> threads = new HashSet<Posts>();
 }

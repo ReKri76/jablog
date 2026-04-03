@@ -8,7 +8,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 import java.util.List;
 
 @Repository
@@ -18,29 +18,29 @@ public class GetterRepository {
     private final SessionFactory sessionFactory;
     private final static int limitOfPagination = 10;
 
-    public LinkedList<Board> start(){
+    public ArrayDeque<Board> start(){
 
         Session session = sessionFactory.getCurrentSession();
         List<Board> result = session.createQuery("from Board", Board.class).getResultList();
 
-        return new LinkedList<Board>(result);
+        return new ArrayDeque<Board>(result);
     }
 
-   public LinkedList<Threads> board(String boardName, int page){
+   public ArrayDeque<Threads> board(String boardName, int page){
 
        Session session = sessionFactory.getCurrentSession();
        String hql = "from Threads t where t.board = :boardName order by t.id desc";
 
        List<Threads> threads = session.createQuery(hql, Threads.class)
                .setParameter("boardName", boardName)
-               .setFirstResult(limitOfPagination)
-               .setMaxResults(limitOfPagination*(page+1))
+               .setFirstResult(page)
+               .setMaxResults(limitOfPagination*page)
                .getResultList();
 
-       return new LinkedList<Threads>(threads);
+       return new ArrayDeque<Threads>(threads);
    }
 
-    public LinkedList<Posts> thread(long threadId){
+    public ArrayDeque<Posts> thread(long threadId){
 
         Session session = sessionFactory.getCurrentSession();
         String hql = "from Posts p where p.thread = :threadId";
@@ -49,6 +49,6 @@ public class GetterRepository {
                 .setParameter("threadId", threadId)
                 .getResultList();
 
-        return new LinkedList<Posts>(posts);
+        return new ArrayDeque<Posts>(posts);
     }
 }

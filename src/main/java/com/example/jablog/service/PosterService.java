@@ -53,12 +53,11 @@ public class PosterService {
         if (post.getHead().isEmpty())
             post.setHead(post.getBody().substring(0,Math.min(120, post.getBody().length())));
 
-        String nameOfFile = "";
+        String name = "";
         if (file!=null) {
             minioService.savePicture(file, bucket);
-            nameOfFile = file.getName();
+            name = "http://localhost:9000/"+bucket+"/"+file.getName();
         }
-        final String name = "http://localhost:9000/"+bucket+"/"+nameOfFile;
 
         final Posts posts = new Posts();
         posts.setContent(post.getBody());

@@ -3,10 +3,10 @@ package com.example.jablog.service;
 import com.example.jablog.DTO.Picture;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +29,18 @@ public class MinioService {
 
     public void deletePicture(@NonNull String pathToPic){
 
-    }
+        String[] parts = pathToPic.split("/");
+        String objectName = parts[parts.length-1];
+        String bucketName = parts[parts.length-2];
 
+        try {
+            minioClient.removeObject(RemoveObjectArgs.builder()
+                    .bucket(bucketName)
+                    .object(objectName)
+                    .build());
+        } catch (Exception e) {
+            throw new RuntimeException("error to delete file");
+        }
+    }
 }
 

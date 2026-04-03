@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.NaturalId;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name="board")
@@ -22,5 +22,5 @@ public class Board {
     private String name;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Threads> threads = new ArrayList<Threads>();
+    private Set<Threads> threads = new HashSet<Threads>();
 }
