@@ -9,7 +9,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayDeque;
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -18,10 +18,10 @@ public class GetterService {
     private final GetterRepository getterRepository;
 
     @Transactional
-    public ArrayDeque<String> start(){
+    public ArrayList<String> start(){
 
-        ArrayDeque<String> boards = new ArrayDeque<String>();
-        ArrayDeque<Board> input = getterRepository.start();
+        ArrayList<String> boards = new ArrayList<String>();
+        ArrayList<Board> input = getterRepository.start();
 
         input.forEach(board -> boards.add(board.getName()));
 
@@ -29,10 +29,10 @@ public class GetterService {
     }
 
     @Transactional
-    public ArrayDeque<PostWithPicture> board(String boardName, int page){
+    public ArrayList<PostWithPicture> board(String boardName, int page){
 
-        ArrayDeque<PostWithPicture> threads = new ArrayDeque<PostWithPicture>();
-        ArrayDeque<Threads> input = getterRepository.board(boardName, page);
+        ArrayList<PostWithPicture> threads = new ArrayList<PostWithPicture>();
+        ArrayList<Threads> input = getterRepository.board(boardName, page);
 
         input.forEach(thread -> {
 
@@ -48,10 +48,10 @@ public class GetterService {
     }
 
     @Transactional
-    public ArrayDeque<PostWithPicture> thread(long threadId){
+    public ArrayList<PostWithPicture> thread(long threadId){
 
-        ArrayDeque<PostWithPicture> posts = new ArrayDeque<PostWithPicture>();
-        ArrayDeque<Posts> input = getterRepository.thread(threadId);
+        ArrayList<PostWithPicture> posts = new ArrayList<PostWithPicture>();
+        ArrayList<Posts> input = getterRepository.thread(threadId);
 
         input.forEach(post -> {
 

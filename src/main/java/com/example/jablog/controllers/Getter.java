@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayDeque;
+import java.util.ArrayList;
 
 @Controller
 @RequiredArgsConstructor
@@ -21,7 +21,7 @@ public class Getter {
     @GetMapping("/{boardName}")
     public String board(@PathVariable String boardName, @RequestParam(defaultValue = "0") int page, @NonNull Model model){
 
-        ArrayDeque<PostWithPicture> threads = getterService.board(boardName, page);
+        ArrayList<PostWithPicture> threads = getterService.board(boardName, page);
         model.addAttribute("threads", threads);
         return "board";
     }
@@ -29,7 +29,7 @@ public class Getter {
     @GetMapping("/{threadId}")
     public String thread(@PathVariable long threadId, @NonNull Model model){
 
-        ArrayDeque<PostWithPicture> posts = getterService.thread(threadId);
+        ArrayList<PostWithPicture> posts = getterService.thread(threadId);
         model.addAttribute("posts", posts);
         return "thread";
     }
@@ -37,7 +37,7 @@ public class Getter {
     @GetMapping("/")
     public String start(@NonNull Model model){
 
-        ArrayDeque<String> boards = getterService.start();
+        ArrayList<String> boards = getterService.start();
         model.addAttribute("boards", boards);
         return "index";
     }

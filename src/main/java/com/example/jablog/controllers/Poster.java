@@ -25,7 +25,8 @@ public class Poster {
     private final PosterService posterService;
 
     @PostMapping(value = "/{boardName}/", consumes = "multipart/form-data")
-    public String thread(@PathVariable String boardName, @Valid @RequestPart("post") Post post, @RequestPart("image") @NonNull MultipartFile file) throws IOException {
+    public String thread(@PathVariable String boardName, @Valid @RequestPart("post") Post post,
+                         @RequestPart("image") @NonNull MultipartFile file) throws IOException {
 
         chekFile(file);
 
@@ -44,11 +45,11 @@ public class Poster {
     }
 
     @PostMapping(value = "/{boardName}/{threadID}/", consumes = "multipart/form-data")
-    public String post(@PathVariable String boardName, @PathVariable long threadID,
-                       @Valid @RequestPart("post") Post post, @RequestPart(value = "image", required = false) MultipartFile file) throws IOException {
+    public String post(@PathVariable String boardName, @PathVariable long threadID, @Valid @RequestPart("post") Post post,
+                       @RequestPart(value = "image", required = false) MultipartFile file) throws IOException {
 
         Picture picture = new Picture();
-        if (!file.isEmpty()) {
+        if (file != null && !file.isEmpty()) {
             chekFile(file);
             picture.setInputStream(file.getInputStream());
             picture.setName("["+file.getOriginalFilename()+"]["+System.currentTimeMillis()+"]");

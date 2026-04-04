@@ -8,7 +8,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -16,39 +16,39 @@ import java.util.List;
 public class GetterRepository {
 
     private final EntityManager entityManager;
-    private final static int limitOfPagination = 10;
+    private final int limitOfPagination = 10;
 
     @Transactional
-    public ArrayDeque<Board> start(){
+    public ArrayList<Board> start(){
 
         List<Board> result = entityManager.createQuery("from Board", Board.class).getResultList();
 
-        return new ArrayDeque<Board>(result);
+        return new ArrayList<Board>(result);
     }
 
     @Transactional
-   public ArrayDeque<Threads> board(String boardName, int page){
+   public ArrayList<Threads> board(String boardName, int page){
 
-       String hql = "from Threads t where t.board = :boardName order by t.id desc";
+       String jpql = "from Threads t where t.board = :boardName order by t.id desc";
 
-       List<Threads> threads = entityManager.createQuery(hql, Threads.class)
+       List<Threads> threads = entityManager.createQuery(jpql, Threads.class)
                .setParameter("boardName", boardName)
                .setFirstResult(page*limitOfPagination)
                .setMaxResults(limitOfPagination)
                .getResultList();
 
-       return new ArrayDeque<Threads>(threads);
+       return new ArrayList<Threads>(threads);
    }
 
    @Transactional
-   public ArrayDeque<Posts> thread(long threadId){
+   public ArrayList<Posts> thread(long threadId){
 
-        String hql = "from Posts p where p.thread = :threadId order by p.id";
+        String jpql = "from Posts p where p.thread = :threadId order by p.id";
 
-        List<Posts> posts = entityManager.createQuery(hql, Posts.class)
+        List<Posts> posts = entityManager.createQuery(jpql, Posts.class)
                 .setParameter("threadId", threadId)
                 .getResultList();
 
-        return new ArrayDeque<Posts>(posts);
+        return new ArrayList<Posts>(posts);
     }
 }
