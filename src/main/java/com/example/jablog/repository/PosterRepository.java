@@ -1,23 +1,22 @@
 package com.example.jablog.repository;
 
 import com.example.jablog.entity.PostBase;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
 public class PosterRepository {
 
-    final private SessionFactory sessionFactory;
+    private final EntityManager entityManager;
 
+    @Transactional
     public long save(PostBase postBase) {
 
-        Session session = sessionFactory.getCurrentSession();
-
-        session.persist(postBase);
-        session.flush();
+        entityManager.persist(postBase);
+        entityManager.flush();
 
         return postBase.getId();
     }
