@@ -48,22 +48,6 @@ public class CleanerRepository {
                 .setParameter("oldThread", oldThread)
                 .getResultList();
 
-        String deletePostsJpql =
-                "delete from Posts p " +
-                "where p.thread in (" +
-                        "select t from Threads t " +
-                        "where not exists(" +
-                                "select 1 from Posts p2 " +
-                                "where p2.createdAt >= :expiredDate " +
-                                "and p2.thread = t" +
-                                ") " +
-                                "and t.createdAt < :oldThread" +
-                        ")";
-        entityManager.createQuery(deletePostsJpql)
-                .setParameter("expiredDate", expiredDate)
-                .setParameter("oldThread", oldThread)
-                .executeUpdate();
-
         String deleteJpql =
                 "delete from Threads t " +
                 "where not exists(" +
