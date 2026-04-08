@@ -18,16 +18,16 @@ public class Getter {
 
     private final GetterService getterService;
 
-    @GetMapping("/{threadId : \\d+}")
-    public String thread(@PathVariable long threadId, @NonNull Model model){
+    @GetMapping("/v/{threadId}")
+    public String thread(@PathVariable long threadId, Model model){
 
         ArrayList<PostWithPicture> posts = getterService.thread(threadId);
         model.addAttribute("posts", posts);
         return "thread";
     }
 
-    @GetMapping("/{boardName : [a-zA-Z]+}")
-    public String board(@PathVariable String boardName, @RequestParam(defaultValue = "0") int page, @NonNull Model model){
+    @GetMapping("/{boardName}")
+    public String board(@PathVariable String boardName, @RequestParam(defaultValue = "0") int page, Model model){
 
         ArrayList<PostWithPicture> threads = getterService.board(boardName, page);
         model.addAttribute("threads", threads);
@@ -35,7 +35,7 @@ public class Getter {
     }
 
     @GetMapping("/")
-    public String start(@NonNull Model model){
+    public String start(Model model){
 
         ArrayList<String> boards = getterService.start();
         model.addAttribute("boards", boards);

@@ -27,6 +27,6 @@ public abstract class PostBase {
     private String picture;
 
     @CreationTimestamp
-    @Column(name = "createdAt", updatable = false)
+    @Column(name = "createdat", updatable = false)
     private long createdAt;
 }

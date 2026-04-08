@@ -14,9 +14,4 @@ public class GlobalExceptionHandler {
         return "error-page";
     }
 
-    @ExceptionHandler(Throwable.class)
-    public String handleThrowble(){
-        return "redirect:/error-page";
-    }
-
 }

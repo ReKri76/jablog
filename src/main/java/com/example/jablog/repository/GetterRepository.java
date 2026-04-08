@@ -29,7 +29,7 @@ public class GetterRepository {
     @Transactional
    public ArrayList<Threads> board(String boardName, int page){
 
-       String jpql = "from Threads t where t.board = :boardName order by t.id desc";
+       String jpql = "from Threads t where t.board.name = :boardName order by t.id desc";
 
        List<Threads> threads = entityManager.createQuery(jpql, Threads.class)
                .setParameter("boardName", boardName)
@@ -43,7 +43,7 @@ public class GetterRepository {
    @Transactional
    public ArrayList<Posts> thread(long threadId){
 
-        String jpql = "from Posts p where p.thread = :threadId order by p.id";
+        String jpql = "from Posts p where p.thread.id = :threadId order by p.id";
 
         List<Posts> posts = entityManager.createQuery(jpql, Posts.class)
                 .setParameter("threadId", threadId)
