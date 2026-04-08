@@ -5,14 +5,18 @@
     <title>Title</title>
 </head>
     <body>
-        <ul>
-            <li  th:each="thread :${threads}" id="${thread.id}" >
-                <a th:href="@{/read/{threadId}(threadId = ${thread.id})}"
-                th:text="${thread.id}">id</a>
+        <div>
+            <span th:each="thread :${threads}" id="${thread.id}" >
+                <a
+                    th:href="@{/read/{threadId}(threadId = ${thread.id})}"
+                    th:text="${thread.id}">
+                    id
+                </a>
                 <span th:text="${thread.head}">head</span>
                 <span th:text="${thread.body}">name</span>
                 <img th:src="${thread.url}" alt="picture"/>
-            </li>
-        </ul>
+                <br>
+            </span>
+        </div>
     </body>
 </html>

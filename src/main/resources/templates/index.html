@@ -5,15 +5,16 @@
     <title>Title</title>
 </head>
     <body>
-        <table>
-            <tr th:each="board : ${boards}">
-                <td>
+        <div>
+            <span th:each="board : ${boards}">
+                <span>
                     <a th:href="@{/{name}(name=${board})}"
                        th:text="${board}">
                         name
                     </a>
-                </td>
-            </tr>
-        </table>
+                    <br>
+                </span>
+            </span>
+        </div>
     </body>
 </html>
