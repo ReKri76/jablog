@@ -8,7 +8,6 @@
         <ul>
             <li th:each="post :${posts}" id="${post.id}">
                 <span th:text="${post.id}">id</span>
-                <span th:text="${post.head}">head</span>
                 <span th:text="${post.body}">body</span>
                 <img th:src="${post.url}" alt="picture"/>
             </li>
