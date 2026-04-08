@@ -1,14 +1,18 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="../static/js/htmx.min.js"></script>
 </head>
     <body>
         <table>
-            <tr th:each="board :${boards}">
-                <td th:text="${board}">name</td>
+            <tr th:each="board : ${boards}">
+                <td>
+                    <a th:href="@{/{name}(name=${board})}"
+                       th:text="${board}">
+                        name
+                    </a>
+                </td>
             </tr>
         </table>
     </body>

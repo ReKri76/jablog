@@ -1,17 +1,18 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="../static/js/htmx.min.js"></script>
 </head>
     <body>
-        <table>
-            <tr th:each="thread :${threads}">
-                <td th:text="${thread.head}">head</td>
-                <td th:text="${thread.body}">name</td>
-                <td th:text="${thread.url}">pic</td>
-            </tr>
-        </table>
+        <ul>
+            <li  th:each="thread :${threads}" >
+                <a th:href="@{/read/{threadId}(threadId = ${thread.id})}"
+                th:text="${thread.id}">id</a>
+                <span th:text="${thread.head}">head</span>
+                <span th:text="${thread.body}">name</span>
+                <img th:src="${thread.url}" alt="picture"/>
+            </li>
+        </ul>
     </body>
 </html>

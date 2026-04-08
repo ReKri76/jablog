@@ -7,4 +7,5 @@ import lombok.EqualsAndHashCode;
 @Data
 public class PostWithPicture extends Post{
     private String url;
+    private long id;
 }

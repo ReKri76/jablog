@@ -37,6 +37,7 @@ public class GetterService {
         input.forEach(thread -> {
 
             PostWithPicture postWithPicture= new PostWithPicture();
+            postWithPicture.setId(thread.getId());
             postWithPicture.setUrl(thread.getPicture());
             postWithPicture.setHead(thread.getHeader());
             postWithPicture.setBody(thread.getContent());
@@ -56,6 +57,7 @@ public class GetterService {
         input.forEach(post -> {
 
             PostWithPicture postWithPicture= new PostWithPicture();
+            postWithPicture.setId(post.getId());
             postWithPicture.setUrl(post.getPicture());
             postWithPicture.setHead(post.getHeader());
             postWithPicture.setBody(post.getContent());

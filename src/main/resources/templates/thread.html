@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="../static/js/htmx.min.js"></script>
 </head>
     <body>
-        <table>
-            <tr th:each="post :${posts}">
-                <td th:text="${thread.head}">head</td>
-                <td th:text="${thread.body}">name</td>
-                <td th:text="${thread.url}">pic</td>
-            </tr>
-        </table>
+        <ul>
+            <li th:each="post :${posts}">
+                <span th:text="${post.id}">id</span>
+                <span th:text="${post.head}">head</span>
+                <span th:text="${post.body}">body</span>
+                <img th:src="${post.url}" alt="picture"/>
+            </li>
+        </ul>
     </body>
 </html>
