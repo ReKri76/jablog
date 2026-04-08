@@ -48,9 +48,10 @@ public class Poster {
     public String post(@PathVariable String boardName, @PathVariable long threadID, @Valid @RequestPart("post") Post post,
                        @RequestPart(value = "image", required = false) MultipartFile file) throws IOException {
 
-        Picture picture = new Picture();
+        Picture picture = null;
         if (file != null && !file.isEmpty()) {
             chekFile(file);
+            picture = new Picture();
             picture.setInputStream(file.getInputStream());
             picture.setName("["+file.getOriginalFilename()+"]["+System.currentTimeMillis()+"]");
             picture.setSize(file.getSize());
