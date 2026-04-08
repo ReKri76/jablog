@@ -41,12 +41,13 @@ public class GetterRepository {
    }
 
    @Transactional
-   public ArrayList<Posts> thread(long threadId){
+   public ArrayList<Posts> thread(long threadId, String boardName){
 
-        String jpql = "from Posts p where p.thread.id = :threadId order by p.id";
+        String jpql = "from Posts p where p.thread.id = :threadId and p.thread.board.name = :boardName order by p.id";
 
         List<Posts> posts = entityManager.createQuery(jpql, Posts.class)
                 .setParameter("threadId", threadId)
+                .setParameter("boardName", boardName)
                 .getResultList();
 
         return new ArrayList<Posts>(posts);

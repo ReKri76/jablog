@@ -6,10 +6,11 @@
 </head>
     <body>
         <div>
-            <span th:each="thread :${threads}" id="${thread.id}" >
+            <span th:each="thread :${threads}">
                 <a
-                    th:href="@{/read/{threadId}(threadId = ${thread.id})}"
-                    th:text="${thread.id}">
+                    th:href="@{/{boardName}/{thread.id}}"
+                    th:text="${thread.id}"
+                    id="${thread.id}">
                     id
                 </a>
                 <span th:text="${thread.head}">head</span>
@@ -18,5 +19,11 @@
                 <br>
             </span>
         </div>
+
+        <form method="post"
+              th:action="@{/${boardName}/}"
+              enctype="multipart/form-data">
+
+        </form>
     </body>
 </html>

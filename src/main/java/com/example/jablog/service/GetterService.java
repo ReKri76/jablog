@@ -49,10 +49,10 @@ public class GetterService {
     }
 
     @Transactional
-    public ArrayList<PostWithPicture> thread(long threadId){
+    public ArrayList<PostWithPicture> thread(long threadId, String boardName){
 
         ArrayList<PostWithPicture> posts = new ArrayList<PostWithPicture>();
-        ArrayList<Posts> input = getterRepository.thread(threadId);
+        ArrayList<Posts> input = getterRepository.thread(threadId, boardName);
 
         input.forEach(post -> {
 

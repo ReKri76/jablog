@@ -17,11 +17,12 @@ public class Getter {
 
     private final GetterService getterService;
 
-    @GetMapping("/read/{threadId}")
-    public String thread(@PathVariable long threadId, Model model){
+    @GetMapping("/{boardName}/{threadId}")
+    public String thread(@PathVariable long threadId, @PathVariable String boardName, Model model){
 
-        ArrayList<PostWithPicture> posts = getterService.thread(threadId);
+        ArrayList<PostWithPicture> posts = getterService.thread(threadId, boardName);
         model.addAttribute("posts", posts);
+        model.addAttribute("boardName", boardName);
         return "thread";
     }
 
