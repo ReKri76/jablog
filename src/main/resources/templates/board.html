@@ -6,7 +6,7 @@
 </head>
     <body>
         <ul>
-            <li  th:each="thread :${threads}" >
+            <li  th:each="thread :${threads}" id="${thread.id}" >
                 <a th:href="@{/read/{threadId}(threadId = ${thread.id})}"
                 th:text="${thread.id}">id</a>
                 <span th:text="${thread.head}">head</span>

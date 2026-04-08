@@ -6,7 +6,7 @@
 </head>
     <body>
         <ul>
-            <li th:each="post :${posts}">
+            <li th:each="post :${posts}" id="${post.id}">
                 <span th:text="${post.id}">id</span>
                 <span th:text="${post.head}">head</span>
                 <span th:text="${post.body}">body</span>
