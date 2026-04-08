@@ -18,7 +18,7 @@ public class Getter {
 
     private final GetterService getterService;
 
-    @GetMapping("/v/{threadId}")
+    @GetMapping("/read/{threadId}")
     public String thread(@PathVariable long threadId, Model model){
 
         ArrayList<PostWithPicture> posts = getterService.thread(threadId);

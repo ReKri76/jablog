@@ -4,5 +4,13 @@
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
-
+    <body>
+        <table>
+            <tr th:each="thread :${threads}">
+                <td th:text="${thread.head}">head</td>
+                <td th:text="${thread.body}">name</td>
+                <td th:text="${thread.url}">pic</td>
+            </tr>
+        </table>
+    </body>
 </html>
