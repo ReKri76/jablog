@@ -10,7 +10,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
 import org.jspecify.annotations.NonNull;
-import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import com.example.jablog.DTO.Post;
 
@@ -78,8 +77,6 @@ public class PosterService {
             if (currentValue != 'w' && currentValue !='r' && currentValue != '-')
                 throw new RuntimeException("incorrect rule");
         }
-
-        password = BCrypt.hashpw(password, BCrypt.gensalt());
 
         posterRepository.board(boardName, password, rule);
     }
