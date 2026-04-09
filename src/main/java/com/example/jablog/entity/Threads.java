@@ -25,5 +25,5 @@ public class Threads extends PostBase {
     private Board board;
 
     @OneToMany(mappedBy = "thread", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Set<Posts> posts = new HashSet<Posts>();
+    private HashSet<Posts> posts = new HashSet<Posts>();
 }

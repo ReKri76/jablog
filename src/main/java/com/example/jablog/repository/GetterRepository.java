@@ -41,20 +41,15 @@ public class GetterRepository {
    }
 
    @Transactional
-   public ArrayList<Posts> thread(long threadId, String boardName){
+   public Threads thread(long threadId, String boardName){
 
-        String jpql = "from Posts p where p.thread.id = :threadId and p.thread.board.name = :boardName order by p.id";
+        String jpql = "from Threads t join fetch t.posts where t.id = :threadId and t.board.name = :boardName";
 
-        List<Posts> posts = entityManager.createQuery(jpql, Posts.class)
+       Threads posts = entityManager.createQuery(jpql, Threads.class)
                 .setParameter("threadId", threadId)
                 .setParameter("boardName", boardName)
-                .getResultList();
+               .getSingleResult();
 
-        return new ArrayList<Posts>(posts);
-    }
-
-    @Transactional
-    public Threads getThread(long threadId){
-        return  entityManager.find(Threads.class, threadId);
+        return posts;
     }
 }

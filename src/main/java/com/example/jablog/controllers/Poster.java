@@ -14,7 +14,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 
-
 @Controller
 @RequestMapping("/poster")
 @RequiredArgsConstructor
@@ -33,12 +32,7 @@ public class Poster {
         if (file.isEmpty())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "dosent upload image");
 
-        Picture picture = new Picture();
-        picture.setInputStream(file.getInputStream());
-        picture.setName("["+file.getOriginalFilename()+"]["+System.currentTimeMillis()+"]");
-        picture.setSize(file.getSize());
-        picture.setContentType(file.getContentType());
-
+        Picture picture = new Picture(file);
         long ifOfPost = posterService.thread(post, picture, boardName);
 
         return "redirect:/"+boardName+"/"+ifOfPost;
@@ -51,14 +45,10 @@ public class Poster {
         Picture picture = null;
         if (file != null && !file.isEmpty()) {
             chekFile(file);
-            picture = new Picture();
-            picture.setInputStream(file.getInputStream());
-            picture.setName("["+file.getOriginalFilename()+"]["+System.currentTimeMillis()+"]");
-            picture.setSize(file.getSize());
-            picture.setContentType(file.getContentType());
+            picture = new Picture(file);
         }
 
-        long ifOfPost = posterService.post(post, picture, threadID);
+        posterService.post(post, picture, threadID);
 
         return "redirect:/"+boardName+"/"+threadID;
     }
@@ -71,4 +61,11 @@ public class Poster {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "file is not image");
     }
 
+    @PostMapping(value = "/")
+    public String board(@PathVariable String boardName, @PathVariable String rule, @PathVariable String password){
+
+        posterService.board(boardName, password, rule);
+
+        return "redirect:/"+boardName;
+    }
 }

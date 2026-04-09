@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 @Service
 @RequiredArgsConstructor
@@ -51,9 +52,18 @@ public class GetterService {
     @Transactional
     public ArrayList<PostWithPicture> thread(long threadId, String boardName){
 
-        ArrayList<PostWithPicture> posts = new ArrayList<PostWithPicture>();
-        ArrayList<Posts> input = getterRepository.thread(threadId, boardName);
+        Threads threads = getterRepository.thread(threadId, boardName);
 
+        PostWithPicture main= new PostWithPicture();
+        main.setId(threads.getId());
+        main.setUrl(threads.getPicture());
+        main.setHead(threads.getHeader());
+        main.setBody(threads.getContent());
+
+        ArrayList<PostWithPicture> posts = new ArrayList<PostWithPicture>();
+        posts.add(main);
+
+        HashSet<Posts> input = threads.getPosts();
         input.forEach(post -> {
 
             PostWithPicture postWithPicture= new PostWithPicture();
@@ -66,18 +76,5 @@ public class GetterService {
         });
 
         return posts;
-    }
-
-    @Transactional
-    public PostWithPicture getThread(long threadId){
-        Threads thread = getterRepository.getThread(threadId);
-
-        PostWithPicture postWithPicture = new PostWithPicture();
-        postWithPicture.setId(thread.getId());
-        postWithPicture.setUrl(thread.getPicture());
-        postWithPicture.setHead(thread.getHeader());
-        postWithPicture.setBody(thread.getContent());
-
-        return postWithPicture;
     }
 }

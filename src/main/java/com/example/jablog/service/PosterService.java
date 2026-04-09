@@ -8,7 +8,9 @@ import com.example.jablog.repository.PosterRepository;
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Session;
 import org.jspecify.annotations.NonNull;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import com.example.jablog.DTO.Post;
 
@@ -28,7 +30,7 @@ public class PosterService {
         if (post.getHead().isEmpty())
             post.setHead(post.getBody().substring(0,Math.min(120, post.getBody().length())));
 
-        final Board boardRef = entityManager.unwrap(org.hibernate.Session.class)
+        final Board boardRef = entityManager.unwrap(Session.class)
                 .bySimpleNaturalId(Board.class)
                 .getReference(board);
 
@@ -42,13 +44,13 @@ public class PosterService {
         threads.setPicture(name);
         threads.setBoard(boardRef);
 
-        final long idOfThread = posterRepository.save(threads);
+        final long idOfThread = posterRepository.thread(threads);
 
         return idOfThread;
     }
 
     @Transactional
-    public long post(@NonNull Post post, Picture file, long threadId){
+    public void post(@NonNull Post post, Picture file, long threadId){
 
         String name = "";
         if (file!=null) {
@@ -62,8 +64,23 @@ public class PosterService {
         posts.setThread(entityManager.getReference(Threads.class, threadId));
         posts.setPicture(name);
 
-        final long idOfThread = posterRepository.save(posts);
+        posterRepository.post(posts);
+    }
 
-        return idOfThread;
+    @Transactional
+    public void board(String boardName, String password, String rule){
+
+        if (rule.length()!=6)
+            throw new RuntimeException("incorrect rule");
+
+        for (int i = 0; i<rule.length(); i++){
+            char currentValue = rule.charAt(i);
+            if (currentValue != 'w' && currentValue !='r' && currentValue != '-')
+                throw new RuntimeException("incorrect rule");
+        }
+
+        password = BCrypt.hashpw(password, BCrypt.gensalt());
+
+        posterRepository.board(boardName, password, rule);
     }
 }
