@@ -22,8 +22,12 @@ public class Getter {
     public String thread(@PathVariable long threadId, @PathVariable String boardName, Model model){
 
         ArrayList<PostWithPicture> posts = getterService.thread(threadId, boardName);
+        PostWithPicture thread = getterService.getThread(threadId);
+
         model.addAttribute("posts", posts);
+        model.addAttribute("thread", thread);
         model.addAttribute("boardName", boardName);
+        model.addAttribute("post", new Post());
         return "thread";
     }
 

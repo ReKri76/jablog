@@ -67,4 +67,17 @@ public class GetterService {
 
         return posts;
     }
+
+    @Transactional
+    public PostWithPicture getThread(long threadId){
+        Threads thread = getterRepository.getThread(threadId);
+
+        PostWithPicture postWithPicture = new PostWithPicture();
+        postWithPicture.setId(thread.getId());
+        postWithPicture.setUrl(thread.getPicture());
+        postWithPicture.setHead(thread.getHeader());
+        postWithPicture.setBody(thread.getContent());
+
+        return postWithPicture;
+    }
 }

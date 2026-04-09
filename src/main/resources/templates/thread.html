@@ -6,12 +6,37 @@
 </head>
     <body>
         <div>
+            <span th:text="${thread.id}">id</span>
+            <span th:text="${thread.head}">head</span>
+            <span th:text="${thread.body}">body</span>
+            <img th:src="${thread.url}" alt="picture"/>
+            <br>
+        </div>
+
+        <div>
             <span th:each="post :${posts}" id="${post.id}">
                 <span th:text="${post.id}">id</span>
+                <span th:text="${post.head}">head</span>
                 <span th:text="${post.body}">body</span>
-                <img th:src="${post.url}" alt="picture"/>
+                <img th:src="${post.url}"/>
                 <br>
             </span>
         </div>
+
+        <form method="post"
+              th:action="@{/poster/{boardName}/{threadId}(boardName=${boardName}, threadId=${thread.id})}"
+              enctype="multipart/form-data"
+              th:object="${post}">
+
+            <label for="head">head:</label>
+            <input type="text" th:field="*{head}" id="head">
+
+            <label for="body">body</label>
+            <textarea th:field="*{body}" id="body" rows="6"></textarea>
+
+            <input type="file" name="image" accept="image/*"/>
+
+            <button type="submit">create</button>
+        </form>
     </body>
 </html>

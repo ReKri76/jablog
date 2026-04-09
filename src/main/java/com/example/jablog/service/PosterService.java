@@ -50,9 +50,6 @@ public class PosterService {
     @Transactional
     public long post(@NonNull Post post, Picture file, long threadId){
 
-        if (post.getHead().isEmpty())
-            post.setHead(post.getBody().substring(0,Math.min(120, post.getBody().length())));
-
         String name = "";
         if (file!=null) {
             minioService.savePicture(file, bucket);

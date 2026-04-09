@@ -45,7 +45,7 @@ public class Poster {
     }
 
     @PostMapping(value = "/{boardName}/{threadID}", consumes = "multipart/form-data")
-    public String post(@PathVariable String boardName, @PathVariable long threadID, @Valid @RequestPart("post") Post post,
+    public String post(@PathVariable String boardName, @PathVariable long threadID, @Valid @ModelAttribute("post") Post post,
                        @RequestPart(value = "image", required = false) MultipartFile file) throws IOException {
 
         Picture picture = null;
@@ -60,7 +60,7 @@ public class Poster {
 
         long ifOfPost = posterService.post(post, picture, threadID);
 
-        return "redirect:/"+boardName+"/"+ifOfPost;
+        return "redirect:/"+boardName+"/"+threadID;
     }
 
     private void chekFile(@NonNull MultipartFile file){

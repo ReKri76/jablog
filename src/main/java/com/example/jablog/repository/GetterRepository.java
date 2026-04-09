@@ -52,4 +52,9 @@ public class GetterRepository {
 
         return new ArrayList<Posts>(posts);
     }
+
+    @Transactional
+    public Threads getThread(long threadId){
+        return  entityManager.find(Threads.class, threadId);
+    }
 }
