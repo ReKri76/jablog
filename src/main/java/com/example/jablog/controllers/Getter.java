@@ -1,5 +1,6 @@
 package com.example.jablog.controllers;
 
+import com.example.jablog.DTO.Post;
 import com.example.jablog.DTO.PostWithPicture;
 import com.example.jablog.service.GetterService;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,8 @@ public class Getter {
 
         ArrayList<PostWithPicture> threads = getterService.board(boardName, page);
         model.addAttribute("threads", threads);
+        model.addAttribute("boardName", boardName);
+        model.addAttribute("post", new Post());
         return "board";
     }
 

@@ -26,7 +26,6 @@ public abstract class PostBase {
     @Column(name = "picture", updatable = false)
     private String picture;
 
-    @CreationTimestamp
     @Column(name = "createdat", updatable = false)
-    private long createdAt;
+    private long createdAt = System.currentTimeMillis();
 }

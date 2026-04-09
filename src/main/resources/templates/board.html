@@ -7,12 +7,14 @@
     <body>
         <div>
             <span th:each="thread :${threads}">
-                <a
-                    th:href="@{/{boardName}/{thread.id}}"
-                    th:text="${thread.id}"
-                    id="${thread.id}">
-                    id
-                </a>
+                <span>
+                    <a
+                        th:href="@{/{boardName}/{threadId}(boardName=${boardName}, threadId=${thread.id})}"
+                        th:text="${thread.id}"
+                        id="${thread.id}">
+                        id
+                    </a>
+                </span>
                 <span th:text="${thread.head}">head</span>
                 <span th:text="${thread.body}">name</span>
                 <img th:src="${thread.url}" alt="picture"/>
@@ -21,9 +23,19 @@
         </div>
 
         <form method="post"
-              th:action="@{/${boardName}/}"
-              enctype="multipart/form-data">
+              th:action="@{/poster/{boardName}(boardName=${boardName})}"
+              enctype="multipart/form-data"
+              th:object="${post}">
 
+            <label for="head">head:</label>
+            <input type="text" th:field="*{head}" id="head">
+
+            <label for="body">body</label>
+            <textarea th:field="*{body}" id="body" rows="6"></textarea>
+
+            <input type="file" name="image" accept="image/*"/>
+
+            <button type="submit">create</button>
         </form>
     </body>
 </html>

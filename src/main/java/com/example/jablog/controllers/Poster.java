@@ -24,8 +24,8 @@ public class Poster {
 
     private final PosterService posterService;
 
-    @PostMapping(value = "/{boardName}/", consumes = "multipart/form-data")
-    public String thread(@PathVariable String boardName, @Valid @RequestPart("post") Post post,
+    @PostMapping(value = "/{boardName}", consumes = "multipart/form-data")
+    public String thread(@PathVariable String boardName, @Valid @ModelAttribute("post") Post post,
                          @RequestPart("image") @NonNull MultipartFile file) throws IOException {
 
         chekFile(file);
@@ -44,7 +44,7 @@ public class Poster {
         return "redirect:/"+boardName+"/"+ifOfPost;
     }
 
-    @PostMapping(value = "/{boardName}/{threadID}/", consumes = "multipart/form-data")
+    @PostMapping(value = "/{boardName}/{threadID}", consumes = "multipart/form-data")
     public String post(@PathVariable String boardName, @PathVariable long threadID, @Valid @RequestPart("post") Post post,
                        @RequestPart(value = "image", required = false) MultipartFile file) throws IOException {
 
