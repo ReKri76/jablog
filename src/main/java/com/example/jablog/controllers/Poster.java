@@ -57,14 +57,20 @@ public class Poster {
         String fileType = file.getContentType();
         if (file.getSize()>maxImageSize)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "file is too big");
-        if (!fileType.equals("image/png") && !fileType.equals("image/jpeg") && !fileType.equals("image/jpg") && !fileType.equals("image/gif"))
+        if (!fileType.equals("image/png") && !fileType.equals("image/jpeg")
+                && !fileType.equals("image/jpg") && !fileType.equals("image/gif"))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "file is not image");
     }
 
     @PostMapping(value = "/")
-    public String board(@PathVariable String boardName, @PathVariable String rule, @PathVariable String password){
+    public String board(@RequestParam("boardName") @NonNull String boardName, @RequestParam("rule") @NonNull String rule,
+                        @RequestParam("pass") @NonNull String pass, @RequestParam("nickname") @NonNull String nickname,
+                        @RequestParam("lifeCycleThreads") int lifeCycleThreads,
+                        @RequestParam("lifeCyclePosts") int lifeCyclePosts){
 
-        posterService.board(boardName, password, rule);
+        posterService.board(boardName, pass, rule, nickname, lifeCycleThreads, lifeCyclePosts);
+
+        //TODO: выдать JWT
 
         return "redirect:/"+boardName;
     }

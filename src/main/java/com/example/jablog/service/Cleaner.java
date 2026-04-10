@@ -4,7 +4,6 @@ import ch.qos.logback.classic.Logger;
 import com.example.jablog.entity.Posts;
 import com.example.jablog.entity.Threads;
 import com.example.jablog.repository.CleanerRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,8 +20,6 @@ public class Cleaner {
 
     private final CleanerRepository cleanerRepository;
     private final static Logger logger = (Logger) LoggerFactory.getLogger(Cleaner.class);
-    private final long deltaPost = Duration.ofDays(14).toMillis();
-    private final long deltaThread = Duration.ofDays(7).toMillis();
     private final long oldThread = Instant.now().toEpochMilli()- Duration.ofMinutes(30).toMillis();
     private final String bucket = "images";
     private final MinioService minioService;
@@ -30,7 +27,7 @@ public class Cleaner {
     @Scheduled(cron = "0 0 4 * * WED")
     public void cleanThreads(){
 
-        ArrayList<Threads> deletedThreads = cleanerRepository.threads(deltaThread, oldThread);
+        ArrayList<Threads> deletedThreads = cleanerRepository.threads(oldThread);
 
         deletedThreads.forEach( thread -> minioService.deletePicture(thread.getPicture()));
 
@@ -40,7 +37,7 @@ public class Cleaner {
     @Scheduled(cron = "0 0 4 * * MON")
     public void cleanPosts(){
 
-        ArrayList<Posts> deletedPosts = cleanerRepository.posts(deltaPost);
+        ArrayList<Posts> deletedPosts = cleanerRepository.posts();
 
         deletedPosts.forEach(post->{
             String url = post.getPicture();
@@ -58,7 +55,7 @@ public class Cleaner {
         ArrayList<String> realPics = minioService.getAllFileName(bucket);
 
         realPics.forEach( pic -> {
-            pic = "http://localhost:9000/"+bucket+"/"+pic;
+            pic = System.getenv("MINIO_ENDPOINT")+bucket+"/"+pic;
             if (pics.contains(pic)){
                 minioService.deletePicture(pic);
                 pics.remove(pic);

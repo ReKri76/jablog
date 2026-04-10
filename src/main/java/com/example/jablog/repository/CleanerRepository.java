@@ -6,6 +6,7 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,50 +16,55 @@ import java.util.List;
 public class CleanerRepository {
 
     private final EntityManager entityManager;
+    private final long unxtm = Duration.ofDays(1).toMillis();
 
-    public ArrayList<Posts> posts(long delta) {
-        final long expiredDate = Instant.now().toEpochMilli() - delta;
+    public ArrayList<Posts> posts() {
+        final long now = Instant.now().toEpochMilli();
 
-        String selectJpql = "from Posts p where p.createdAt < :expiredDate";
+        String selectJpql = "from Posts p where p.createdAt < :now - p.thread.board.lifeCyclePosts * :unxtm";
         List<Posts> posts = entityManager.createQuery(selectJpql, Posts.class)
-                .setParameter("expiredDate", expiredDate)
+                .setParameter("now", now)
+                .setParameter("unxtm", unxtm)
                 .getResultList();
 
-        String deleteJpql = "delete from Posts p where p.createdAt < :expiredDate";
+        String deleteJpql = "delete from Posts p where p.createdAt < :now - p.thread.board.lifeCyclePosts * :unxtm";
         entityManager.createQuery(deleteJpql)
-                .setParameter("expiredDate", expiredDate)
+                .setParameter("now", now)
+                .setParameter("unxtm", unxtm)
                 .executeUpdate();
 
         return new ArrayList<Posts>(posts);
     }
 
-    public ArrayList<Threads> threads(long delta, long oldThread){
-        final long expiredDate = Instant.now().toEpochMilli() - delta;
+    public ArrayList<Threads> threads(long oldThread){
+        final long now = Instant.now().toEpochMilli();
 
         String selectJpql =
                 "from Threads t " +
                 "where not exists(" +
                         "select 1 from Posts p " +
-                        "where p.createdAt >= :expiredDate " +
+                        "where p.createdAt >= :now - t.board.lifeCycleThreads * :unxtm " +
                         "and p.thread = t" +
                         ") " +
                         "and t.createdAt < :oldThread";
         List<Threads> threads = entityManager.createQuery(selectJpql, Threads.class)
-                .setParameter("expiredDate", expiredDate)
                 .setParameter("oldThread", oldThread)
+                .setParameter("unxtm", unxtm)
+                .setParameter("now", now)
                 .getResultList();
 
         String deleteJpql =
                 "delete from Threads t " +
                 "where not exists(" +
                         "select 1 from Posts p " +
-                        "where p.createdAt >= :expiredDate " +
+                        "where p.createdAt >= now - t.board.lifeCycleThreads * :unxtm " +
                         "and p.thread = t" +
                         ") " +
-                        "and t.createdAt < :oldThread";
+                        "and t.createdAt < : oldThread";
         entityManager.createQuery(deleteJpql)
-                .setParameter("expiredDate", expiredDate)
                 .setParameter("oldThread", oldThread)
+                .setParameter("unxtm", unxtm)
+                .setParameter("now", now)
                 .executeUpdate();
 
         return new ArrayList<Threads>(threads);

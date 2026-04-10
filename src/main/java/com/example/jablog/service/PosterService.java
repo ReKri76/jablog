@@ -4,6 +4,7 @@ import com.example.jablog.DTO.Picture;
 import com.example.jablog.entity.Board;
 import com.example.jablog.entity.Posts;
 import com.example.jablog.entity.Threads;
+import com.example.jablog.entity.Users;
 import com.example.jablog.repository.PosterRepository;
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
@@ -35,7 +36,7 @@ public class PosterService {
 
         minioService.savePicture(file, bucket);
 
-        final String name = "http://localhost:9000/"+bucket+"/"+file.getName();
+        final String name = System.getenv("MINIO_ENDPOINT")+bucket+"/"+file.getName();
 
         final Threads threads = new Threads();
         threads.setContent(post.getBody());
@@ -54,7 +55,7 @@ public class PosterService {
         String name = "";
         if (file!=null) {
             minioService.savePicture(file, bucket);
-            name = "http://localhost:9000/"+bucket+"/"+file.getName();
+            name = System.getenv("MINIO_ENDPOINT")+bucket+"/"+file.getName();
         }
 
         final Posts posts = new Posts();
@@ -67,17 +68,41 @@ public class PosterService {
     }
 
     @Transactional
-    public void board(String boardName, String password, String rule){
+    public void board(String boardName, String password, String rule,
+                      String nickname, int lifeCycleThreads , int lifeCyclePosts){
 
-        if (rule.length()!=6)
+        if (lifeCyclePosts>=lifeCycleThreads)
+            throw new RuntimeException("life cycle of posts cant be longer then threads");
+        if (lifeCyclePosts<0)
+            throw new RuntimeException("value of life cycle must be positive");
+
+        if (rule.length()!=15)
             throw new RuntimeException("incorrect rule");
+
+        String[] rules = new String[15];
 
         for (int i = 0; i<rule.length(); i++){
             char currentValue = rule.charAt(i);
-            if (currentValue != 'w' && currentValue !='r' && currentValue != '-')
+            if (currentValue != 'w' && currentValue !='r' && currentValue != '-'
+                    && currentValue != 'x' && currentValue != 'd')
                 throw new RuntimeException("incorrect rule");
+            rules[i]=String.valueOf(currentValue);
         }
 
-        posterRepository.board(boardName, password, rule);
+        Board board = new Board();
+        board.setName(boardName);
+        board.setRules(rules);
+        board.setLifeCyclePosts(lifeCyclePosts);
+        board.setLifeCycleThreads(lifeCycleThreads);
+
+        Users users = new Users();
+        users.setBoard(board);
+        users.setRole(true);
+        users.setPassword(password);
+        users.setNickname(nickname);
+
+        //TODO: добавить хеширование пароля через Spring Security
+
+        posterRepository.board(board, users);
     }
 }

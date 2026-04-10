@@ -1,7 +1,9 @@
 package com.example.jablog.repository;
 
+import com.example.jablog.entity.Board;
 import com.example.jablog.entity.Posts;
 import com.example.jablog.entity.Threads;
+import com.example.jablog.entity.Users;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -23,14 +25,11 @@ public class PosterRepository {
     }
 
     @Transactional
-    public void post(Posts posts) {
-
-        entityManager.persist(posts);
-        entityManager.flush();
-    }
+    public void post(Posts posts) {entityManager.persist(posts);}
 
     @Transactional
-    public void board(String boardName, String password, String rule){
-
+    public void board(Board board, Users users){
+        entityManager.persist(board);
+        entityManager.persist(users);
     }
 }

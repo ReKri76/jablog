@@ -10,8 +10,8 @@ public class MinioConfig {
     @Bean
     public MinioClient minioClient(){
         return MinioClient.builder()
-                .endpoint("http://localhost:9000")
-                .credentials("minio", "634289761")
+                .endpoint(System.getenv("MINIO_ENDPOINT"))
+                .credentials(System.getenv("MINIO_ACCESS_KEY"), System.getenv("MINIO_SECRET_KEY"))
                 .build();
     }
 }
