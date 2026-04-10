@@ -6,6 +6,7 @@ import com.example.jablog.entity.Threads;
 import com.example.jablog.repository.CleanerRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,8 @@ public class Cleaner {
     private final long oldThread = Instant.now().toEpochMilli()- Duration.ofMinutes(30).toMillis();
     private final String bucket = "images";
     private final MinioService minioService;
+    @Value("${minio.endpoint}")
+    private String endpoint;
 
     @Scheduled(cron = "0 0 4 * * WED")
     public void cleanThreads(){
@@ -55,7 +58,7 @@ public class Cleaner {
         ArrayList<String> realPics = minioService.getAllFileName(bucket);
 
         realPics.forEach( pic -> {
-            pic = System.getenv("MINIO_ENDPOINT")+bucket+"/"+pic;
+            pic = endpoint+bucket+"/"+pic;
             if (pics.contains(pic)){
                 minioService.deletePicture(pic);
                 pics.remove(pic);

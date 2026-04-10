@@ -25,9 +25,6 @@ public class Users {
     @Column(name =  "role", nullable = false, updatable = false)
     private boolean role;
 
-    @Column(name="refreshTime", nullable = false)
-    private long refreshTIme;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board", referencedColumnName = "name")
     private Board board;
