@@ -43,7 +43,7 @@ public class GetterRepository {
    @Transactional
    public Threads thread(long threadId, String boardName){
 
-        String jpql = "from Threads t join fetch t.posts where t.id = :threadId and t.board.name = :boardName";
+        String jpql = "from Threads t left join fetch t.posts where t.id = :threadId and t.board.name = :boardName";
 
        Threads posts = entityManager.createQuery(jpql, Threads.class)
                 .setParameter("threadId", threadId)

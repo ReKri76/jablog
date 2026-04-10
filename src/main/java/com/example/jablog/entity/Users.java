@@ -13,13 +13,16 @@ public class Users {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(name="nickname",  nullable=false, unique=true, length = 10)
+    private String nickname;
+
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name =  "role", nullable = false) //check
-    private String role;
+    @Column(name =  "role", nullable = false)
+    private boolean role;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board", referencedColumnName = "name")
-    private String board;
+    private Board board;
 }

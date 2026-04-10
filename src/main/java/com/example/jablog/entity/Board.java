@@ -21,8 +21,8 @@ public class Board {
     @Column(name="name", nullable = false, unique = true, length = 3)
     private String name;
 
-    @Column(name="rule", nullable = false) //chek
-    private String[] rule;
+    @Column(name="rules", nullable = false) //chek
+    private String[] rules;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Threads> threads = new HashSet<Threads>();

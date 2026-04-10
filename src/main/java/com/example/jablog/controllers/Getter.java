@@ -24,7 +24,8 @@ public class Getter {
         ArrayList<PostWithPicture> posts = getterService.thread(threadId, boardName);
 
         model.addAttribute("thread", posts.getFirst());
-        model.addAttribute("posts", posts.removeFirst());
+        posts.removeFirst();
+        model.addAttribute("posts", posts);
         model.addAttribute("boardName", boardName);
         model.addAttribute("post", new Post());
         return "thread";

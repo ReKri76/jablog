@@ -63,7 +63,7 @@ public class GetterService {
         ArrayList<PostWithPicture> posts = new ArrayList<PostWithPicture>();
         posts.add(main);
 
-        HashSet<Posts> input = threads.getPosts();
+        HashSet<Posts> input = new HashSet<Posts>(threads.getPosts());
         input.forEach(post -> {
 
             PostWithPicture postWithPicture= new PostWithPicture();
