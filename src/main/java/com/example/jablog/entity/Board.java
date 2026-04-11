@@ -35,8 +35,8 @@ public class Board {
      * */
     @Column(name="rules", nullable = false,
             check = @CheckConstraint(constraint = "rules <@ ARRAY['r', 'w', 'd', 'x', '-']"))
-    @Size(min = 15, max = 15)
-    private String[] rules = {"r","w","d","-","x", "r","w","d","-","x", "r","w","d","-","x"};
+    @Size(min = 12, max = 12)
+    private String[] rules = {"r","w","-","x", "r","w","-","x", "r","w","-","x"};
 
     @Column(name="lifeCycleThreads",  nullable = false)
     @Max(28)
