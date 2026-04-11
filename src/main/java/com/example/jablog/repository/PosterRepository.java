@@ -32,4 +32,7 @@ public class PosterRepository {
         entityManager.persist(board);
         entityManager.persist(users);
     }
+
+    @Transactional
+    public void user(Users users){entityManager.persist(users);}
 }

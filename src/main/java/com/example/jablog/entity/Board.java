@@ -48,9 +48,12 @@ public class Board {
     @Min(1)
     private int lifeCyclePosts = 7;
 
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Column(name="createdat", nullable = false, updatable = false)
+    private long createdAt = System.currentTimeMillis();
+
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Threads> threads = new HashSet<Threads>();
 
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Set<Users> users = new HashSet<Users>();
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<Users> users = new HashSet<Users>(); //TODO: On cascade delete in db
 }

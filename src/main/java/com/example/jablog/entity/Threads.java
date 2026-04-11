@@ -24,6 +24,6 @@ public class Threads extends PostBase {
     @JoinColumn(name="board", referencedColumnName = "name")
     private Board board;
 
-    @OneToMany(mappedBy = "thread", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "thread", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Posts> posts = new HashSet<Posts>();
 }

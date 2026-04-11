@@ -53,16 +53,7 @@ public class Poster {
         return "redirect:/"+boardName+"/"+threadID;
     }
 
-    private void chekFile(@NonNull MultipartFile file){
-        String fileType = file.getContentType();
-        if (file.getSize()>maxImageSize)
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "file is too big");
-        if (!fileType.equals("image/png") && !fileType.equals("image/jpeg")
-                && !fileType.equals("image/jpg") && !fileType.equals("image/gif"))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "file is not image");
-    }
-
-    @PostMapping(value = "/")
+    @PostMapping(value = "/board")
     public String board(@RequestParam("boardName") @NonNull String boardName, @RequestParam("rule") @NonNull String rule,
                         @RequestParam("pass") @NonNull String pass, @RequestParam("nickname") @NonNull String nickname,
                         @RequestParam("lifeCycleThreads") int lifeCycleThreads,
@@ -70,8 +61,31 @@ public class Poster {
 
         posterService.board(boardName, pass, rule, nickname, lifeCycleThreads, lifeCyclePosts);
 
-        //TODO: выдать JWT
+        //TODO: выдать сессию
 
         return "redirect:/"+boardName;
+    }
+
+    @PostMapping(value = "/user")
+    public String users(@RequestParam("boardName") @NonNull String boardName,
+                        @RequestParam("pass") @NonNull String pass, @RequestParam("nickname") @NonNull String nickname){
+
+        posterService.user(boardName, nickname, pass);
+
+        //TODO: выдать сессию
+        //TODO: авторизация
+
+        return "redirect:/"+boardName;
+    }
+
+
+
+    private void chekFile(@NonNull MultipartFile file){
+        String fileType = file.getContentType();
+        if (file.getSize()>maxImageSize)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "file is too big");
+        if (!fileType.equals("image/png") && !fileType.equals("image/jpeg")
+                && !fileType.equals("image/jpg") && !fileType.equals("image/gif"))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "file is not image");
     }
 }

@@ -1,12 +1,12 @@
 package com.example.jablog.service;
 
 import ch.qos.logback.classic.Logger;
+import com.example.jablog.entity.Board;
 import com.example.jablog.entity.Posts;
 import com.example.jablog.entity.Threads;
 import com.example.jablog.repository.CleanerRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -22,10 +22,9 @@ public class Cleaner {
     private final CleanerRepository cleanerRepository;
     private final static Logger logger = (Logger) LoggerFactory.getLogger(Cleaner.class);
     private final long oldThread = Instant.now().toEpochMilli()- Duration.ofMinutes(30).toMillis();
+    private final long oldBoard = Instant.now().toEpochMilli()-Duration.ofDays(1).toMillis();
     private final String bucket = "images";
     private final MinioService minioService;
-    @Value("${minio.endpoint}")
-    private String endpoint;
 
     @Scheduled(cron = "0 0 4 * * WED")
     public void cleanThreads(){
@@ -58,11 +57,21 @@ public class Cleaner {
         ArrayList<String> realPics = minioService.getAllFileName(bucket);
 
         realPics.forEach( pic -> {
-            pic = endpoint+bucket+"/"+pic;
-            if (pics.contains(pic)){
+            if (!pics.contains(pic))
                 minioService.deletePicture(pic);
-                pics.remove(pic);
-            }
         });
+    }
+
+    @Scheduled(cron="0 0 5 24 * *")
+    public void cleanBoards(){
+
+        ArrayList<Board> deletedBoards = cleanerRepository.boards(oldBoard);
+
+        deletedBoards.forEach(board ->
+            logger.info("{} board was deleted. This board has a {} users", board.getName(), board.getUsers().size())
+        );
+
+        logger.info("{} boards deleted in {}.", deletedBoards.size(), LocalDateTime.now());
+
     }
 }

@@ -1,5 +1,6 @@
 package com.example.jablog.repository;
 
+import com.example.jablog.entity.Board;
 import com.example.jablog.entity.Posts;
 import com.example.jablog.entity.Threads;
 import jakarta.persistence.EntityManager;
@@ -72,19 +73,27 @@ public class CleanerRepository {
 
     public ArrayList<String> pics(){
 
-        ArrayList<String> pics = new ArrayList<>(1000);
+        List<String> pics = entityManager.createQuery("select t.picture from Threads t", String.class).getResultList();
+        pics.addAll(entityManager.createQuery("select p.picture from Posts p", String.class).getResultList());
 
-        List<Threads> threads = entityManager.createQuery("from Threads t", Threads.class).getResultList();
-        List<Posts> posts = entityManager.createQuery("from Posts p", Posts.class).getResultList();
+        return new ArrayList<String>(pics);
+    }
 
-        threads.forEach(thread ->
-                pics.add(thread.getPicture())
-                );
-        posts.forEach(post ->
-                pics.add(post.getPicture())
-        );
+    public ArrayList<Board> boards(long oldBoard){
 
-        return pics;
+        String selectJpql = "from Board b left join fetch b.users where not exists(select 1 from threads t where t.board = b) " +
+                "and b.createdAt < :oldBoard";
+        List<Board> boards = entityManager.createQuery(selectJpql, Board.class)
+                .setParameter("oldBoard", oldBoard)
+                .getResultList();
+
+        String deleteJpql = "delete from Board b where not exists(select 1 from threads t where t.board = b) " +
+                "and b.createdAt < :oldBoard";
+        entityManager.createQuery(deleteJpql, Board.class)
+                .setParameter("oldBoard", oldBoard)
+                .executeUpdate();
+
+        return new ArrayList<Board>(boards);
     }
 
 }

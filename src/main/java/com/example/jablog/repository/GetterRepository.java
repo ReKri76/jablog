@@ -1,7 +1,6 @@
 package com.example.jablog.repository;
 
 import com.example.jablog.entity.Board;
-import com.example.jablog.entity.Posts;
 import com.example.jablog.entity.Threads;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
