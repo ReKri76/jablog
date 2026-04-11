@@ -31,7 +31,7 @@ public class Board {
      * x - have access to threads;
      * no one can have access to threads and havent to read board or write boards
      * users with 'x' modificator also can delete threads if they have 'd' modificator;
-     * (owner), (group) , (other);
+     * (owner), (group), (other);
      * */
     @Column(name="rules", nullable = false,
             check = @CheckConstraint(constraint = "rules <@ ARRAY['r', 'w', 'd', 'x', '-']"))
@@ -55,5 +55,5 @@ public class Board {
     private Set<Threads> threads = new HashSet<Threads>();
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Set<Users> users = new HashSet<Users>(); //TODO: On cascade delete in db
+    private Set<Users> users = new HashSet<Users>();
 }

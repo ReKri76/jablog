@@ -15,7 +15,7 @@ public class Deleter {
 
     @DeleteMapping(value = "/post")
     public String post(){
-
+        return "error-page";
     }
 
 }

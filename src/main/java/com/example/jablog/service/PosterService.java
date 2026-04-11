@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
 import org.jspecify.annotations.NonNull;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.example.jablog.DTO.Post;
 
@@ -23,6 +24,7 @@ public class PosterService {
     private final PosterRepository posterRepository;
     private final EntityManager entityManager;
     private final MinioService minioService;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public long thread(@NonNull Post post, Picture file, String board){
@@ -98,10 +100,8 @@ public class PosterService {
         Users users = new Users();
         users.setBoard(board);
         users.setRole(true);
-        users.setPassword(password);
+        users.setPassword(passwordEncoder.encode(password));
         users.setNickname(nickname);
-
-        //TODO: добавить хеширование пароля через Spring Security
 
         posterRepository.board(board, users);
     }
@@ -115,10 +115,8 @@ public class PosterService {
         Users users = new Users();
         users.setBoard(boardRef);
         users.setRole(false);
-        users.setPassword(password);
+        users.setPassword(passwordEncoder.encode(password));
         users.setNickname(nickname);
-
-        //TODO: добавить хеширование пароля через Spring Security
 
         posterRepository.user(users);
     }
