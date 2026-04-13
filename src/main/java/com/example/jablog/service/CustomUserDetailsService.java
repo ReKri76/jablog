@@ -1,10 +1,10 @@
 package com.example.jablog.service;
 
+import com.example.jablog.config.CustomUserDetails;
 import com.example.jablog.entity.Users;
 import com.example.jablog.repository.UserDetailsRepository;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,10 +21,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         Users user = userDetailsRepository.user(username);
 
-        return User
-                .withUsername(user.getNickname())
-                .password(user.getPassword())
-                .authorities(user.isRole() ? "ROLE_ADMIN" : "ROLE_GROUP")
-                .build();
+        return CustomUserDetails.build(user);
     }
 }
