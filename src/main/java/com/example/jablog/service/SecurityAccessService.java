@@ -1,7 +1,6 @@
 package com.example.jablog.service;
 
 import com.example.jablog.config.security.CustomUserDetails;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
@@ -12,7 +11,6 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class SecurityAccessService {
 
-    @Transactional
     public boolean canAccess(String boardName, @NonNull CustomUserDetails user, String method, boolean isThread,
                              boolean isUser){
 
