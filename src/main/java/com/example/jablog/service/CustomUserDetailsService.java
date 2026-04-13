@@ -1,6 +1,6 @@
 package com.example.jablog.service;
 
-import com.example.jablog.config.CustomUserDetails;
+import com.example.jablog.config.security.CustomUserDetails;
 import com.example.jablog.entity.Users;
 import com.example.jablog.repository.UserDetailsRepository;
 import lombok.RequiredArgsConstructor;
