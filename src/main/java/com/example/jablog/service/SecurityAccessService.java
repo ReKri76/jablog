@@ -33,8 +33,8 @@ public class SecurityAccessService {
 
         int l = switch (user.getRole()) {
             case "ROLE_ADMIN" -> 0;
-            case "ROLE_GROUP" -> 1;
-            default -> 2;
+            case "ROLE_GROUP" -> 4;
+            default -> 8;
         };
 
         System.arraycopy(rules, l, currentRules, 0, currentRules.length);
