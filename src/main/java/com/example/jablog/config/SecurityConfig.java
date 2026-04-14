@@ -70,7 +70,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/deleter/{boardName}/{thread}/**").access(customAuthorizationManager)
 
                         .requestMatchers(HttpMethod.DELETE, "/users/{boardName}/**").access(customAuthorizationManager)
-                        .requestMatchers(HttpMethod.POST, "/users/{boardName}/**").access(customAuthorizationManager)
 
                         .requestMatchers(HttpMethod.GET,"/{boardName}/**").access(customAuthorizationManager)
                         .requestMatchers(HttpMethod.GET,"/{boardName}/{thread}/**").access(customAuthorizationManager)
