@@ -31,7 +31,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             user.setId(0);
             user.setRole(false);
             user.setNickname("ANON");
-            user.setPassword("EMPTY");
+            user.setPassword("{noop}");
 
             Board board = new Board();
             board.setName("ANON");
