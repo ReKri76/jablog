@@ -1,8 +1,10 @@
 package com.example.jablog.service;
 
 import com.example.jablog.config.security.CustomUserDetails;
+import com.example.jablog.entity.Board;
 import com.example.jablog.entity.Users;
 import com.example.jablog.repository.UserDetailsRepository;
+import jakarta.persistence.NoResultException;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,8 +21,28 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public @NonNull UserDetails loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
 
-        Users user = userDetailsRepository.user(username);
+        Users user = new Users();
+        CustomUserDetails customUserDetails;
 
-        return CustomUserDetails.build(user);
+        try {
+            user = userDetailsRepository.user(username);
+            customUserDetails = CustomUserDetails.build(user);
+        } catch (NoResultException e ){
+            user.setId(0);
+            user.setRole(false);
+            user.setNickname("ANON");
+            user.setPassword("EMPTY");
+
+            Board board = new Board();
+            board.setName("ANON");
+            board.setRules(new String[12]);
+
+            user.setBoard(board);
+
+            customUserDetails = CustomUserDetails.build(user);
+            customUserDetails.setRole("ROLE_ANON");
+        }
+
+        return customUserDetails;
     }
 }

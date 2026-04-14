@@ -1,6 +1,7 @@
 package com.example.jablog.service;
 
 import com.example.jablog.config.security.CustomUserDetails;
+import com.example.jablog.repository.SecurityRepository;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
@@ -11,8 +12,15 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class SecurityAccessService {
 
+    private final SecurityRepository securityRepository;
+
     public boolean canAccess(String boardName, @NonNull CustomUserDetails user, String method, boolean isThread,
                              boolean isUser){
+
+        if (user.getBoardName().equals("ANON")){
+            user.setBoardName(boardName);
+            user.setBoardRules(securityRepository.getRulesByBoardName(boardName));
+        }
 
         if (!Objects.equals(boardName, user.getBoardName()))
             return false;

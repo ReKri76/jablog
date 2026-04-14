@@ -1,6 +1,7 @@
 package com.example.jablog.config.security;
 
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -20,7 +21,7 @@ public class SecurityConfig {
     final private CustomAuthorizationManager customAuthorizationManager;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(@NonNull HttpSecurity http){
 
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -29,9 +30,14 @@ public class SecurityConfig {
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
+                .httpBasic(httpBasic -> httpBasic.authenticationEntryPoint(
+                        (req, res, ex) ->
+                                res.sendRedirect("/")
+                ))
+
                 .exceptionHandling(exception -> exception
-                        .accessDeniedHandler((request, response, accessDeniedException) ->
-                            response.sendRedirect("/")
+                        .accessDeniedHandler((req, res, accessDeniedException) ->
+                            res.sendRedirect("/")
                         )
                 )
                 
