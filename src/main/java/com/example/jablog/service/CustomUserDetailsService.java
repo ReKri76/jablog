@@ -45,4 +45,14 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         return customUserDetails;
     }
+
+    public @NonNull CustomUserDetails createDefault(){
+        return new CustomUserDetails(
+                "ANON",
+                new String[12],
+                "{noop}",
+                "ANON",
+                "ROLE_ANON"
+        );
+    }
 }

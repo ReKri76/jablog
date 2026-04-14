@@ -3,8 +3,7 @@ package com.example.jablog.config;
 import com.example.jablog.config.security.CustomAuthorizationManager;
 import com.example.jablog.config.security.CustomJwtFilter;
 import com.example.jablog.config.security.CustomUserDetails;
-import com.example.jablog.entity.Board;
-import com.example.jablog.entity.Users;
+import com.example.jablog.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +27,7 @@ public class SecurityConfig {
 
     final private CustomAuthorizationManager customAuthorizationManager;
     final private CustomJwtFilter customJwtFilter;
+    final private CustomUserDetailsService customUserDetailsService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(@NonNull HttpSecurity http){
@@ -52,7 +52,7 @@ public class SecurityConfig {
                 )
 
                 .anonymous(anonymous -> anonymous
-                        .principal(createDefaultUser())
+                        .principal(customUserDetailsService.createDefault())
                         .authorities("ROLE_ANON")
                 )
 
@@ -77,17 +77,6 @@ public class SecurityConfig {
                 );
 
         return http.build();
-    }
-
-    private CustomUserDetails createDefaultUser(){
-
-        return new CustomUserDetails(
-          "ANON",
-                new String[12],
-                "{noop}",
-                "ANON",
-                "ROLE_ANON"
-        );
     }
 
     @Bean
