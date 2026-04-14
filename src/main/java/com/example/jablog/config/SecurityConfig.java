@@ -1,5 +1,6 @@
-package com.example.jablog.config.security;
+package com.example.jablog.config;
 
+import com.example.jablog.config.security.CustomAuthorizationManager;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;
@@ -57,7 +58,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/users/{boardName}**").access(customAuthorizationManager)
 
                         .anyRequest().denyAll()
-                );
+                )
+
+                ;
 
         return http.build();
     }

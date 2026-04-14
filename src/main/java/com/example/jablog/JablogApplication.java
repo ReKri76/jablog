@@ -2,7 +2,7 @@ package com.example.jablog;
 
 import com.example.jablog.config.MinioConfig;
 import com.example.jablog.config.MvcConfig;
-import com.example.jablog.config.security.SecurityConfig;
+import com.example.jablog.config.SecurityConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.persistence.autoconfigure.EntityScan;
