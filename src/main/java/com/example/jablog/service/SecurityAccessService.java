@@ -23,7 +23,7 @@ public class SecurityAccessService {
         }
 
         if (!Objects.equals(boardName, user.getBoardName()))
-            return false;
+            user.setRole("ROLE_ANON");
 
         if (isUser)
             return user.getRole().equals("ROLE_ADMIN");
