@@ -18,7 +18,7 @@ public class SecurityAccessService {
             return false;
 
         if (isUser)
-            return user.getRole().equals("ROLE_ADMIN") && user.getBoardRules()[2].equals("d");
+            return user.getRole().equals("ROLE_ADMIN");
 
         String[] rules = user.getBoardRules();
         String[] currentRules = new String[4];
