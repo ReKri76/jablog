@@ -22,36 +22,22 @@ public class SecurityAccessService {
 
         String[] rules = user.getBoardRules();
         String[] currentRules = new String[4];
-        int l;
 
-        switch (user.getRole()) {
-            case "ROLE_ADMIN":
-                l = 0;
-                break;
-            case "ROLE_GROUP":
-                l=1;
-                break;
-            default:
-                l=2;
-                break;
-        }
+        int l = switch (user.getRole()) {
+            case "ROLE_ADMIN" -> 0;
+            case "ROLE_GROUP" -> 1;
+            default -> 2;
+        };
 
-        currentRules[0]=rules[0+l];
-        currentRules[1]=rules[1+l];
-        currentRules[2]=rules[2+l];
-        currentRules[3]=rules[3+l];
+        System.arraycopy(rules, l, currentRules, 0, currentRules.length);
 
         boolean hasAccess = isThread == currentRules[3].equals("x");
 
-        switch (method){
-            case"POST":
-                return currentRules[1].equals("w") && hasAccess;
-            case "DELETE":
-                return currentRules[2].equals("d") && hasAccess;
-            case "GET":
-                return currentRules[0].equals("r") && hasAccess;
-            default:
-                return false;
-        }
+        return switch (method) {
+            case "POST" -> currentRules[1].equals("w") && hasAccess;
+            case "DELETE" -> currentRules[2].equals("d") && hasAccess;
+            case "GET" -> currentRules[0].equals("r") && hasAccess;
+            default -> false;
+        };
     }
 }
