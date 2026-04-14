@@ -1,6 +1,9 @@
 package com.example.jablog.config;
 
 import com.example.jablog.config.security.CustomAuthorizationManager;
+import com.example.jablog.config.security.CustomUserDetails;
+import com.example.jablog.entity.Board;
+import com.example.jablog.entity.Users;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;
@@ -41,6 +44,11 @@ public class SecurityConfig {
                             res.sendRedirect("/")
                         )
                 )
+
+                .anonymous(anonymous -> anonymous
+                        .principal(createDefaultUser())
+                        .authorities("ROLE_ANON")
+                )
                 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET,  "/").permitAll()
@@ -58,11 +66,29 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/users/{boardName}**").access(customAuthorizationManager)
 
                         .anyRequest().denyAll()
-                )
-
-                ;
+                );
 
         return http.build();
+    }
+
+    private CustomUserDetails createDefaultUser(){
+
+        Users user = new Users();
+        user.setId(0);
+        user.setRole(false);
+        user.setNickname("ANON");
+        user.setPassword("{noop}");
+
+        Board board = new Board();
+        board.setName("ANON");
+        board.setRules(new String[12]);
+
+        user.setBoard(board);
+
+        CustomUserDetails customUserDetails = CustomUserDetails.build(user);
+        customUserDetails.setRole("ROLE_ANON");
+
+        return customUserDetails;
     }
 
     @Bean
