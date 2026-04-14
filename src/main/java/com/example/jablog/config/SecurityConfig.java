@@ -2,7 +2,6 @@ package com.example.jablog.config;
 
 import com.example.jablog.config.security.CustomAuthorizationManager;
 import com.example.jablog.config.security.CustomJwtFilter;
-import com.example.jablog.config.security.CustomUserDetails;
 import com.example.jablog.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
@@ -60,9 +59,9 @@ public class SecurityConfig {
                 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET,  "/").permitAll()
-
-                        .requestMatchers(HttpMethod.GET,"/{boardName}/**").access(customAuthorizationManager)
-                        .requestMatchers(HttpMethod.GET,"/{boardName}/{thread}/**").access(customAuthorizationManager)
+                        .requestMatchers(HttpMethod.POST, "/poster/board").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/refresh").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/login").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/poster/{boardName}/**").access(customAuthorizationManager)
                         .requestMatchers(HttpMethod.POST, "/poster/{boardName}/{thread}/**").access(customAuthorizationManager)
@@ -71,7 +70,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/deleter/{boardName}/{thread}/**").access(customAuthorizationManager)
 
                         .requestMatchers(HttpMethod.DELETE, "/users/{boardName}/**").access(customAuthorizationManager)
-                        .requestMatchers(HttpMethod.POST, "/users/{boardName}**").access(customAuthorizationManager)
+                        .requestMatchers(HttpMethod.POST, "/users/{boardName}/**").access(customAuthorizationManager)
+
+                        .requestMatchers(HttpMethod.GET,"/{boardName}/**").access(customAuthorizationManager)
+                        .requestMatchers(HttpMethod.GET,"/{boardName}/{thread}/**").access(customAuthorizationManager)
 
                         .anyRequest().denyAll()
                 );
@@ -91,7 +93,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config){
         return config.getAuthenticationManager();
     }
 }

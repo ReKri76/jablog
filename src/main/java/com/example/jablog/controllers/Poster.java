@@ -61,24 +61,8 @@ public class Poster {
 
         posterService.board(boardName, pass, rule, nickname, lifeCycleThreads, lifeCyclePosts);
 
-        //TODO: выдать сессию
-
         return "redirect:/"+boardName;
     }
-
-    @PostMapping(value = "/user")
-    public String users(@RequestParam("boardName") @NonNull String boardName,
-                        @RequestParam("pass") @NonNull String pass, @RequestParam("nickname") @NonNull String nickname){
-
-        posterService.user(boardName, nickname, pass);
-
-        //TODO: выдать сессию
-        //TODO: авторизация
-
-        return "redirect:/"+boardName;
-    }
-
-
 
     private void chekFile(@NonNull MultipartFile file){
         String fileType = file.getContentType();

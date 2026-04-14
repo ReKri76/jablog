@@ -106,18 +106,5 @@ public class PosterService {
         posterRepository.board(board, users);
     }
 
-    @Transactional
-    public void user(String boardName, String nickname, String password){
 
-        final Board boardRef = entityManager.unwrap(Session.class)
-                .bySimpleNaturalId(Board.class)
-                .getReference(boardName);
-        Users users = new Users();
-        users.setBoard(boardRef);
-        users.setRole(false);
-        users.setPassword(passwordEncoder.encode(password));
-        users.setNickname(nickname);
-
-        posterRepository.user(users);
-    }
 }
