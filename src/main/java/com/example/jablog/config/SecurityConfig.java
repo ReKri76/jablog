@@ -63,16 +63,21 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/refresh").permitAll()
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
 
-                        .requestMatchers(HttpMethod.POST, "/poster/{boardName}/**").access(customAuthorizationManager)
-                        .requestMatchers(HttpMethod.POST, "/poster/{boardName}/{thread}/**").access(customAuthorizationManager)
+                        .requestMatchers(HttpMethod.POST, "/poster/{boardName}/{thread}/")
+                            .access(customAuthorizationManager)
+                        .requestMatchers(HttpMethod.POST, "/poster/{boardName}/")
+                            .access(customAuthorizationManager)
 
-                        .requestMatchers(HttpMethod.DELETE, "/deleter/{boardName}/**").access(customAuthorizationManager)
-                        .requestMatchers(HttpMethod.DELETE, "/deleter/{boardName}/{thread}/**").access(customAuthorizationManager)
+                        .requestMatchers(HttpMethod.DELETE, "/deleter/{boardName}/{thread}/")
+                            .access(customAuthorizationManager)
+                        .requestMatchers(HttpMethod.DELETE, "/deleter/{boardName}/{thread}/{post}")
+                            .access(customAuthorizationManager)
 
                         .requestMatchers(HttpMethod.DELETE, "/users/{boardName}/**").access(customAuthorizationManager)
 
-                        .requestMatchers(HttpMethod.GET,"/{boardName}/**").access(customAuthorizationManager)
-                        .requestMatchers(HttpMethod.GET,"/{boardName}/{thread}/**").access(customAuthorizationManager)
+                        .requestMatchers(HttpMethod.GET,"/{boardName}/{thread}/").access(customAuthorizationManager)
+                        .requestMatchers(HttpMethod.GET,"/{boardName}/").access(customAuthorizationManager)
+
 
                         .anyRequest().denyAll()
                 );

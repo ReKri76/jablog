@@ -27,6 +27,7 @@ public class CustomAuthorizationManager implements AuthorizationManager<RequestA
 
         String boardName = context.getVariables().get("boardName");
         String thread = context.getVariables().get("thread");
+        String post = context.getVariables().get("post");
         HttpServletRequest req = context.getRequest();
         String user = req.getRequestURI().split("/")[0];
 
@@ -34,7 +35,7 @@ public class CustomAuthorizationManager implements AuthorizationManager<RequestA
                 boardName,
                 (CustomUserDetails) Objects.requireNonNull(Objects.requireNonNull(auth.get()).getPrincipal()),
                 req.getMethod(),
-                thread != null,
+                ((thread != null) != (post == null)),
                 user.equals("user")
                 );
 
