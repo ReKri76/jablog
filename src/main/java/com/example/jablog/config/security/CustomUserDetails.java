@@ -21,7 +21,6 @@ public class CustomUserDetails implements UserDetails {
     private String password;
     private String nickname;
     private String role;
-    private long id;
 
     public static CustomUserDetails build(Users users){
         Board board = users.getBoard();
@@ -31,8 +30,7 @@ public class CustomUserDetails implements UserDetails {
             board.getRules(),
             users.getPassword(),
             users.getNickname(),
-            users.isRole() ? "ROLE_ADMIN" : "ROLE_GROUP",
-            users.getId()
+            users.isRole() ? "ROLE_ADMIN" : "ROLE_GROUP"
         );
     }
 

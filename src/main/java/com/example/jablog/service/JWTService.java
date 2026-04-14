@@ -31,7 +31,6 @@ public class JWTService {
     public String generateAccess(CustomUserDetails user) {
         return Jwts.builder()
                 .subject(user.getUsername())
-                .claim("id", user.getId())
                 .claim("role", user.getRole())
                 .claim("boardName", user.getBoardName())
                 .claim("boardRules", List.of(user.getBoardRules()))
@@ -57,5 +56,4 @@ public class JWTService {
                 .parseSignedClaims(token)
                 .getPayload();
     }
-
 }

@@ -1,6 +1,7 @@
 package com.example.jablog.config;
 
 import com.example.jablog.config.security.CustomAuthorizationManager;
+import com.example.jablog.config.security.CustomJwtFilter;
 import com.example.jablog.config.security.CustomUserDetails;
 import com.example.jablog.entity.Board;
 import com.example.jablog.entity.Users;
@@ -9,6 +10,8 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -16,6 +19,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -23,6 +27,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     final private CustomAuthorizationManager customAuthorizationManager;
+    final private CustomJwtFilter customJwtFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(@NonNull HttpSecurity http){
@@ -37,7 +42,8 @@ public class SecurityConfig {
                 .httpBasic(httpBasic -> httpBasic.authenticationEntryPoint(
                         (req, res, ex) ->
                                 res.sendRedirect("/")
-                ))
+                        )
+                )
 
                 .exceptionHandling(exception -> exception
                         .accessDeniedHandler((req, res, accessDeniedException) ->
@@ -49,6 +55,8 @@ public class SecurityConfig {
                         .principal(createDefaultUser())
                         .authorities("ROLE_ANON")
                 )
+
+                .addFilterBefore(customJwtFilter, UsernamePasswordAuthenticationFilter.class)
                 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET,  "/").permitAll()
@@ -73,22 +81,13 @@ public class SecurityConfig {
 
     private CustomUserDetails createDefaultUser(){
 
-        Users user = new Users();
-        user.setId(0);
-        user.setRole(false);
-        user.setNickname("ANON");
-        user.setPassword("{noop}");
-
-        Board board = new Board();
-        board.setName("ANON");
-        board.setRules(new String[12]);
-
-        user.setBoard(board);
-
-        CustomUserDetails customUserDetails = CustomUserDetails.build(user);
-        customUserDetails.setRole("ROLE_ANON");
-
-        return customUserDetails;
+        return new CustomUserDetails(
+          "ANON",
+                new String[12],
+                "{noop}",
+                "ANON",
+                "ROLE_ANON"
+        );
     }
 
     @Bean
@@ -100,5 +99,10 @@ public class SecurityConfig {
                 1 << 16,
                 3
         );
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 }
