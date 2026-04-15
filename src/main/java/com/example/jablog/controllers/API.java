@@ -1,32 +1,37 @@
-package com.example.jablog.config.security;
+package com.example.jablog.controllers;
 
 import com.example.jablog.service.JWTService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.util.WebUtils;
 
-import java.io.IOException;
 import java.time.Duration;
-import java.util.Objects;
 
-@Component
+@Controller
+@RequestMapping("/api")
 @RequiredArgsConstructor
-public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+public class API {
 
-    final private JWTService jwtService;
+    private final JWTService jwtService;
 
-    @Override
-    public void onAuthenticationSuccess(HttpServletRequest req, HttpServletResponse res, Authentication auth) throws IOException {
+    @PostMapping(value="/refresh/{boardName}")
+    public String refresh(@PathVariable("boardName") String boardName, HttpServletRequest req, HttpServletResponse res){
 
-        CustomUserDetails customUserDetails = (CustomUserDetails) Objects.requireNonNull(auth.getPrincipal());
-        String boardName = customUserDetails.getBoardName();
+        Cookie cookie = WebUtils.getCookie(req, "REFRESH-"+ boardName);
 
-        String access = jwtService.generateAccess(customUserDetails);
-        String refresh = jwtService.generateRefresh(customUserDetails);
+        if (cookie == null)
+            return "redirect:/"+boardName;
+
+        String refresh = cookie.getValue();
+
+        String access = jwtService.getAccessByRefresh(refresh);
 
         ResponseCookie accessCookie = ResponseCookie.from("ACCESS-"+boardName, access)
                 .httpOnly(true)
@@ -48,6 +53,8 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
         res.addHeader("Set-Cookie", accessCookie.toString());
         res.addHeader("Set-Cookie", refreshCookie.toString());
-        res.sendRedirect("/"+boardName);
+
+        return "redirect:/"+boardName;
     }
+
 }

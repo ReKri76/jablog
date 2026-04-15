@@ -16,5 +16,20 @@
                 </span>
             </span>
         </div>
+
+        <form method="post"
+              th:action="@{/poster/board"
+              th:object="${post}">
+
+            <label for="head">head:</label>
+            <input type="text" th:field="*{head}" id="head">
+
+            <label for="body">body</label>
+            <textarea th:field="*{body}" id="body" rows="6"></textarea>
+
+            <input type="file" name="image" accept="image/*"/>
+
+            <button type="submit">create</button>
+        </form>
     </body>
 </html>

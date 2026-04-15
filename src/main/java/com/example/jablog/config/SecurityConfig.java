@@ -1,5 +1,6 @@
 package com.example.jablog.config;
 
+import com.example.jablog.config.security.CustomAuthenticationSuccessHandler;
 import com.example.jablog.config.security.CustomAuthorizationManager;
 import com.example.jablog.config.security.CustomJwtFilter;
 import com.example.jablog.service.CustomUserDetailsService;
@@ -27,6 +28,7 @@ public class SecurityConfig {
     final private CustomAuthorizationManager customAuthorizationManager;
     final private CustomJwtFilter customJwtFilter;
     final private CustomUserDetailsService customUserDetailsService;
+    private final CustomAuthenticationSuccessHandler successHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(@NonNull HttpSecurity http){
@@ -83,11 +85,15 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/deleter/{boardName}/{thread}/{post}")
                             .access(customAuthorizationManager)
 
-                        .requestMatchers(HttpMethod.DELETE, "/users/{boardName}/**").access(customAuthorizationManager)
+                        .requestMatchers(HttpMethod.DELETE, "/users/{boardName}/**")
+                            .access(customAuthorizationManager)
+                        .requestMatchers(HttpMethod.POST, "/users/{boardName}/**")
+                            .access(customAuthorizationManager)
 
-                        .requestMatchers(HttpMethod.GET,"/{boardName}/{thread}/").access(customAuthorizationManager)
-                        .requestMatchers(HttpMethod.GET,"/{boardName}/").access(customAuthorizationManager)
-
+                        .requestMatchers(HttpMethod.GET,"/{boardName}/{thread}/")
+                            .access(customAuthorizationManager)
+                        .requestMatchers(HttpMethod.GET,"/{boardName}/")
+                            .access(customAuthorizationManager)
 
                         .anyRequest().denyAll()
                 );

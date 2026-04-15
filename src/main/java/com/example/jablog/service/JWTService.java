@@ -22,7 +22,7 @@ public class JWTService {
     private String secret;
 
     private final long accessTime = Duration.ofDays(1).toMillis();
-    private final long  refreshTime = Duration.ofDays(36).toMillis() + Duration.ofHours(12).toMillis();
+    private final long refreshTime = Duration.ofDays(36).toMillis() + Duration.ofHours(12).toMillis();
 
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
@@ -45,7 +45,7 @@ public class JWTService {
                 .subject(user.getUsername())
                 .claim("role", user.getRole())
                 .claim("boardName", user.getBoardName())
-                .claim("boardRules",user.getBoardRules())
+                .claim("boardRules", user.getBoardRules())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + refreshTime))
                 .signWith(getSigningKey())
@@ -60,7 +60,7 @@ public class JWTService {
                 .getPayload();
     }
 
-    public String getAccessByRefresh(String refresh){
+    public String getAccessByRefresh(String refresh) {
         Claims claims = this.getClaims(refresh);
 
         return Jwts.builder()
