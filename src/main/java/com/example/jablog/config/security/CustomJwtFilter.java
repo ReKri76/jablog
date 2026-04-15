@@ -32,24 +32,24 @@ public class CustomJwtFilter extends OncePerRequestFilter {
             return;
         }
 
-            String jwt = authHeader.substring(7);
-            Claims claims = jwtService.getClaims(jwt);
+        String jwt = authHeader.substring(7);
+        Claims claims = jwtService.getClaims(jwt);
 
-            String[] rules = claims.get("boardRules", String[].class);
+        String[] rules = claims.get("boardRules", String[].class);
 
-            CustomUserDetails userDetails = new CustomUserDetails(
-                    claims.get("boardName", String.class),
-                    rules,
-                    "",
-                    claims.getSubject(),
-                    claims.get("role", String.class)
-            );
+        CustomUserDetails userDetails = new CustomUserDetails(
+                claims.get("boardName", String.class),
+                rules,
+                "",
+                claims.getSubject(),
+                claims.get("role", String.class)
+        );
 
-            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities()
-            );
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities()
+        );
 
-            SecurityContextHolder.getContext().setAuthentication(authToken);
+        SecurityContextHolder.getContext().setAuthentication(authToken);
 
         filterChain.doFilter(request, response);
 

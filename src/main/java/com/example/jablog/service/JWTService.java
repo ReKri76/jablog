@@ -33,16 +33,19 @@ public class JWTService {
                 .subject(user.getUsername())
                 .claim("role", user.getRole())
                 .claim("boardName", user.getBoardName())
-                .claim("boardRules", List.of(user.getBoardRules()))
+                .claim("boardRules", user.getBoardRules())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + accessTime))
                 .signWith(getSigningKey())
                 .compact();
     }
 
-    public String generateRefresh(String username) {
+    public String generateRefresh(CustomUserDetails user) {
         return Jwts.builder()
-                .subject(username)
+                .subject(user.getUsername())
+                .claim("role", user.getRole())
+                .claim("boardName", user.getBoardName())
+                .claim("boardRules",user.getBoardRules())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + refreshTime))
                 .signWith(getSigningKey())
@@ -55,5 +58,19 @@ public class JWTService {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    public String getAccessByRefresh(String refresh){
+        Claims claims = this.getClaims(refresh);
+
+        return Jwts.builder()
+                .subject(claims.getSubject())
+                .claim("role", claims.get("role"))
+                .claim("boardName", claims.get("boardName"))
+                .claim("boardRules", claims.get("boardRules"))
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + accessTime))
+                .signWith(getSigningKey())
+                .compact();
     }
 }

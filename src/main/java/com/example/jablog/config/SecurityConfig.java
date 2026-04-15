@@ -55,6 +55,16 @@ public class SecurityConfig {
                         .authorities("ROLE_ANON")
                 )
 
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login/verify")
+                        .usernameParameter("nickname")
+                        .passwordParameter("password")
+                        .successHandler(successHandler)
+                        .failureUrl("/login")
+                        .permitAll()
+                )
+
                 .addFilterBefore(customJwtFilter, UsernamePasswordAuthenticationFilter.class)
                 
                 .authorizeHttpRequests(auth -> auth
