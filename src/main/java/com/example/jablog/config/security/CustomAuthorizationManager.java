@@ -29,7 +29,7 @@ public class CustomAuthorizationManager implements AuthorizationManager<RequestA
         String thread = context.getVariables().get("thread");
         String post = context.getVariables().get("post");
         HttpServletRequest req = context.getRequest();
-        String user = req.getRequestURI().split("/")[0];
+        String user = req.getRequestURI().split("/")[1];
 
         boolean canAccess = securityAccessService.canAccess(
                 boardName,

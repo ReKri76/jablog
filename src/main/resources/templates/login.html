@@ -1,10 +1,18 @@
 <!DOCTYPE html>
-<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
+    <title>Title</title>
 </head>
     <body>
+        <form method="post" th:action="@{/api/login/verify}" th:object="${login}">
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" required>
 
+            <label for="nickname">Nickname:</label>
+            <input type="text" name="nickname" id="nickname" required>
+
+            <button type="submit">Login</button>
+        </form>
     </body>
 </html>

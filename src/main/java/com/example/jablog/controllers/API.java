@@ -1,60 +1,43 @@
 package com.example.jablog.controllers;
 
-import com.example.jablog.service.JWTService;
-import jakarta.servlet.http.Cookie;
+import com.example.jablog.DTO.Login;
+import com.example.jablog.config.security.CustomUserDetails;
+import com.example.jablog.service.APIService;
+import jakarta.persistence.NoResultException;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.util.WebUtils;
-
-import java.time.Duration;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class API {
 
-    private final JWTService jwtService;
+    private final APIService apiService;
 
-    @PostMapping(value="/refresh/{boardName}")
-    public String refresh(@PathVariable("boardName") String boardName, HttpServletRequest req, HttpServletResponse res){
-
-        Cookie cookie = WebUtils.getCookie(req, "REFRESH-"+ boardName);
-
-        if (cookie == null)
-            return "redirect:/"+boardName;
-
-        String refresh = cookie.getValue();
-
-        String access = jwtService.getAccessByRefresh(refresh);
-
-        ResponseCookie accessCookie = ResponseCookie.from("ACCESS-"+boardName, access)
-                .httpOnly(true)
-                .secure(false)
-                .path("/"+boardName)
-                .sameSite("Lax")
-                .maxAge(Duration.ofDays(1).getSeconds())
-                .build();
-
-        ResponseCookie refreshCookie = ResponseCookie.from("REFRESH-"+boardName, refresh)
-                .httpOnly(true)
-                .secure(false)
-                .path("/api/refresh"+boardName)
-                .sameSite("Lax")
-                .maxAge(Duration.ofDays(36).getSeconds() + Duration.ofHours(12).getSeconds())
-                .build();
-
-        //TODO: при деплое поменять на отправку по https
-
-        res.addHeader("Set-Cookie", accessCookie.toString());
-        res.addHeader("Set-Cookie", refreshCookie.toString());
-
-        return "redirect:/"+boardName;
+    @GetMapping("/login")
+    public String loginPage() {
+        return "login";
     }
 
+    @PostMapping("/login/verify")
+    public String login(HttpServletRequest req,
+                        @Valid @ModelAttribute("login") Login login) {
+
+        CustomUserDetails customUserDetails;
+        try {
+            customUserDetails = apiService.login(login);
+        } catch (NoResultException e) {
+            return "redirect:/api/login?error=true";
+        }
+
+        String boardName = customUserDetails.getBoardName();
+
+        // ← САМОЕ ГЛАВНОЕ: сохраняем в сессию
+        req.getSession(true).setAttribute("boardAuth." + boardName, customUserDetails);
+
+        return "redirect:/" + boardName;
+    }
 }

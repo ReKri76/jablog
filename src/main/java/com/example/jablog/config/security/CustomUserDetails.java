@@ -1,5 +1,6 @@
 package com.example.jablog.config.security;
 
+import com.example.jablog.DTO.Login;
 import com.example.jablog.entity.Board;
 import com.example.jablog.entity.Users;
 import lombok.AllArgsConstructor;

@@ -18,18 +18,29 @@
         </div>
 
         <form method="post"
-              th:action="@{/poster/board"
-              th:object="${post}">
+              th:action="@{/poster/board}">
 
-            <label for="head">head:</label>
-            <input type="text" th:field="*{head}" id="head">
+            <label for="boardName">boardName:</label>
+            <input type="text" name="boardName" id="boardName" required>
 
-            <label for="body">body</label>
-            <textarea th:field="*{body}" id="body" rows="6"></textarea>
+            <label for="rule">rule:</label>
+            <input type="text" name="rule" id="rule" required>
 
-            <input type="file" name="image" accept="image/*"/>
+            <label for="pass">pass:</label>
+            <input type="text" name="pass" id="pass" required>
+
+            <label for="nickname">nickname:</label>
+            <input type="text" name="nickname" id="nickname" required>
+
+            <label for="lifeCycleThreads">lifeCycleThreads:</label>
+            <input type="text" name="lifeCycleThreads" id="lifeCycleThreads" required>
+
+            <label for="lifeCyclePosts">lifeCyclePosts:</label>
+            <input type="text" name="lifeCyclePosts" id="lifeCyclePosts" required>
 
             <button type="submit">create</button>
         </form>
+
+        <a href ="/api/login">login</a>
     </body>
 </html>
