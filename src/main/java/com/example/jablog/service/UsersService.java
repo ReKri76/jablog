@@ -10,6 +10,8 @@ import org.hibernate.Session;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+
 @Service
 @RequiredArgsConstructor
 public class UsersService {
@@ -36,5 +38,10 @@ public class UsersService {
     @Transactional
     public void deleteUser(String nickname){
         usersRepository.deleteUser(nickname);
+    }
+
+    @Transactional
+    public ArrayList<String> viewUsers(String boardName){
+        return usersRepository.viewUsers(boardName);
     }
 }

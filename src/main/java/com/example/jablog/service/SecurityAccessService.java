@@ -39,7 +39,7 @@ public class SecurityAccessService {
 
         System.arraycopy(rules, shift, currentRules, 0, currentRules.length);
 
-        boolean hasAccess = isThread == currentRules[3].equals("x");
+        boolean hasAccess = !isThread || currentRules[3].equals("x");
 
         return switch (method) {
             case "POST" -> currentRules[1].equals("w") && hasAccess;

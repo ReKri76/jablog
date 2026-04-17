@@ -40,12 +40,17 @@ public class CustomAuthorizationManager implements AuthorizationManager<RequestA
         if (customUserDetails == null)
             customUserDetails = customUserDetailsService.createDefault();
 
+        boolean isUser = user.equals("user");
+        String method = req.getMethod();
+
+        boolean isThread = !isUser && (method.equals("DELETE") && post != null || thread != null);
+
         boolean canAccess = securityAccessService.canAccess(
                 boardName,
                 customUserDetails,
-                req.getMethod(),
-                ((thread != null) != (post == null)),
-                user.equals("user")
+                method,
+                isThread,
+                isUser
                 );
 
         return new AuthorizationDecision(canAccess);

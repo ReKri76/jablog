@@ -30,13 +30,12 @@ public class API {
         try {
             customUserDetails = apiService.login(login);
         } catch (NoResultException e) {
-            return "redirect:/api/login?error=true";
+            return "redirect:/api/login";
         }
 
         String boardName = customUserDetails.getBoardName();
 
-        // ← САМОЕ ГЛАВНОЕ: сохраняем в сессию
-        req.getSession(true).setAttribute("boardAuth." + boardName, customUserDetails);
+        req.getSession(false).setAttribute(boardName, customUserDetails);
 
         return "redirect:/" + boardName;
     }

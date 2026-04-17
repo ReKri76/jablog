@@ -38,7 +38,7 @@ public class SecurityConfig {
                                         "script-src 'none'; " +
                                         "object-src 'none'; " +
                                         "style-src 'self'; " +
-                                        "img-src 'self'; " +
+                                        "img-src http://localhost:9000 'self'; " +
                                         "connect-src 'none'; " +
                                         "font-src 'self'; " +
                                         "frame-ancestors 'none'; " +
@@ -75,7 +75,8 @@ public class SecurityConfig {
                 .anonymous(AbstractHttpConfigurer::disable)
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/login/verify").permitAll()
                         .requestMatchers(HttpMethod.GET,  "/").permitAll()
                         .requestMatchers(HttpMethod.POST, "/poster/board").permitAll()
 
@@ -89,9 +90,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/deleter/{boardName}/{thread}/{post}")
                             .access(customAuthorizationManager)
 
-                        .requestMatchers(HttpMethod.DELETE, "/users/{boardName}/**")
+                        .requestMatchers(HttpMethod.DELETE, "/users/{boardName}/")
                             .access(customAuthorizationManager)
-                        .requestMatchers(HttpMethod.POST, "/users/{boardName}**")
+                        .requestMatchers(HttpMethod.POST, "/users/{boardName}")
+                            .access(customAuthorizationManager)
+                        .requestMatchers(HttpMethod.GET, "/users/{boardName}")
                             .access(customAuthorizationManager)
 
                         .requestMatchers(HttpMethod.GET, "/{boardName}/{thread}")

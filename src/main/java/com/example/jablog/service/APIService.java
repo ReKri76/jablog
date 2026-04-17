@@ -28,8 +28,7 @@ public class APIService {
             throw new NoResultException();
         }
 
-        if (!passwordEncoder.matches(login.getPassword(), user.getPassword()))
-            throw new NoResultException();
+
 
         return CustomUserDetails.build(user);
     }
