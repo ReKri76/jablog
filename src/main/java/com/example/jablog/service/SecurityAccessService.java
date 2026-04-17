@@ -31,13 +31,13 @@ public class SecurityAccessService {
         String[] rules = user.getBoardRules();
         String[] currentRules = new String[4];
 
-        int l = switch (user.getRole()) {
+        int shift = switch (user.getRole()) {
             case "ROLE_ADMIN" -> 0;
             case "ROLE_GROUP" -> 4;
             default -> 8;
         };
 
-        System.arraycopy(rules, l, currentRules, 0, currentRules.length);
+        System.arraycopy(rules, shift, currentRules, 0, currentRules.length);
 
         boolean hasAccess = isThread == currentRules[3].equals("x");
 

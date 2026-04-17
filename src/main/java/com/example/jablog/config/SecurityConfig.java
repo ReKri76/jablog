@@ -1,7 +1,6 @@
 package com.example.jablog.config;
 
 import com.example.jablog.config.security.CustomAuthorizationManager;
-import com.example.jablog.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;
@@ -11,12 +10,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 @Configuration
@@ -25,19 +25,41 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
 public class SecurityConfig {
 
     private final CustomAuthorizationManager customAuthorizationManager;
-    private final CustomUserDetailsService customUserDetailsService;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(@NonNull HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(@NonNull HttpSecurity http) {
 
         http
+                .headers(headers -> headers
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
+
+                        .contentSecurityPolicy(csp -> csp
+                                .policyDirectives("default-src 'none'; " +
+                                        "script-src 'none'; " +
+                                        "object-src 'none'; " +
+                                        "style-src 'self'; " +
+                                        "img-src 'self'; " +
+                                        "connect-src 'none'; " +
+                                        "font-src 'self'; " +
+                                        "frame-ancestors 'none'; " +
+                                        "base-uri 'self'; " +
+                                        "form-action 'self'; " +
+                                        "upgrade-insecure-requests")
+                        )
+
+                        .httpStrictTransportSecurity(hsts -> hsts
+                                .includeSubDomains(true)
+                                .maxAgeInSeconds(31536000)
+                        )
+                )
+
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/**")
+                        .ignoringRequestMatchers("/api/**", "/", "/poster/board")
                 )
 
                 .sessionManagement(session ->
 
-                        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
 
                         .sessionConcurrency(concurrency -> concurrency
                                 .maximumSessions(1)
@@ -46,10 +68,11 @@ public class SecurityConfig {
                         .sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::changeSessionId)
                 )
 
-                .anonymous(anonymous -> anonymous
-                        .principal(customUserDetailsService.createDefault())
-                        .authorities("ROLE_ANON")
-                )
+                .formLogin(AbstractHttpConfigurer::disable)
+
+                .httpBasic(AbstractHttpConfigurer::disable)
+
+                .anonymous(AbstractHttpConfigurer::disable)
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/**").permitAll()
@@ -78,9 +101,6 @@ public class SecurityConfig {
 
                         .anyRequest().denyAll()
                 );
-
-        http.addFilterAfter(boardContextPreparationFilter(), AnonymousAuthenticationFilter.class);
-
 
         return http.build();
     }
