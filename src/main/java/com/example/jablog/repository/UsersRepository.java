@@ -30,10 +30,10 @@ public class UsersRepository {
     @Transactional
     public ArrayList<String> viewUsers(String boardName){
 
-        String jpql = "select u.nickname from Users u where u.board.name = :board";
+        String jpql = "select u.nickname from Users u where u.board.name = :boardName";
 
         List<String> res = entityManager.createQuery(jpql, String.class)
-                .setParameter("board", boardName)
+                .setParameter("boardName", boardName)
                 .getResultList();
 
         return new ArrayList<String>(res);

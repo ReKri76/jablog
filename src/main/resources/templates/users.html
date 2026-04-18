@@ -1,10 +1,32 @@
 <!DOCTYPE html>
-<html lang="ru" xmlns:th="http://www.thymeleaf.org"
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <script src="../static/js/htmx.min.js"></script>
 </head>
     <body>
+        <div>
+            <span th:each="user : ${users}">
+                <span th:text="${user}" id="username">user</span>
+                <button
+                th:hx-delete="@{/users/boardName(boardName=${boardName})}"
+                th:hx-include="#username">
+                    delete user
+                </button>
+            </span>
+        </div>
+        <form method="post"
+              th:action="@{/users/boardName(boardName=${boardName})}"
+              th:object="${login}">
 
+            <label for="password">password:</label>
+            <input type="text" th:field="*{password}" id="password">
+
+            <label for="nickname">nickname:</label>
+            <input type="text" th:field="*{nickname}" id="nickname">
+
+            <button type="submit">create user</button>
+        </form>
     </body>
 </html>

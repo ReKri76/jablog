@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+    <body>
+        <span th:each="boardName : ${boardName}">
+            <a th:href="@{/users/boardName(boardName=${boardName})}"
+               th:text="${boardName}">
+                board
+            </a>
+        </span>
+    </body>
+</html>

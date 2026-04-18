@@ -1,5 +1,6 @@
 package com.example.jablog.service;
 
+import com.example.jablog.DTO.Login;
 import com.example.jablog.entity.Board;
 import com.example.jablog.entity.Users;
 import com.example.jablog.repository.UsersRepository;
@@ -21,7 +22,10 @@ public class UsersService {
     private final UsersRepository usersRepository;
 
     @Transactional
-    public void addUser(String boardName, String nickname, String password){
+    public void addUser(String boardName, Login login){
+
+        String password = login.getPassword();
+        String nickname = login.getNickname();
 
         final Board boardRef = entityManager.unwrap(Session.class)
                 .bySimpleNaturalId(Board.class)

@@ -2,13 +2,14 @@ package com.example.jablog.controllers;
 
 import com.example.jablog.DTO.Post;
 import com.example.jablog.DTO.PostWithPicture;
+import com.example.jablog.config.security.CustomUserDetails;
 import com.example.jablog.service.GetterService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
@@ -20,25 +21,31 @@ public class Getter {
     private final GetterService getterService;
 
     @GetMapping("/{boardName}/{threadId}")
-    public String thread(@PathVariable long threadId, @PathVariable String boardName, Model model){
+    public String thread(@PathVariable long threadId, @PathVariable String boardName, Model model, HttpSession session){
 
         ArrayList<PostWithPicture> posts = getterService.thread(threadId, boardName);
+        CustomUserDetails customUserDetails = (CustomUserDetails) session.getAttribute(boardName);
 
         model.addAttribute("thread", posts.getFirst());
         posts.removeFirst();
         model.addAttribute("posts", posts);
         model.addAttribute("boardName", boardName);
         model.addAttribute("post", new Post());
+        model.addAttribute("canDelete", getterService.canDelete(boardName, customUserDetails, false));
         return "thread";
     }
 
     @GetMapping("/{boardName}")
-    public String board(@PathVariable String boardName, @RequestParam(defaultValue = "0") int page, Model model){
+    public String board(@PathVariable String boardName, @RequestParam(defaultValue = "0") int page, Model model,
+                        HttpSession session){
 
         ArrayList<PostWithPicture> threads = getterService.board(boardName, page);
+        CustomUserDetails customUserDetails = (CustomUserDetails) session.getAttribute(boardName);
+
         model.addAttribute("threads", threads);
         model.addAttribute("boardName", boardName);
         model.addAttribute("post", new Post());
+        model.addAttribute("canDelete", getterService.canDelete(boardName, customUserDetails, false));
         return "board";
     }
 
@@ -50,3 +57,4 @@ public class Getter {
         return "index";
     }
 }
+//TODO: Getter отдает, может ли юзер на этой доске удалять, и если может, то котлин добавит кнопку для удаления

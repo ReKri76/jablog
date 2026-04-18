@@ -51,4 +51,11 @@ public class GetterRepository {
 
         return posts;
     }
+
+   @Transactional
+   public String[] canDelete(String boardName){
+       return entityManager.createQuery("select b.rules from b where b.name = :boardName", String[].class)
+               .setParameter("boardName", boardName)
+               .getSingleResult();
+   }
 }

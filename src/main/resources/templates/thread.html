@@ -12,12 +12,12 @@
             <br>
         </div>
 
-        <div>
-            <span th:each="post :${posts}" id="${post.id}">
-                <span th:text="${post.id}">id</span>
-                <span th:text="${post.head}">head</span>
-                <span th:text="${post.body}">body</span>
-                <img th:src="${post.url}"/>
+        <div th:each="currentPost :${posts}">
+            <span id="${currentPost.id}">
+                <span th:text="${currentPost.id}">id</span>
+                <span th:text="${currentPost.head}">head</span>
+                <span th:text="${currentPost.body}">body</span>
+                <img th:src="${currentPost.url}" alt="${currentPost.url}"/>
                 <br>
             </span>
         </div>

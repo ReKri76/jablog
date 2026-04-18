@@ -79,6 +79,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/login/verify").permitAll()
                         .requestMatchers(HttpMethod.GET,  "/").permitAll()
                         .requestMatchers(HttpMethod.POST, "/poster/board").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/users/panel").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/poster/{boardName}/{thread}")
                             .access(customAuthorizationManager)
@@ -90,7 +91,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/deleter/{boardName}/{thread}/{post}")
                             .access(customAuthorizationManager)
 
-                        .requestMatchers(HttpMethod.DELETE, "/users/{boardName}/")
+                        .requestMatchers(HttpMethod.DELETE, "/users/{boardName}")
                             .access(customAuthorizationManager)
                         .requestMatchers(HttpMethod.POST, "/users/{boardName}")
                             .access(customAuthorizationManager)

@@ -1,6 +1,7 @@
 package com.example.jablog.service;
 
 import com.example.jablog.DTO.PostWithPicture;
+import com.example.jablog.config.security.CustomUserDetails;
 import com.example.jablog.entity.Board;
 import com.example.jablog.entity.Posts;
 import com.example.jablog.entity.Threads;
@@ -17,6 +18,7 @@ import java.util.HashSet;
 public class GetterService {
 
     private final GetterRepository getterRepository;
+    private final SecurityAccessService securityAccessService;
 
     @Transactional
     public ArrayList<String> start(){
@@ -76,5 +78,10 @@ public class GetterService {
         });
 
         return posts;
+    }
+
+    @Transactional
+    public boolean canDelete(String boardName, CustomUserDetails customUserDetails, boolean isThread){
+        return securityAccessService.canAccess(boardName, customUserDetails, "DELETE", isThread, false);
     }
 }
