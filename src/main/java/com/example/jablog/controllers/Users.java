@@ -2,6 +2,7 @@ package com.example.jablog.controllers;
 
 import com.example.jablog.DTO.Login;
 import com.example.jablog.config.security.CustomUserDetails;
+import com.example.jablog.service.CustomUserDetailsService;
 import com.example.jablog.service.UsersService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -21,34 +22,36 @@ import java.util.Enumeration;
 public class Users {
 
     private final UsersService usersService;
+    private final CustomUserDetailsService customUserDetailsService;
 
-    @PostMapping(value = "/{boardName}")
+    @PostMapping(value = "/panel/{boardName}")
     public String addUser(@PathVariable("boardName") @NonNull String boardName,
                           @Valid @ModelAttribute("login") Login login) {
 
         usersService.addUser(boardName, login);
 
-        return "redirect:/users/"+boardName;
+        return "redirect:/users/panel/"+boardName;
     }
 
-    @DeleteMapping(value = "/{boardName}")
+    @DeleteMapping(value = "/panel/{boardName}/{nickname}")
     public ResponseEntity<Void> deleteUser(@PathVariable("boardName") String boardName, @PathVariable("nickname") String nickname) {
 
         usersService.deleteUser(nickname);
 
         return ResponseEntity
                 .ok()
-                .header("HX-Redirect", "/users/"+boardName)
+                .header("HX-Redirect", "/users/panel/"+boardName)
                 .build();
     }
 
-    @GetMapping(value = "/{boardName}")
+    @GetMapping(value = "/panel/{boardName}")
     public String viewUsers(@PathVariable("boardName") String boardName, Model model) {
 
         ArrayList<String> usersName = usersService.viewUsers(boardName);
 
         model.addAttribute("users", usersName);
         model.addAttribute("boardName", boardName);
+        model.addAttribute("login", new Login());
 
         return "users";
     }
@@ -61,7 +64,13 @@ public class Users {
 
         while (boards.hasMoreElements()){
             String boardName = boards.nextElement();
+            if(boardName.length()>3)
+                continue;
+
             CustomUserDetails user = (CustomUserDetails) session.getAttribute(boardName);
+            if (user == null)
+                continue;
+
             if (user.getRole().equals("ROLE_ADMIN"))
                 boardNames.add(boardName);
         }

@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="../static/js/htmx.min.js"></script>
+    <script th:src="@{/js/htmx.min.js}" nonce="htmx"></script>
 </head>
     <body>
         <div>
             <span th:each="user : ${users}">
-                <span th:text="${user}" id="username">user</span>
+                <span th:text="${user}" th:id="'username_' + ${user}">user</span>
                 <button
-                th:hx-delete="@{/users/boardName(boardName=${boardName})}"
-                th:hx-include="#username">
+                th:hx-delete="@{/users/panel/{boardName}/{nickname}
+                (boardName=${boardName}, nickname=${user})}">
                     delete user
                 </button>
             </span>
         </div>
         <form method="post"
-              th:action="@{/users/boardName(boardName=${boardName})}"
+              th:action="@{/users/panel/{boardName}(boardName=${boardName})}"
               th:object="${login}">
 
             <label for="password">password:</label>
@@ -28,5 +28,6 @@
 
             <button type="submit">create user</button>
         </form>
+        <a href="/">home</a>
     </body>
 </html>

@@ -19,6 +19,7 @@ public class GetterService {
 
     private final GetterRepository getterRepository;
     private final SecurityAccessService securityAccessService;
+    private final CustomUserDetailsService customUserDetailsService;
 
     @Transactional
     public ArrayList<String> start(){
@@ -82,6 +83,10 @@ public class GetterService {
 
     @Transactional
     public boolean canDelete(String boardName, CustomUserDetails customUserDetails, boolean isThread){
+
+        if (customUserDetails == null)
+            customUserDetails = customUserDetailsService.createDefault();
+
         return securityAccessService.canAccess(boardName, customUserDetails, "DELETE", isThread, false);
     }
 }

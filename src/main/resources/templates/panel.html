@@ -5,11 +5,12 @@
     <title>Title</title>
 </head>
     <body>
-        <span th:each="boardName : ${boardName}">
-            <a th:href="@{/users/boardName(boardName=${boardName})}"
+        <span th:each="boardName : ${boardNames}">
+            <a th:href="@{/users/panel/{boardName}(boardName=${boardName})}"
                th:text="${boardName}">
                 board
             </a>
         </span>
+        <a href="/">home</a>
     </body>
 </html>

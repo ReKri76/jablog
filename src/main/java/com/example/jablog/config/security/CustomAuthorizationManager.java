@@ -40,7 +40,7 @@ public class CustomAuthorizationManager implements AuthorizationManager<RequestA
         if (customUserDetails == null)
             customUserDetails = customUserDetailsService.createDefault();
 
-        boolean isUser = user.equals("user");
+        boolean isUser = user.equals("users");
         String method = req.getMethod();
 
         boolean isThread = !isUser && (method.equals("DELETE") && post != null || thread != null);

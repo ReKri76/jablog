@@ -3,7 +3,6 @@ package com.example.jablog.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.NaturalId;
@@ -34,8 +33,8 @@ public class Board {
      * (owner), (group), (other);
      * */
     @Column(name="rules", nullable = false,
-            check = @CheckConstraint(constraint = "rules <@ ARRAY['r', 'w', 'd', 'x', '-']"))
-    @Size(min = 12, max = 12)
+            check = @CheckConstraint(constraint = "rules <@ ARRAY['r', 'w', 'd', 'x', '-']"),
+            length = 12)
     private String[] rules = {"r","w","-","x", "r","w","-","x", "r","w","-","x"};
 
     @Column(name="lifeCycleThreads",  nullable = false)

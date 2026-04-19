@@ -4,11 +4,14 @@ import com.example.jablog.DTO.Login;
 import com.example.jablog.config.security.CustomUserDetails;
 import com.example.jablog.service.APIService;
 import jakarta.persistence.NoResultException;
-import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/api")
@@ -23,7 +26,7 @@ public class API {
     }
 
     @PostMapping("/login/verify")
-    public String login(HttpServletRequest req,
+    public String login(HttpSession session,
                         @Valid @ModelAttribute("login") Login login) {
 
         CustomUserDetails customUserDetails;
@@ -35,7 +38,7 @@ public class API {
 
         String boardName = customUserDetails.getBoardName();
 
-        req.getSession(false).setAttribute(boardName, customUserDetails);
+        session.setAttribute(boardName, customUserDetails);
 
         return "redirect:/" + boardName;
     }

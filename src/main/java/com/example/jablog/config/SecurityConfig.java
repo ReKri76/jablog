@@ -35,11 +35,11 @@ public class SecurityConfig {
 
                         .contentSecurityPolicy(csp -> csp
                                 .policyDirectives("default-src 'none'; " +
-                                        "script-src 'none'; " +
+                                        "script-src 'self' 'nonce-htmx'; " +
                                         "object-src 'none'; " +
-                                        "style-src 'self'; " +
+                                        "style-src 'self' 'unsafe-inline'; " +
                                         "img-src http://localhost:9000 'self'; " +
-                                        "connect-src 'none'; " +
+                                        "connect-src 'self'; " +
                                         "font-src 'self'; " +
                                         "frame-ancestors 'none'; " +
                                         "base-uri 'self'; " +
@@ -80,6 +80,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET,  "/").permitAll()
                         .requestMatchers(HttpMethod.POST, "/poster/board").permitAll()
                         .requestMatchers(HttpMethod.GET, "/users/panel").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/js/htmx.min.js").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/poster/{boardName}/{thread}")
                             .access(customAuthorizationManager)
@@ -91,11 +92,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/deleter/{boardName}/{thread}/{post}")
                             .access(customAuthorizationManager)
 
-                        .requestMatchers(HttpMethod.DELETE, "/users/{boardName}")
+                        .requestMatchers(HttpMethod.DELETE, "/users/panel/{boardName}/{nickname}")
                             .access(customAuthorizationManager)
-                        .requestMatchers(HttpMethod.POST, "/users/{boardName}")
+                        .requestMatchers(HttpMethod.POST, "/users/panel/{boardName}")
                             .access(customAuthorizationManager)
-                        .requestMatchers(HttpMethod.GET, "/users/{boardName}")
+                        .requestMatchers(HttpMethod.GET, "/users/panel/{boardName}")
                             .access(customAuthorizationManager)
 
                         .requestMatchers(HttpMethod.GET, "/{boardName}/{thread}")
@@ -103,7 +104,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/{boardName}")
                             .access(customAuthorizationManager)
 
-                        .anyRequest().denyAll()
+                        .anyRequest().permitAll()
                 );
 
         return http.build();

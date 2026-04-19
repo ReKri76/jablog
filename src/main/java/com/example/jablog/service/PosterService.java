@@ -20,6 +20,7 @@ import com.example.jablog.DTO.Post;
 public class PosterService {
 
     private final String bucket = "images";
+    private final int sizeOfArrayOfRules = 12;
 
     private final PosterRepository posterRepository;
     private final EntityManager entityManager;
@@ -78,10 +79,10 @@ public class PosterService {
         if (lifeCyclePosts<0)
             throw new RuntimeException("value of life cycle must be positive");
 
-        if (rule.length()!=15)
+        if (rule.length()!=sizeOfArrayOfRules)
             throw new RuntimeException("incorrect rule");
 
-        String[] rules = new String[15];
+        String[] rules = new String[sizeOfArrayOfRules];
 
         for (int i = 0; i<rule.length(); i++){
             char currentValue = rule.charAt(i);
