@@ -1,6 +1,6 @@
 #!/usr/bin/env kotlin
 
-package static.kt
+package static.script.js.kt
 
 fun createAnchors() {
 

@@ -3,6 +3,7 @@ package com.example.jablog.config;
 import com.example.jablog.config.security.CustomAuthorizationManager;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
+import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -34,17 +35,19 @@ public class SecurityConfig {
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
 
                         .contentSecurityPolicy(csp -> csp
-                                .policyDirectives("default-src 'none'; " +
-                                        "script-src 'self' 'nonce-htmx'; " +
+                                .policyDirectives(
+                                        "default-src 'none'; " +
+                                        "script-src 'self'; " +
                                         "object-src 'none'; " +
                                         "style-src 'self' 'unsafe-inline'; " +
-                                        "img-src http://localhost:9000 'self'; " +
+                                        "img-src http://localhost:9000 'self' data:; " +
                                         "connect-src 'self'; " +
                                         "font-src 'self'; " +
                                         "frame-ancestors 'none'; " +
                                         "base-uri 'self'; " +
                                         "form-action 'self'; " +
-                                        "upgrade-insecure-requests")
+                                        "upgrade-insecure-requests"
+                                )
                         )
 
                         .httpStrictTransportSecurity(hsts -> hsts
@@ -54,7 +57,7 @@ public class SecurityConfig {
                 )
 
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/**", "/", "/poster/board")
+                        .ignoringRequestMatchers("/api/**", "/", "/poster/board", "/script/**", "/styles/**")
                 )
 
                 .sessionManagement(session ->
@@ -75,12 +78,16 @@ public class SecurityConfig {
                 .anonymous(AbstractHttpConfigurer::disable)
 
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/script/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/styles/**").permitAll()
+
                         .requestMatchers(HttpMethod.GET, "/api/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/login/verify").permitAll()
                         .requestMatchers(HttpMethod.GET,  "/").permitAll()
                         .requestMatchers(HttpMethod.POST, "/poster/board").permitAll()
                         .requestMatchers(HttpMethod.GET, "/users/panel").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/js/htmx.min.js").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/poster/{boardName}/{thread}")
                             .access(customAuthorizationManager)
@@ -104,7 +111,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/{boardName}")
                             .access(customAuthorizationManager)
 
-                        .anyRequest().permitAll()
+                        .anyRequest().denyAll()
                 );
 
         return http.build();
