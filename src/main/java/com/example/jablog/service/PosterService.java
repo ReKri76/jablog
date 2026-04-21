@@ -1,19 +1,19 @@
 package com.example.jablog.service;
 
 import com.example.jablog.DTO.Picture;
+import com.example.jablog.DTO.Post;
 import com.example.jablog.entity.Board;
 import com.example.jablog.entity.Posts;
 import com.example.jablog.entity.Threads;
 import com.example.jablog.entity.Users;
 import com.example.jablog.repository.PosterRepository;
-import jakarta.persistence.*;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.example.jablog.DTO.Post;
 
 @Service
 @RequiredArgsConstructor
@@ -86,14 +86,24 @@ public class PosterService {
 
         String[] rules = new String[sizeOfArrayOfRules];
 
-        for (int i =0; i<numberOfRulesGroups; i+=sizeOfGroup){
-            if(
-                    !rules[i].equals("r") && !rules[i].equals("-") ||
-                    !rules[i+1].equals("w") && !rules[i+1].equals("-") ||
-                    !rules[i+2].equals("d") && !rules[i+2].equals("-") ||
-                    !rules[i+3].equals("x") && !rules[i+3].equals("-") ||
-                    rules[i].equals("-") && rules[i+3].equals("x") ||
-                    rules[i+1].equals("-") && rules[i+3].equals("x"))
+        for (int i = 0; i<numberOfRulesGroups; i+=sizeOfGroup){
+            if (
+                    switch (rules[i]) {
+                        case "r" ->
+                                !rules[i+1].equals("w") && !rules[i+1].equals("-") ||
+                                !rules[i+2].equals("d") && !rules[i+2].equals("-") ||
+                                !rules[i+3].equals("x") && !rules[i+3].equals("-");
+
+                        case "-" -> {
+                            for(int k = i; k < i+sizeOfGroup; k++)
+                                if (!rules[k].equals("-"))
+                                    yield true;
+                            yield false;
+                        }
+
+                        default -> true;
+                    }
+            )
                 throw new RuntimeException("incorrect rule");
         }
 
@@ -111,6 +121,4 @@ public class PosterService {
 
         posterRepository.board(board, users);
     }
-
-
 }
