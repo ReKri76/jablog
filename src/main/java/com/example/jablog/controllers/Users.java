@@ -2,7 +2,6 @@ package com.example.jablog.controllers;
 
 import com.example.jablog.DTO.Login;
 import com.example.jablog.config.security.CustomUserDetails;
-import com.example.jablog.service.CustomUserDetailsService;
 import com.example.jablog.service.UsersService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -22,7 +21,6 @@ import java.util.Enumeration;
 public class Users {
 
     private final UsersService usersService;
-    private final CustomUserDetailsService customUserDetailsService;
 
     @PostMapping(value = "/panel/{boardName}")
     public String addUser(@PathVariable("boardName") @NonNull String boardName,

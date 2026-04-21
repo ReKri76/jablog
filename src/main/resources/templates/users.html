@@ -5,7 +5,7 @@
     <title>Title</title>
     <script th:src="@{/script/js/htmx.min.js}" type="text/javascript"></script>
 </head>
-    <body>
+    <body th:hx-headers='|{"X-CSRF-TOKEN": "${_csrf.token}"}|'>
         <div>
             <span th:each="user : ${users}">
                 <span th:text="${user}" th:id="'username_' + ${user}">user</span>

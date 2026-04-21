@@ -33,7 +33,9 @@ public class Board {
      * (owner), (group), (other);
      * */
     @Column(name="rules", nullable = false,
-            check = @CheckConstraint(constraint = "rules <@ ARRAY['r', 'w', 'd', 'x', '-']"),
+            check = @CheckConstraint(constraint = "rules <@ ARRAY['r', 'w', 'd', 'x', '-'] " +
+                    "AND array_length(rules, 1) = 12" +
+                    " AND array_to_string(rules, '') ~ '^(rw[d-]x|[r-][w-][d-]-){3}$'"),
             length = 12)
     private String[] rules = {"r","w","-","x", "r","w","-","x", "r","w","-","x"};
 

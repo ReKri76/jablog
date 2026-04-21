@@ -20,7 +20,9 @@ import com.example.jablog.DTO.Post;
 public class PosterService {
 
     private final String bucket = "images";
-    private final int sizeOfArrayOfRules = 12;
+    private final int numberOfRulesGroups = 3;
+    private final int sizeOfGroup = 4;
+    private final int sizeOfArrayOfRules = sizeOfGroup*numberOfRulesGroups;
 
     private final PosterRepository posterRepository;
     private final EntityManager entityManager;
@@ -84,12 +86,15 @@ public class PosterService {
 
         String[] rules = new String[sizeOfArrayOfRules];
 
-        for (int i = 0; i<rule.length(); i++){
-            char currentValue = rule.charAt(i);
-            if (currentValue != 'w' && currentValue !='r' && currentValue != '-'
-                    && currentValue != 'x' && currentValue != 'd')
+        for (int i =0; i<numberOfRulesGroups; i+=sizeOfGroup){
+            if(
+                    !rules[i].equals("r") && !rules[i].equals("-") ||
+                    !rules[i+1].equals("w") && !rules[i+1].equals("-") ||
+                    !rules[i+2].equals("d") && !rules[i+2].equals("-") ||
+                    !rules[i+3].equals("x") && !rules[i+3].equals("-") ||
+                    rules[i].equals("-") && rules[i+3].equals("x") ||
+                    rules[i+1].equals("-") && rules[i+3].equals("x"))
                 throw new RuntimeException("incorrect rule");
-            rules[i]=String.valueOf(currentValue);
         }
 
         Board board = new Board();
