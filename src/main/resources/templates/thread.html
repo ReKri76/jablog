@@ -13,11 +13,11 @@
         </div>
 
         <div th:each="currentPost :${posts}">
-            <span id="${currentPost.id}">
+            <span th:id="'p' + ${currentPost.id}">
                 <span th:text="${currentPost.id}">id</span>
                 <span th:text="${currentPost.head}">head</span>
                 <span th:utext="${currentPost.body}">body</span>
-                <img th:src="${currentPost.url}" alt="${currentPost.url}"/>
+                <img th:src="${currentPost.url}"/>
                 <br>
             </span>
         </div>

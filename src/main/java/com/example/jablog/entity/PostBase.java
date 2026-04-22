@@ -1,18 +1,13 @@
 package com.example.jablog.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
 
 @MappedSuperclass
 @Getter
 @Setter
-public abstract class PostBase {
+public abstract class PostBase implements Comparable<PostBase>{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -28,4 +23,9 @@ public abstract class PostBase {
 
     @Column(name = "createdat", updatable = false)
     private long createdAt = System.currentTimeMillis();
+
+    @Override
+    public int compareTo(PostBase other) {
+        return Long.compare(this.id, other.id);
+    }
 }

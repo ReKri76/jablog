@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.HtmlUtils;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.TreeSet;
 
 @Service
 @RequiredArgsConstructor
@@ -67,7 +67,7 @@ public class GetterService {
         ArrayList<PostWithPicture> posts = new ArrayList<PostWithPicture>();
         posts.add(main);
 
-        HashSet<Posts> input = new HashSet<Posts>(threads.getPosts());
+        TreeSet<Posts> input = new TreeSet<Posts>(threads.getPosts());
         input.forEach(post -> {
 
             PostWithPicture postWithPicture= new PostWithPicture();
@@ -94,7 +94,7 @@ public class GetterService {
     private String createAnchor(String text){
         text = HtmlUtils.htmlEscape(text);
 
-        text = text.replaceAll(">>(\\d+)", "<a class=\"anchor\" href=\"#p$1\">>>$1</a>");
+        text = text.replaceAll("&gt;&gt;(\\d+)", "<a class=\"anchor\" href=\"#p$1\">&gt;&gt;$1</a>");
 
         return text;
     }

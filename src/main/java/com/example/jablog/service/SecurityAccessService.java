@@ -50,7 +50,7 @@ public class SecurityAccessService {
                 currentRules[2].equals("d") && (!isThread || currentRules[3].equals("x"));
 
             case "GET" ->
-                !isThread || anyOtherFlagsIsEmpty(currentRules);
+                !isThread || !anyOtherFlagsIsEmpty(currentRules);
 
             default -> false;
         };
