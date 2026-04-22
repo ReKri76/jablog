@@ -16,22 +16,23 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CleanerRepository {
 
+    private static final long UNIX_TIME_DAY = Duration.ofDays(1).toMillis();
+
     private final EntityManager entityManager;
-    private final long unxtm = Duration.ofDays(1).toMillis();
 
     public ArrayList<Posts> posts() {
         final long now = Instant.now().toEpochMilli();
 
-        String selectJpql = "from Posts p where p.createdAt < :now - p.thread.board.lifeCyclePosts * :unxtm";
-        List<Posts> posts = entityManager.createQuery(selectJpql, Posts.class)
+        final String selectJpql = "from Posts p where p.createdAt < :now - p.thread.board.lifeCyclePosts * :unxtm";
+        final List<Posts> posts = entityManager.createQuery(selectJpql, Posts.class)
                 .setParameter("now", now)
-                .setParameter("unxtm", unxtm)
+                .setParameter("unxtm", UNIX_TIME_DAY)
                 .getResultList();
 
-        String deleteJpql = "delete from Posts p where p.createdAt < :now - p.thread.board.lifeCyclePosts * :unxtm";
+        final String deleteJpql = "delete from Posts p where p.createdAt < :now - p.thread.board.lifeCyclePosts * :unxtm";
         entityManager.createQuery(deleteJpql)
                 .setParameter("now", now)
-                .setParameter("unxtm", unxtm)
+                .setParameter("unxtm", UNIX_TIME_DAY)
                 .executeUpdate();
 
         return new ArrayList<Posts>(posts);
@@ -40,7 +41,7 @@ public class CleanerRepository {
     public ArrayList<Threads> threads(long oldThread){
         final long now = Instant.now().toEpochMilli();
 
-        String selectJpql =
+        final String selectJpql =
                 "from Threads t " +
                 "where not exists(" +
                         "select 1 from Posts p " +
@@ -48,13 +49,13 @@ public class CleanerRepository {
                         "and p.thread = t" +
                         ") " +
                         "and t.createdAt < :oldThread";
-        List<Threads> threads = entityManager.createQuery(selectJpql, Threads.class)
+        final List<Threads> threads = entityManager.createQuery(selectJpql, Threads.class)
                 .setParameter("oldThread", oldThread)
-                .setParameter("unxtm", unxtm)
+                .setParameter("unxtm", UNIX_TIME_DAY)
                 .setParameter("now", now)
                 .getResultList();
 
-        String deleteJpql =
+        final String deleteJpql =
                 "delete from Threads t " +
                 "where not exists(" +
                         "select 1 from Posts p " +
@@ -64,7 +65,7 @@ public class CleanerRepository {
                         "and t.createdAt < :oldThread";
         entityManager.createQuery(deleteJpql)
                 .setParameter("oldThread", oldThread)
-                .setParameter("unxtm", unxtm)
+                .setParameter("unxtm", UNIX_TIME_DAY)
                 .setParameter("now", now)
                 .executeUpdate();
 
@@ -73,7 +74,7 @@ public class CleanerRepository {
 
     public ArrayList<String> pics(){
 
-        List<String> pics = entityManager.createQuery("select t.picture from Threads t", String.class).getResultList();
+        final List<String> pics = entityManager.createQuery("select t.picture from Threads t", String.class).getResultList();
         pics.addAll(entityManager.createQuery("select p.picture from Posts p", String.class).getResultList());
 
         return new ArrayList<String>(pics);
@@ -81,13 +82,13 @@ public class CleanerRepository {
 
     public ArrayList<Board> boards(long oldBoard){
 
-        String selectJpql = "from Board b left join fetch b.users where not exists(select 1 from Threads t where t.board = b) " +
+        final String selectJpql = "from Board b left join fetch b.users where not exists(select 1 from Threads t where t.board = b) " +
                 "and b.createdAt < :oldBoard";
-        List<Board> boards = entityManager.createQuery(selectJpql, Board.class)
+        final List<Board> boards = entityManager.createQuery(selectJpql, Board.class)
                 .setParameter("oldBoard", oldBoard)
                 .getResultList();
 
-        String deleteJpql = "delete from Board b where not exists(select 1 from Threads t where t.board = b) " +
+        final String deleteJpql = "delete from Board b where not exists(select 1 from Threads t where t.board = b) " +
                 "and b.createdAt < :oldBoard";
         entityManager.createQuery(deleteJpql, Board.class)
                 .setParameter("oldBoard", oldBoard)

@@ -33,7 +33,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             user.setNickname("ANON");
             user.setPassword("{noop}");
 
-            Board board = new Board();
+            final Board board = new Board();
             board.setName("ANON");
             board.setRules(new String[12]);
 

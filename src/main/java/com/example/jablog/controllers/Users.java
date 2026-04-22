@@ -45,7 +45,7 @@ public class Users {
     @GetMapping(value = "/panel/{boardName}")
     public String viewUsers(@PathVariable("boardName") String boardName, Model model) {
 
-        ArrayList<String> usersName = usersService.viewUsers(boardName);
+        final ArrayList<String> usersName = usersService.viewUsers(boardName);
 
         model.addAttribute("users", usersName);
         model.addAttribute("boardName", boardName);
@@ -57,15 +57,15 @@ public class Users {
     @GetMapping(value = "/panel")
     public String panel(Model model, HttpSession session){
 
-        Enumeration<String> boards = session.getAttributeNames();
-        ArrayList<String> boardNames = new ArrayList<String>();
+        final Enumeration<String> boards = session.getAttributeNames();
+        final ArrayList<String> boardNames = new ArrayList<String>();
 
         while (boards.hasMoreElements()){
-            String boardName = boards.nextElement();
+            final String boardName = boards.nextElement();
             if(boardName.length()>3)
                 continue;
 
-            CustomUserDetails user = (CustomUserDetails) session.getAttribute(boardName);
+            final CustomUserDetails user = (CustomUserDetails) session.getAttribute(boardName);
             if (user == null)
                 continue;
 

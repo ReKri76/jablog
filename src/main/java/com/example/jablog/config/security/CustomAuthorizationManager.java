@@ -27,25 +27,25 @@ public class CustomAuthorizationManager implements AuthorizationManager<RequestA
     public @Nullable AuthorizationResult authorize(@NonNull Supplier<? extends @Nullable Authentication> auth,
                                                    @NonNull RequestAuthorizationContext context) {
 
-        HttpSession session = context.getRequest().getSession(false);
+        final HttpSession session = context.getRequest().getSession(false);
 
-        String boardName = context.getVariables().get("boardName");
-        String thread = context.getVariables().get("thread");
-        String post = context.getVariables().get("post");
-        HttpServletRequest req = context.getRequest();
-        String user = req.getRequestURI().split("/")[1];
+        final String boardName = context.getVariables().get("boardName");
+        final String thread = context.getVariables().get("thread");
+        final String post = context.getVariables().get("post");
+        final HttpServletRequest req = context.getRequest();
+        final String user = req.getRequestURI().split("/")[1];
 
         CustomUserDetails customUserDetails = (CustomUserDetails) session.getAttribute(boardName);
 
         if (customUserDetails == null)
             customUserDetails = customUserDetailsService.createDefault();
 
-        boolean isUser = user.equals("users");
-        String method = req.getMethod();
+        final boolean isUser = user.equals("users");
+        final String method = req.getMethod();
 
-        boolean isThread = !isUser && (method.equals("DELETE") && post != null || thread != null);
+        final boolean isThread = !isUser && (method.equals("DELETE") && post != null || thread != null);
 
-        boolean canAccess = securityAccessService.canAccess(
+        final boolean canAccess = securityAccessService.canAccess(
                 boardName,
                 customUserDetails,
                 method,

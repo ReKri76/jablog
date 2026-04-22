@@ -25,8 +25,8 @@ public class GetterService {
     @Transactional
     public ArrayList<String> start(){
 
-        ArrayList<String> boards = new ArrayList<String>();
-        ArrayList<Board> input = getterRepository.start();
+        final ArrayList<String> boards = new ArrayList<String>();
+        final ArrayList<Board> input = getterRepository.start();
 
         input.forEach(board -> boards.add(board.getName()));
 
@@ -36,12 +36,12 @@ public class GetterService {
     @Transactional
     public ArrayList<PostWithPicture> board(String boardName, int page){
 
-        ArrayList<PostWithPicture> threads = new ArrayList<PostWithPicture>();
-        ArrayList<Threads> input = getterRepository.board(boardName, page);
+        final ArrayList<PostWithPicture> threads = new ArrayList<PostWithPicture>();
+        final ArrayList<Threads> input = getterRepository.board(boardName, page);
 
         input.forEach(thread -> {
 
-            PostWithPicture postWithPicture= new PostWithPicture();
+            final PostWithPicture postWithPicture= new PostWithPicture();
             postWithPicture.setId(thread.getId());
             postWithPicture.setUrl(thread.getPicture());
             postWithPicture.setHead(thread.getHeader());
@@ -56,21 +56,21 @@ public class GetterService {
     @Transactional
     public ArrayList<PostWithPicture> thread(long threadId, String boardName){
 
-        Threads threads = getterRepository.thread(threadId, boardName);
+        final Threads threads = getterRepository.thread(threadId, boardName);
 
-        PostWithPicture main = new PostWithPicture();
+        final PostWithPicture main = new PostWithPicture();
         main.setId(threads.getId());
         main.setUrl(threads.getPicture());
         main.setHead(threads.getHeader());
         main.setBody(threads.getContent());
 
-        ArrayList<PostWithPicture> posts = new ArrayList<PostWithPicture>();
+        final ArrayList<PostWithPicture> posts = new ArrayList<PostWithPicture>();
         posts.add(main);
 
-        TreeSet<Posts> input = new TreeSet<Posts>(threads.getPosts());
+        final TreeSet<Posts> input = new TreeSet<Posts>(threads.getPosts());
         input.forEach(post -> {
 
-            PostWithPicture postWithPicture= new PostWithPicture();
+            final PostWithPicture postWithPicture= new PostWithPicture();
             postWithPicture.setId(post.getId());
             postWithPicture.setUrl(post.getPicture());
             postWithPicture.setHead(post.getHeader());

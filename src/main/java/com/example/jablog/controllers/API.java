@@ -36,7 +36,7 @@ public class API {
             return "redirect:/api/login";
         }
 
-        String boardName = customUserDetails.getBoardName();
+        final String boardName = customUserDetails.getBoardName();
 
         session.setAttribute(boardName, customUserDetails);
 

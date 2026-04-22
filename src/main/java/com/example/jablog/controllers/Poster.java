@@ -19,7 +19,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class Poster {
 
-    final public static long maxImageSize = 1024*1024*10-1;
+    public static final long MAX_IMAGE_SIZE = 1024 * 1024 * 10 - 1;
 
     private final PosterService posterService;
 
@@ -32,8 +32,8 @@ public class Poster {
         if (file.isEmpty())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "dosent upload image");
 
-        Picture picture = new Picture(file);
-        long ifOfPost = posterService.thread(post, picture, boardName);
+        final Picture picture = new Picture(file);
+        final long ifOfPost = posterService.thread(post, picture, boardName);
 
         return "redirect:/"+boardName+"/"+ifOfPost;
     }
@@ -65,8 +65,8 @@ public class Poster {
     }
 
     private void chekFile(@NonNull MultipartFile file){
-        String fileType = file.getContentType();
-        if (file.getSize()>maxImageSize)
+        final String fileType = file.getContentType();
+        if (file.getSize() > MAX_IMAGE_SIZE)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "file is too big");
         if (!fileType.equals("image/png") && !fileType.equals("image/jpeg")
                 && !fileType.equals("image/jpg") && !fileType.equals("image/gif"))

@@ -35,9 +35,9 @@ class PosterMultipartPostTest {
     @BeforeEach
     void setUp() {
         posterService = mock(PosterService.class);
-        Poster posterController = new Poster(posterService);
+        final Poster posterController = new Poster(posterService);
 
-        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
+        final LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
         validator.afterPropertiesSet();
 
         mockMvc = MockMvcBuilders.standaloneSetup(posterController)
@@ -48,9 +48,9 @@ class PosterMultipartPostTest {
 
     @Test
     void multipartPostWithImageShouldRedirectBackToThread() throws Exception {
-        doNothing().when(posterService).post(any(Post.class), any(Picture.class), eq(777L));
+        doNothing().when(posterService).post(any(Post.class), any(Picture.class), eq(777L), eq("b"));
 
-        MockMultipartFile imagePart = new MockMultipartFile(
+        final MockMultipartFile imagePart = new MockMultipartFile(
                 "image",
                 "cat.jpg",
                 MediaType.IMAGE_JPEG_VALUE,
@@ -65,15 +65,15 @@ class PosterMultipartPostTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/b/777"));
 
-        ArgumentCaptor<Post> postCaptor = ArgumentCaptor.forClass(Post.class);
-        verify(posterService).post(postCaptor.capture(), any(Picture.class), eq(777L));
+        final ArgumentCaptor<Post> postCaptor = ArgumentCaptor.forClass(Post.class);
+        verify(posterService).post(postCaptor.capture(), any(Picture.class), eq(777L), eq("b"));
         assertThat(postCaptor.getValue().getHead()).isEqualTo("hello");
         assertThat(postCaptor.getValue().getBody()).isEqualTo("world");
     }
 
     @Test
     void multipartPostWithNonImageShouldReturnBadRequest() throws Exception {
-        MockMultipartFile imagePart = new MockMultipartFile(
+        final MockMultipartFile imagePart = new MockMultipartFile(
                 "image",
                 "note.txt",
                 MediaType.TEXT_PLAIN_VALUE,
@@ -87,12 +87,12 @@ class PosterMultipartPostTest {
                         .with(csrf()))
                 .andExpect(status().isBadRequest());
 
-        verify(posterService, never()).post(any(Post.class), any(Picture.class), eq(777L));
+        verify(posterService, never()).post(any(Post.class), any(Picture.class), eq(777L), eq("b"));
     }
 
     @Test
     void multipartPostWithoutImageShouldPassNullPicture() throws Exception {
-        doNothing().when(posterService).post(any(Post.class), eq(null), eq(777L));
+        doNothing().when(posterService).post(any(Post.class), eq(null), eq(777L), eq("b"));
 
         mockMvc.perform(multipart("/poster/{boardName}/{threadID}", "b", 777L)
                         .param("head", "hello")
@@ -101,7 +101,7 @@ class PosterMultipartPostTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/b/777"));
 
-        verify(posterService).post(any(Post.class), eq(null), eq(777L));
+        verify(posterService).post(any(Post.class), eq(null), eq(777L), eq("b"));
     }
 
     @Test
@@ -109,7 +109,7 @@ class PosterMultipartPostTest {
         when(posterService.thread(any(Post.class), any(Picture.class), eq("b")))
                 .thenReturn(123L);
 
-        MockMultipartFile imagePart = new MockMultipartFile(
+        final MockMultipartFile imagePart = new MockMultipartFile(
                 "image",
                 "cat.jpg",
                 MediaType.IMAGE_JPEG_VALUE,
@@ -129,7 +129,7 @@ class PosterMultipartPostTest {
 
     @Test
     void multipartThreadWithEmptyImageShouldReturnBadRequest() throws Exception {
-        MockMultipartFile imagePart = new MockMultipartFile(
+        final MockMultipartFile imagePart = new MockMultipartFile(
                 "image",
                 "",
                 MediaType.IMAGE_JPEG_VALUE,

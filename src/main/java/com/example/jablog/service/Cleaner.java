@@ -19,9 +19,10 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 public class Cleaner {
 
+    private static final Logger LOGGER = (Logger) LoggerFactory.getLogger(Cleaner.class);
+    private static final String BUCKET = "images";
+
     private final CleanerRepository cleanerRepository;
-    private final static Logger logger = (Logger) LoggerFactory.getLogger(Cleaner.class);
-    private final String bucket = "images";
     private final MinioService minioService;
 
     @Scheduled(cron = "0 0 4 * * WED")
@@ -29,32 +30,32 @@ public class Cleaner {
 
         final long oldThread = Instant.now().toEpochMilli()- Duration.ofMinutes(30).toMillis();
 
-        ArrayList<Threads> deletedThreads = cleanerRepository.threads(oldThread);
+        final ArrayList<Threads> deletedThreads = cleanerRepository.threads(oldThread);
 
         deletedThreads.forEach( thread -> minioService.deletePicture(thread.getPicture()));
 
-        logger.info("{} threads deleted in {}.", deletedThreads.size(), LocalDateTime.now());
+        LOGGER.info("{} threads deleted in {}.", deletedThreads.size(), LocalDateTime.now());
     }
 
     @Scheduled(cron = "0 0 4 * * MON")
     public void cleanPosts(){
 
-        ArrayList<Posts> deletedPosts = cleanerRepository.posts();
+        final ArrayList<Posts> deletedPosts = cleanerRepository.posts();
 
         deletedPosts.forEach(post->{
-            String url = post.getPicture();
+            final String url = post.getPicture();
             if (!url.isEmpty())
                 minioService.deletePicture(url);
         });
 
-        logger.info("{} posts deleted in {}.", deletedPosts.size(), LocalDateTime.now());
+        LOGGER.info("{} posts deleted in {}.", deletedPosts.size(), LocalDateTime.now());
     }
 
     @Scheduled(cron ="0 0 4 13 * *")
     public void cleanPics(){
 
-        ArrayList<String> pics = cleanerRepository.pics();
-        ArrayList<String> realPics = minioService.getAllFileName(bucket);
+        final ArrayList<String> pics = cleanerRepository.pics();
+        final ArrayList<String> realPics = minioService.getAllFileName(BUCKET);
 
         realPics.forEach( pic -> {
             if (!pics.contains(pic))
@@ -67,13 +68,13 @@ public class Cleaner {
 
         final long oldBoard = Instant.now().toEpochMilli()-Duration.ofDays(1).toMillis();
 
-        ArrayList<Board> deletedBoards = cleanerRepository.boards(oldBoard);
+        final ArrayList<Board> deletedBoards = cleanerRepository.boards(oldBoard);
 
         deletedBoards.forEach(board ->
-            logger.info("{} board was deleted. This board has a {} users", board.getName(), board.getUsers().size())
+            LOGGER.info("{} board was deleted. This board has a {} users", board.getName(), board.getUsers().size())
         );
 
-        logger.info("{} boards deleted in {}.", deletedBoards.size(), LocalDateTime.now());
+        LOGGER.info("{} boards deleted in {}.", deletedBoards.size(), LocalDateTime.now());
 
     }
 }

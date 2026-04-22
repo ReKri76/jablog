@@ -24,8 +24,8 @@ public class UsersService {
     @Transactional
     public void addUser(String boardName, Login login){
 
-        String password = login.getPassword();
-        String nickname = login.getNickname();
+        final String password = login.getPassword();
+        final String nickname = login.getNickname();
 
         final Board boardRef = entityManager.unwrap(Session.class)
                 .bySimpleNaturalId(Board.class)

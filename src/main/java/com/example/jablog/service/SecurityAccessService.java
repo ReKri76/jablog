@@ -28,10 +28,10 @@ public class SecurityAccessService {
         if (isUser)
             return user.getRole().equals("ROLE_ADMIN");
 
-        String[] rules = user.getBoardRules();
-        String[] currentRules = new String[4];
+        final String[] rules = user.getBoardRules();
+        final String[] currentRules = new String[4];
 
-        int shift = PosterService.sizeOfGroup * switch (user.getRole()) {
+        final int shift = PosterService.SIZE_OF_GROUP * switch (user.getRole()) {
             case "ROLE_ADMIN" -> 0;
             case "ROLE_GROUP" -> 1;
             default -> 2;
@@ -57,7 +57,7 @@ public class SecurityAccessService {
     }
 
     private boolean anyOtherFlagsIsEmpty (String[] rules){
-        for (int i = 1; i<rules.length; i++){
+        for (int i = 1; i < rules.length; i++){
             if (!rules[i].equals("-"))
                 return false;
         }

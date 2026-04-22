@@ -55,12 +55,12 @@ class PosterServiceTest {
 
     @Test
     void threadShouldUploadPicturePersistThreadAndTrimTrailingSlashInEndpoint() {
-        Post post = new Post();
+        final Post post = new Post();
         post.setHead("");
         post.setBody("message");
 
-        Picture picture = picture("cat.jpg");
-        Board boardRef = new Board();
+        final Picture picture = picture("cat.jpg");
+        final Board boardRef = new Board();
         boardRef.setName("b");
 
         when(entityManager.unwrap(Session.class)).thenReturn(session);
@@ -68,16 +68,16 @@ class PosterServiceTest {
         when(naturalIdLoadAccess.getReference("b")).thenReturn(boardRef);
         when(posterRepository.thread(any(Threads.class))).thenReturn(15L);
 
-        long result = posterService.thread(post, picture, "b");
+        final long result = posterService.thread(post, picture, "b");
 
         assertThat(result).isEqualTo(15L);
         assertThat(post.getHead()).isEqualTo("message");
         verify(minioService).savePicture(picture, "images");
 
-        ArgumentCaptor<Threads> threadCaptor = ArgumentCaptor.forClass(Threads.class);
+        final ArgumentCaptor<Threads> threadCaptor = ArgumentCaptor.forClass(Threads.class);
         verify(posterRepository).thread(threadCaptor.capture());
 
-        Threads saved = threadCaptor.getValue();
+        final Threads saved = threadCaptor.getValue();
         assertThat(saved.getHeader()).isEqualTo("message");
         assertThat(saved.getContent()).isEqualTo("message");
         assertThat(saved.getBoard()).isSameAs(boardRef);
@@ -88,21 +88,21 @@ class PosterServiceTest {
 
     @Test
     void postWithoutImageShouldPersistEmptyPictureAndSkipMinioUpload() {
-        Post post = new Post();
+        final Post post = new Post();
         post.setHead("head");
         post.setBody("message");
 
-        Threads threadRef = new Threads();
-        when(entityManager.getReference(Threads.class, 42L)).thenReturn(threadRef);
+        final Threads threadRef = new Threads();
+        when(posterRepository.getThreadsById(42L, "b")).thenReturn(threadRef);
 
-        posterService.post(post, null, 42L);
+        posterService.post(post, null, 42L, "b");
 
         verify(minioService, never()).savePicture(any(Picture.class), any(String.class));
 
-        ArgumentCaptor<Posts> postCaptor = ArgumentCaptor.forClass(Posts.class);
+        final ArgumentCaptor<Posts> postCaptor = ArgumentCaptor.forClass(Posts.class);
         verify(posterRepository).post(postCaptor.capture());
 
-        Posts saved = postCaptor.getValue();
+        final Posts saved = postCaptor.getValue();
         assertThat(saved.getHeader()).isEqualTo("head");
         assertThat(saved.getContent()).isEqualTo("message");
         assertThat(saved.getPicture()).isEmpty();
@@ -111,22 +111,22 @@ class PosterServiceTest {
 
     @Test
     void postWithImageShouldUploadPictureAndPersistBuiltUrl() {
-        Post post = new Post();
+        final Post post = new Post();
         post.setHead("head");
         post.setBody("message");
 
-        Picture picture = picture("cat.jpg");
-        Threads threadRef = new Threads();
-        when(entityManager.getReference(Threads.class, 42L)).thenReturn(threadRef);
+        final Picture picture = picture("cat.jpg");
+        final Threads threadRef = new Threads();
+        when(posterRepository.getThreadsById(42L, "b")).thenReturn(threadRef);
 
-        posterService.post(post, picture, 42L);
+        posterService.post(post, picture, 42L, "b");
 
         verify(minioService).savePicture(picture, "images");
 
-        ArgumentCaptor<Posts> postCaptor = ArgumentCaptor.forClass(Posts.class);
+        final ArgumentCaptor<Posts> postCaptor = ArgumentCaptor.forClass(Posts.class);
         verify(posterRepository).post(postCaptor.capture());
 
-        Posts saved = postCaptor.getValue();
+        final Posts saved = postCaptor.getValue();
         assertThat(saved.getHeader()).isEqualTo("head");
         assertThat(saved.getContent()).isEqualTo("message");
         assertThat(saved.getPicture())
@@ -163,7 +163,7 @@ class PosterServiceTest {
     }
 
     private Picture picture(String name) {
-        MockMultipartFile file = new MockMultipartFile(
+        final MockMultipartFile file = new MockMultipartFile(
                 "image",
                 name,
                 "image/jpeg",

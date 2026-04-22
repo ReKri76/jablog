@@ -13,24 +13,25 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GetterRepository {
 
+    private static final int LIMIT_OF_PAGINATION = 10;
+
     private final EntityManager entityManager;
-    private final int limitOfPagination = 10;
 
     public ArrayList<Board> start(){
 
-        List<Board> result = entityManager.createQuery("from Board", Board.class).getResultList();
+        final List<Board> result = entityManager.createQuery("from Board", Board.class).getResultList();
 
         return new ArrayList<Board>(result);
     }
 
    public ArrayList<Threads> board(String boardName, int page){
 
-       String jpql = "from Threads t where t.board.name = :boardName order by t.id desc";
+       final String jpql = "from Threads t where t.board.name = :boardName order by t.id desc";
 
-       List<Threads> threads = entityManager.createQuery(jpql, Threads.class)
+       final List<Threads> threads = entityManager.createQuery(jpql, Threads.class)
                .setParameter("boardName", boardName)
-               .setFirstResult(page*limitOfPagination)
-               .setMaxResults(limitOfPagination)
+               .setFirstResult(page * LIMIT_OF_PAGINATION)
+               .setMaxResults(LIMIT_OF_PAGINATION)
                .getResultList();
 
        return new ArrayList<Threads>(threads);
@@ -38,9 +39,9 @@ public class GetterRepository {
 
    public Threads thread(long threadId, String boardName){
 
-        String jpql = "from Threads t left join fetch t.posts where t.id = :threadId and t.board.name = :boardName";
+        final String jpql = "from Threads t left join fetch t.posts where t.id = :threadId and t.board.name = :boardName";
 
-       Threads posts = entityManager.createQuery(jpql, Threads.class)
+       final Threads posts = entityManager.createQuery(jpql, Threads.class)
                 .setParameter("threadId", threadId)
                 .setParameter("boardName", boardName)
                .getSingleResult();

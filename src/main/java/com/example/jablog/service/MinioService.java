@@ -13,6 +13,9 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 public class MinioService {
 
+    private static final int MAX_PART_SIZE = 10 * 1024 * 1024;
+    private static final int INITIAL_FILE_LIST_CAPACITY = 1000;
+
     private final MinioClient minioClient;
 
     public void savePicture(@NonNull Picture pic, String bucket){
@@ -21,7 +24,7 @@ public class MinioService {
             minioClient.putObject(PutObjectArgs.builder()
                     .bucket(bucket)
                     .object(pic.getName())
-                    .stream(pic.getInputStream(), pic.getSize(), 10*1024*1024)
+                    .stream(pic.getInputStream(), pic.getSize(), MAX_PART_SIZE)
                     .contentType(pic.getContentType())
                     .build());
         } catch (Exception e) {
@@ -31,9 +34,9 @@ public class MinioService {
 
     public void deletePicture(@NonNull String pathToPic){
 
-        String[] parts = pathToPic.split("/");
-        String objectName = parts[parts.length-1];
-        String bucketName = parts[parts.length-2];
+        final String[] parts = pathToPic.split("/");
+        final String objectName = parts[parts.length - 1];
+        final String bucketName = parts[parts.length - 2];
 
         try {
             minioClient.removeObject(RemoveObjectArgs.builder()
@@ -47,7 +50,7 @@ public class MinioService {
 
     public ArrayList<String> getAllFileName(String bucket){
 
-        ArrayList<String> names = new ArrayList<String>(1000);
+        final ArrayList<String> names = new ArrayList<String>(INITIAL_FILE_LIST_CAPACITY);
 
         Iterable<Result<Item>> results = minioClient.listObjects(ListObjectsArgs.builder()
                 .bucket(bucket)
@@ -56,7 +59,7 @@ public class MinioService {
 
         results.forEach( result ->{
             try{
-                Item item = result.get();
+                final Item item = result.get();
                 names.add(item.objectName());
             } catch (Exception e){
                 throw new RuntimeException("cant find files: ", e);
@@ -66,4 +69,3 @@ public class MinioService {
     }
 
 }
-

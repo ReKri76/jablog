@@ -23,8 +23,8 @@ public class Getter {
     @GetMapping("/{boardName}/{threadId}")
     public String thread(@PathVariable long threadId, @PathVariable String boardName, Model model, HttpSession session){
 
-        ArrayList<PostWithPicture> posts = getterService.thread(threadId, boardName);
-        CustomUserDetails customUserDetails = (CustomUserDetails) session.getAttribute(boardName);
+        final ArrayList<PostWithPicture> posts = getterService.thread(threadId, boardName);
+        final CustomUserDetails customUserDetails = (CustomUserDetails) session.getAttribute(boardName);
 
         model.addAttribute("thread", posts.getFirst());
         posts.removeFirst();
@@ -39,8 +39,8 @@ public class Getter {
     public String board(@PathVariable String boardName, @RequestParam(defaultValue = "0") int page, Model model,
                         HttpSession session){
 
-        ArrayList<PostWithPicture> threads = getterService.board(boardName, page);
-        CustomUserDetails customUserDetails = (CustomUserDetails) session.getAttribute(boardName);
+        final ArrayList<PostWithPicture> threads = getterService.board(boardName, page);
+        final CustomUserDetails customUserDetails = (CustomUserDetails) session.getAttribute(boardName);
 
         model.addAttribute("threads", threads);
         model.addAttribute("boardName", boardName);
@@ -52,7 +52,7 @@ public class Getter {
     @GetMapping("/")
     public String start(Model model){
 
-        ArrayList<String> boards = getterService.start();
+        final ArrayList<String> boards = getterService.start();
         model.addAttribute("boards", boards);
         return "index";
     }

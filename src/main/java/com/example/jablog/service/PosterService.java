@@ -20,10 +20,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PosterService {
 
-    private final String bucket = "images";
-    public static final int numberOfRulesGroups = 3;
-    public static final int sizeOfGroup = 4;
-    public static final int sizeOfArrayOfRules = sizeOfGroup*numberOfRulesGroups;
+    private static final String BUCKET = "images";
+    public static final int NUMBER_OF_RULES_GROUPS = 3;
+    public static final int SIZE_OF_GROUP = 4;
+    public static final int SIZE_OF_ARRAY_OF_RULES = SIZE_OF_GROUP * NUMBER_OF_RULES_GROUPS;
 
     private final PosterRepository posterRepository;
     private final EntityManager entityManager;
@@ -53,7 +53,7 @@ public class PosterService {
 
         final long idOfThread = posterRepository.thread(threads);
 
-        minioService.savePicture(file, bucket);
+        minioService.savePicture(file, BUCKET);
 
         return idOfThread;
     }
@@ -77,7 +77,7 @@ public class PosterService {
         posterRepository.post(posts);
 
         if (savePic)
-            minioService.savePicture(file, bucket);
+            minioService.savePicture(file, BUCKET);
     }
 
     @Transactional
@@ -89,15 +89,15 @@ public class PosterService {
         if (lifeCyclePosts<0)
             throw new RuntimeException("value of life cycle must be positive");
 
-        if (rule.length()!=sizeOfArrayOfRules)
+        if (rule.length()!=SIZE_OF_ARRAY_OF_RULES)
             throw new RuntimeException("incorrect rule");
 
-        String[] rules = new String[sizeOfArrayOfRules];
+        final String[] rules = new String[SIZE_OF_ARRAY_OF_RULES];
         for (int i = 0; i < rule.length(); i++) {
             rules[i] = String.valueOf(rule.charAt(i));
         }
 
-        for (int i = 0; i<sizeOfArrayOfRules; i+=sizeOfGroup){
+        for (int i = 0; i < SIZE_OF_ARRAY_OF_RULES; i += SIZE_OF_GROUP){
             if (
                     switch (rules[i]) {
                         case "r" ->
@@ -106,7 +106,7 @@ public class PosterService {
                                 !rules[i+3].equals("x") && !rules[i+3].equals("-");
 
                         case "-" -> {
-                            for(int k = i; k < i+sizeOfGroup; k++)
+                            for (int k = i; k < i + SIZE_OF_GROUP; k++)
                                 if (!rules[k].equals("-"))
                                     yield true;
                             yield false;
@@ -118,13 +118,13 @@ public class PosterService {
                 throw new RuntimeException("incorrect rule");
         }
 
-        Board board = new Board();
+        final Board board = new Board();
         board.setName(boardName);
         board.setRules(rules);
         board.setLifeCyclePosts(lifeCyclePosts);
         board.setLifeCycleThreads(lifeCycleThreads);
 
-        Users users = new Users();
+        final Users users = new Users();
         users.setBoard(board);
         users.setRole(true);
         users.setPassword(passwordEncoder.encode(password));
@@ -134,6 +134,6 @@ public class PosterService {
     }
 
     private String buildPictureUrl(String fileName) {
-        return minioEndpoint.replaceAll("/+$", "") + "/" + bucket + "/" + fileName;
+        return minioEndpoint.replaceAll("/+$", "") + "/" + BUCKET + "/" + fileName;
     }
 }

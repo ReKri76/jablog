@@ -23,7 +23,7 @@ public class CustomUserDetails implements UserDetails {
     private String role;
 
     public static CustomUserDetails build(Users users){
-        Board board = users.getBoard();
+        final Board board = users.getBoard();
 
         return new CustomUserDetails(
             board.getName(),

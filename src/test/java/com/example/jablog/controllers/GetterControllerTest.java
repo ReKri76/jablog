@@ -32,7 +32,7 @@ class GetterControllerTest {
 
     @Test
     void startShouldRenderIndexWithBoards() throws Exception {
-        ArrayList<String> boards = new ArrayList<>();
+        final ArrayList<String> boards = new ArrayList<>();
         boards.add("b");
         boards.add("a");
         when(getterService.start()).thenReturn(boards);
@@ -45,15 +45,15 @@ class GetterControllerTest {
 
     @Test
     void boardShouldRenderBoardPageWithDeleteFlagAndFormModel() throws Exception {
-        ArrayList<PostWithPicture> threads = new ArrayList<>();
-        PostWithPicture thread = new PostWithPicture();
+        final ArrayList<PostWithPicture> threads = new ArrayList<>();
+        final PostWithPicture thread = new PostWithPicture();
         thread.setHead("head");
         thread.setBody("body");
         thread.setUrl("http://img");
         threads.add(thread);
 
-        MockHttpSession session = new MockHttpSession();
-        CustomUserDetails user = new CustomUserDetails("b", new String[]{"r", "w", "d", "x"}, "pass", "mod", "ROLE_ADMIN");
+        final MockHttpSession session = new MockHttpSession();
+        final CustomUserDetails user = new CustomUserDetails("b", new String[]{"r", "w", "d", "x"}, "pass", "mod", "ROLE_ADMIN");
         session.setAttribute("b", user);
 
         when(getterService.board("b", 2)).thenReturn(threads);
@@ -70,23 +70,23 @@ class GetterControllerTest {
 
     @Test
     void threadShouldSplitMainPostFromReplies() throws Exception {
-        PostWithPicture main = new PostWithPicture();
+        final PostWithPicture main = new PostWithPicture();
         main.setId(10L);
         main.setHead("main");
         main.setBody("body");
         main.setUrl("http://img/main");
 
-        PostWithPicture reply = new PostWithPicture();
+        final PostWithPicture reply = new PostWithPicture();
         reply.setId(11L);
         reply.setHead("reply");
         reply.setBody("reply body");
         reply.setUrl("http://img/reply");
 
-        ArrayList<PostWithPicture> posts = new ArrayList<>();
+        final ArrayList<PostWithPicture> posts = new ArrayList<>();
         posts.add(main);
         posts.add(reply);
 
-        MockHttpSession session = new MockHttpSession();
+        final MockHttpSession session = new MockHttpSession();
 
         when(getterService.thread(10L, "b")).thenReturn(posts);
         when(getterService.canDelete("b", null, true)).thenReturn(false);
