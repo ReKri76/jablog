@@ -31,21 +31,36 @@ public class SecurityAccessService {
         String[] rules = user.getBoardRules();
         String[] currentRules = new String[4];
 
-        int shift = switch (user.getRole()) {
+        int shift = PosterService.sizeOfGroup * switch (user.getRole()) {
             case "ROLE_ADMIN" -> 0;
-            case "ROLE_GROUP" -> 4;
-            default -> 8;
+            case "ROLE_GROUP" -> 1;
+            default -> 2;
         };
 
         System.arraycopy(rules, shift, currentRules, 0, currentRules.length);
 
-        boolean hasAccess = !isThread || currentRules[3].equals("x");
+        if (!currentRules[0].equals("r"))
+            return false;
 
         return switch (method) {
-            case "POST" -> currentRules[1].equals("w") && hasAccess;
-            case "DELETE" -> currentRules[2].equals("d") && hasAccess;
-            case "GET" -> currentRules[0].equals("r") && hasAccess;
+            case "POST" ->
+                currentRules[1].equals("w") && (isThread || currentRules[3].equals("x"));
+
+            case "DELETE" ->
+                currentRules[2].equals("d") && (!isThread || currentRules[3].equals("x"));
+
+            case "GET" ->
+                isThread && !anyOtherFlagsIsEmpty(currentRules);
+
             default -> false;
         };
+    }
+
+    private boolean anyOtherFlagsIsEmpty (String[] rules){
+        for (int i = 1; i<rules.length; i++){
+            if (!rules[i].equals("-"))
+                return false;
+        }
+        return true;
     }
 }

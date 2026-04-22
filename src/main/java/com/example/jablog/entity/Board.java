@@ -28,14 +28,30 @@ public class Board {
      * w - write posts;
      * d - can delete;
      * x - have access to threads;
-     * no one can have access to threads and havent to read board or write boards
-     * users with 'x' modificator also can delete threads if they have 'd' modificator;
+     * rwdx - full access
+     * rwd- - read threads, read posts, create posts, delete posts
+     * rw-x - read threads, read posts, create posts, create threads
+     * rw-- - read threads, read posts, create posts
+     * r-dx - rad thread, read posts, delete posts, delete threads
+     * r-d- - rad thread, read posts, delete posts
+     * r--x - read threads, read boards
+     * r--- - read threads
+     * -wdx - incorrect
+     * -wd- - incorrect
+     * -w-x - incorrect
+     * -w-- - incorrect
+     * --dx - incorrect
+     * --d- - incorrect
+     * ---x - incorrect
+     * ---- - have no access
      * (owner), (group), (other);
      * */
     @Column(name="rules", nullable = false,
-            check = @CheckConstraint(constraint = "rules <@ ARRAY['r', 'w', 'd', 'x', '-'] " +
-                    "AND array_length(rules, 1) = 12" +
-                    " AND array_to_string(rules, '') ~ '^(rw[d-]x|[r-][w-][d-]-){3}$'"),
+            check = @CheckConstraint(constraint =
+                    "rules <@ ARRAY['r', 'w', 'd', 'x', '-'] " +
+                    "AND array_length(rules, 1) = 12 " +
+                    "AND array_to_string(rules, '') ~ '^(----|r[w-][d-][x-]){3}$'"
+            ),
             length = 12)
     private String[] rules = {"r","w","-","x", "r","w","-","x", "r","w","-","x"};
 

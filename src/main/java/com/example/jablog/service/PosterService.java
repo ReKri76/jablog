@@ -20,9 +20,9 @@ import org.springframework.stereotype.Service;
 public class PosterService {
 
     private final String bucket = "images";
-    private final int numberOfRulesGroups = 3;
-    private final int sizeOfGroup = 4;
-    private final int sizeOfArrayOfRules = sizeOfGroup*numberOfRulesGroups;
+    public static final int numberOfRulesGroups = 3;
+    public static final int sizeOfGroup = 4;
+    public static final int sizeOfArrayOfRules = sizeOfGroup*numberOfRulesGroups;
 
     private final PosterRepository posterRepository;
     private final EntityManager entityManager;

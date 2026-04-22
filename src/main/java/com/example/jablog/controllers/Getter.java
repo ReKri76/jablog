@@ -31,7 +31,7 @@ public class Getter {
         model.addAttribute("posts", posts);
         model.addAttribute("boardName", boardName);
         model.addAttribute("post", new Post());
-        model.addAttribute("canDelete", getterService.canDelete(boardName, customUserDetails, false));
+        model.addAttribute("canDelete", getterService.canDelete(boardName, customUserDetails, true));
         return "thread";
     }
 
