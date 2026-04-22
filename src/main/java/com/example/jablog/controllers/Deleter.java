@@ -27,7 +27,7 @@ public class Deleter {
                 .build();
     }
 
-    @DeleteMapping(value = "/{boardName}/{theadId}/{postId}")
+    @DeleteMapping(value = "/{boardName}/{threadId}/{postId}")
     public  ResponseEntity<Void> post(@PathVariable("boardName") String boardName, @PathVariable("postId") long postId,
                                       @PathVariable("threadId") long threadId){
 

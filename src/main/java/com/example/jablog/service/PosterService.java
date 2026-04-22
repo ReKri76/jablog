@@ -89,6 +89,9 @@ public class PosterService {
             throw new RuntimeException("incorrect rule");
 
         String[] rules = new String[sizeOfArrayOfRules];
+        for (int i = 0; i < rule.length(); i++) {
+            rules[i] = String.valueOf(rule.charAt(i));
+        }
 
         for (int i = 0; i<numberOfRulesGroups; i+=sizeOfGroup){
             if (
