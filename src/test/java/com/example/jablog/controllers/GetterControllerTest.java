@@ -53,7 +53,7 @@ class GetterControllerTest {
         threads.add(thread);
 
         final MockHttpSession session = new MockHttpSession();
-        final CustomUserDetails user = new CustomUserDetails("b", new String[]{"r", "w", "d", "x"}, "pass", "mod", "ROLE_ADMIN");
+        final CustomUserDetails user = new CustomUserDetails("b", "rwdxrw-xr---", "pass", "mod", "ROLE_ADMIN");
         session.setAttribute("b", user);
 
         when(getterService.board("b", 2)).thenReturn(threads);

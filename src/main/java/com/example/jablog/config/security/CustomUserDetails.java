@@ -17,7 +17,7 @@ import java.util.List;
 public class CustomUserDetails implements UserDetails {
 
     private String boardName;
-    private String[] boardRules;
+    private String boardRules;
     private String password;
     private String nickname;
     private String role;

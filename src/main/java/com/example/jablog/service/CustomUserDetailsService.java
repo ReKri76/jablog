@@ -35,7 +35,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
             final Board board = new Board();
             board.setName("ANON");
-            board.setRules(new String[12]);
+            board.setRules("------------");
 
             user.setBoard(board);
 
@@ -49,7 +49,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public @NonNull CustomUserDetails createDefault(){
         return new CustomUserDetails(
                 "ANON",
-                new String[12],
+                "------------",
                 "{noop}",
                 "ANON",
                 "ROLE_ANON"

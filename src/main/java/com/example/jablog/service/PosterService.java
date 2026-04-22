@@ -92,22 +92,17 @@ public class PosterService {
         if (rule.length()!=SIZE_OF_ARRAY_OF_RULES)
             throw new RuntimeException("incorrect rule");
 
-        final String[] rules = new String[SIZE_OF_ARRAY_OF_RULES];
-        for (int i = 0; i < rule.length(); i++) {
-            rules[i] = String.valueOf(rule.charAt(i));
-        }
-
         for (int i = 0; i < SIZE_OF_ARRAY_OF_RULES; i += SIZE_OF_GROUP){
             if (
-                    switch (rules[i]) {
-                        case "r" ->
-                                !rules[i+1].equals("w") && !rules[i+1].equals("-") ||
-                                !rules[i+2].equals("d") && !rules[i+2].equals("-") ||
-                                !rules[i+3].equals("x") && !rules[i+3].equals("-");
+                    switch (rule.charAt(i)) {
+                        case 'r' ->
+                                (rule.charAt(i + 1) != 'w' && rule.charAt(i + 1) != '-') ||
+                                (rule.charAt(i + 2) != 'd' && rule.charAt(i + 2) != '-') ||
+                                (rule.charAt(i + 3) != 'x' && rule.charAt(i + 3) != '-');
 
-                        case "-" -> {
+                        case '-' -> {
                             for (int k = i; k < i + SIZE_OF_GROUP; k++)
-                                if (!rules[k].equals("-"))
+                                if (rule.charAt(k) != '-')
                                     yield true;
                             yield false;
                         }
@@ -120,7 +115,7 @@ public class PosterService {
 
         final Board board = new Board();
         board.setName(boardName);
-        board.setRules(rules);
+        board.setRules(rule);
         board.setLifeCyclePosts(lifeCyclePosts);
         board.setLifeCycleThreads(lifeCycleThreads);
 
