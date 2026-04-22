@@ -23,18 +23,19 @@ public class Deleter {
 
         return ResponseEntity
                 .ok()
-                .header("HX-Redirect", "/"+boardName+"/"+threadId)
+                .header("HX-Redirect", "/"+boardName)
                 .build();
     }
 
-    @DeleteMapping(value = "/{boardName}/{postId}")
-    public  ResponseEntity<Void> post(@PathVariable("boardName") String boardName, @PathVariable("postId") long postId){
+    @DeleteMapping(value = "/{boardName}/{theadId}/{postId}")
+    public  ResponseEntity<Void> post(@PathVariable("boardName") String boardName, @PathVariable("postId") long postId,
+                                      @PathVariable("threadId") long threadId){
 
         deleterService.post(postId);
 
         return ResponseEntity
                 .ok()
-                .header("HX-Redirect", "/"+boardName)
+                .header("HX-Redirect", "/"+threadId)
                 .build();
     }
 

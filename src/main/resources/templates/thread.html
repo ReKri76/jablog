@@ -21,7 +21,7 @@
                 <img th:src="${currentPost.url}"/>
                 <span th:if="${canDelete}">
                     <button
-                         th:hx-delete="@{/deleter/{boardName}/{threadId}/{postId}
+                         th:hx-delete="@{/deleter/{boardName}/{postId}
                         (boardName=${boardName}, threadId=${thread.id}, postId=${currentPost.id})}">
                     delete post
                     </button>
