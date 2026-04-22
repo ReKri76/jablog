@@ -16,7 +16,7 @@
             <span id="${currentPost.id}">
                 <span th:text="${currentPost.id}">id</span>
                 <span th:text="${currentPost.head}">head</span>
-                <span th:text="${currentPost.body}">body</span>
+                <span th:utext="${currentPost.body}">body</span>
                 <img th:src="${currentPost.url}" alt="${currentPost.url}"/>
                 <br>
             </span>

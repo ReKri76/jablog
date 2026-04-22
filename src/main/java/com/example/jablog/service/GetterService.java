@@ -9,6 +9,7 @@ import com.example.jablog.repository.GetterRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.HtmlUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -57,7 +58,7 @@ public class GetterService {
 
         Threads threads = getterRepository.thread(threadId, boardName);
 
-        PostWithPicture main= new PostWithPicture();
+        PostWithPicture main = new PostWithPicture();
         main.setId(threads.getId());
         main.setUrl(threads.getPicture());
         main.setHead(threads.getHeader());
@@ -73,7 +74,7 @@ public class GetterService {
             postWithPicture.setId(post.getId());
             postWithPicture.setUrl(post.getPicture());
             postWithPicture.setHead(post.getHeader());
-            postWithPicture.setBody(post.getContent());
+            postWithPicture.setBody(createAnchor(post.getContent()));
 
             posts.add(postWithPicture);
         });
@@ -89,4 +90,13 @@ public class GetterService {
 
         return securityAccessService.canAccess(boardName, customUserDetails, "DELETE", isThread, false);
     }
+
+    private String createAnchor(String text){
+        text = HtmlUtils.htmlEscape(text);
+
+        text = text.replaceAll(">>(\\d+)", "<a class=\"anchor\" href=\"#p$1\">>>$1</a>");
+
+        return text;
+    }
+
 }
