@@ -3,21 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <title>Board</title>
+    <script th:src="@{/script/js/htmx.min.js}" type="text/javascript"></script>
 </head>
-    <body>
+    <body th:hx-headers='|{"X-CSRF-TOKEN": "${_csrf.token}"}|'>
         <div>
             <span th:each="thread :${threads}">
                 <span>
                     <a
                         th:href="@{/{boardName}/{threadId}(boardName=${boardName}, threadId=${thread.id})}"
                         th:text="${thread.id}"
-                        id="${thread.id}">
+                        th:id="${thread.id}">
                         id
                     </a>
                 </span>
                 <span th:text="${thread.head}">head</span>
                 <span th:text="${thread.body}">name</span>
                 <img th:src="${thread.url}" alt="picture"/>
+                <span th:if="${canDelete}">
+                    <button
+                        th:hx-delete="@{/deleter/{boardName}/{threadId}
+                        (boardName=${boardName}, threadId=${thread.id})}">
+                    delete thread
+                </button>
+                </span>
                 <br>
             </span>
         </div>
