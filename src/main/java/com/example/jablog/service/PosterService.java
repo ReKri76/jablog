@@ -43,8 +43,6 @@ public class PosterService {
                 .bySimpleNaturalId(Board.class)
                 .getReference(board);
 
-        minioService.savePicture(file, bucket);
-
         final String name = buildPictureUrl(file.getName());
 
         final Threads threads = new Threads();
@@ -55,6 +53,8 @@ public class PosterService {
 
         final long idOfThread = posterRepository.thread(threads);
 
+        minioService.savePicture(file, bucket);
+
         return idOfThread;
     }
 
@@ -62,9 +62,10 @@ public class PosterService {
     public void post(@NonNull Post post, Picture file, long threadId, String board){
 
         String name = "";
+        boolean savePic = false;
         if (file!=null) {
-            minioService.savePicture(file, bucket);
             name = buildPictureUrl(file.getName());
+            savePic = true;
         }
 
         final Posts posts = new Posts();
@@ -74,6 +75,9 @@ public class PosterService {
         posts.setPicture(name);
 
         posterRepository.post(posts);
+
+        if (savePic)
+            minioService.savePicture(file, bucket);
     }
 
     @Transactional
