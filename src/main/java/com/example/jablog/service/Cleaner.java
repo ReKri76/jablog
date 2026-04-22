@@ -21,13 +21,13 @@ public class Cleaner {
 
     private final CleanerRepository cleanerRepository;
     private final static Logger logger = (Logger) LoggerFactory.getLogger(Cleaner.class);
-    private final long oldThread = Instant.now().toEpochMilli()- Duration.ofMinutes(30).toMillis();
-    private final long oldBoard = Instant.now().toEpochMilli()-Duration.ofDays(1).toMillis();
     private final String bucket = "images";
     private final MinioService minioService;
 
     @Scheduled(cron = "0 0 4 * * WED")
     public void cleanThreads(){
+
+        final long oldThread = Instant.now().toEpochMilli()- Duration.ofMinutes(30).toMillis();
 
         ArrayList<Threads> deletedThreads = cleanerRepository.threads(oldThread);
 
@@ -64,6 +64,8 @@ public class Cleaner {
 
     @Scheduled(cron="0 0 5 24 * *")
     public void cleanBoards(){
+
+        final long oldBoard = Instant.now().toEpochMilli()-Duration.ofDays(1).toMillis();
 
         ArrayList<Board> deletedBoards = cleanerRepository.boards(oldBoard);
 

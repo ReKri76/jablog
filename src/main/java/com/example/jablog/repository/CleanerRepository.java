@@ -58,10 +58,10 @@ public class CleanerRepository {
                 "delete from Threads t " +
                 "where not exists(" +
                         "select 1 from Posts p " +
-                        "where p.createdAt >= now - t.board.lifeCycleThreads * :unxtm " +
+                        "where p.createdAt >= :now - t.board.lifeCycleThreads * :unxtm " +
                         "and p.thread = t" +
                         ") " +
-                        "and t.createdAt < : oldThread";
+                        "and t.createdAt < :oldThread";
         entityManager.createQuery(deleteJpql)
                 .setParameter("oldThread", oldThread)
                 .setParameter("unxtm", unxtm)
@@ -81,13 +81,13 @@ public class CleanerRepository {
 
     public ArrayList<Board> boards(long oldBoard){
 
-        String selectJpql = "from Board b left join fetch b.users where not exists(select 1 from threads t where t.board = b) " +
+        String selectJpql = "from Board b left join fetch b.users where not exists(select 1 from Threads t where t.board = b) " +
                 "and b.createdAt < :oldBoard";
         List<Board> boards = entityManager.createQuery(selectJpql, Board.class)
                 .setParameter("oldBoard", oldBoard)
                 .getResultList();
 
-        String deleteJpql = "delete from Board b where not exists(select 1 from threads t where t.board = b) " +
+        String deleteJpql = "delete from Board b where not exists(select 1 from Threads t where t.board = b) " +
                 "and b.createdAt < :oldBoard";
         entityManager.createQuery(deleteJpql, Board.class)
                 .setParameter("oldBoard", oldBoard)

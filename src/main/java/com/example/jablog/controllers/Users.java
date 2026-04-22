@@ -34,7 +34,7 @@ public class Users {
     @DeleteMapping(value = "/panel/{boardName}/{nickname}")
     public ResponseEntity<Void> deleteUser(@PathVariable("boardName") String boardName, @PathVariable("nickname") String nickname) {
 
-        usersService.deleteUser(nickname);
+        usersService.deleteUser(nickname, boardName);
 
         return ResponseEntity
                 .ok()

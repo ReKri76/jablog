@@ -59,7 +59,7 @@ public class PosterService {
     }
 
     @Transactional
-    public void post(@NonNull Post post, Picture file, long threadId){
+    public void post(@NonNull Post post, Picture file, long threadId, String board){
 
         String name = "";
         if (file!=null) {
@@ -70,7 +70,7 @@ public class PosterService {
         final Posts posts = new Posts();
         posts.setContent(post.getBody());
         posts.setHeader(post.getHead());
-        posts.setThread(entityManager.getReference(Threads.class, threadId));
+        posts.setThread(posterRepository.getThreadsById(threadId, board));
         posts.setPicture(name);
 
         posterRepository.post(posts);
@@ -93,7 +93,7 @@ public class PosterService {
             rules[i] = String.valueOf(rule.charAt(i));
         }
 
-        for (int i = 0; i<numberOfRulesGroups; i+=sizeOfGroup){
+        for (int i = 0; i<sizeOfArrayOfRules; i+=sizeOfGroup){
             if (
                     switch (rules[i]) {
                         case "r" ->

@@ -19,7 +19,7 @@ public class Deleter {
     public ResponseEntity<Void> thread(@PathVariable("boardName") String boardName,
                                        @PathVariable("threadId") long threadId){
 
-        deleterService.thread(threadId);
+        deleterService.thread(threadId, boardName);
 
         return ResponseEntity
                 .ok()
@@ -31,7 +31,7 @@ public class Deleter {
     public  ResponseEntity<Void> post(@PathVariable("boardName") String boardName, @PathVariable("postId") long postId,
                                       @PathVariable("threadId") long threadId){
 
-        deleterService.post(postId);
+        deleterService.post(postId, boardName);
 
         return ResponseEntity
                 .ok()

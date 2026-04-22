@@ -5,7 +5,6 @@ import com.example.jablog.entity.Posts;
 import com.example.jablog.entity.Threads;
 import com.example.jablog.entity.Users;
 import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -15,7 +14,6 @@ public class PosterRepository {
 
     private final EntityManager entityManager;
 
-    @Transactional
     public long thread(Threads threads) {
 
         entityManager.persist(threads);
@@ -24,15 +22,20 @@ public class PosterRepository {
         return threads.getId();
     }
 
-    @Transactional
     public void post(Posts posts) {entityManager.persist(posts);}
 
-    @Transactional
     public void board(Board board, Users users){
         entityManager.persist(board);
         entityManager.persist(users);
     }
 
-    @Transactional
     public void user(Users users){entityManager.persist(users);}
+
+    public Threads getThreadsById(long id, String boardName){
+        return entityManager.createQuery("from Threads t where t.id = :threadId and t.board.name = :boardName",
+                        Threads.class)
+                 .setParameter("threadId", id)
+                 .setParameter("boardName", boardName)
+                 .getSingleResult();
+     }
 }

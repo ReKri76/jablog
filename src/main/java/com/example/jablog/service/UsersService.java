@@ -40,8 +40,8 @@ public class UsersService {
     }
 
     @Transactional
-    public void deleteUser(String nickname){
-        usersRepository.deleteUser(nickname);
+    public void deleteUser(String nickname, String boardName){
+        usersRepository.deleteUser(nickname, boardName);
     }
 
     @Transactional
