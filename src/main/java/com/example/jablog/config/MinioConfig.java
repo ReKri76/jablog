@@ -8,17 +8,12 @@ import io.minio.MinioClient;
 @Configuration
 public class MinioConfig {
 
-    @Value("${minio.endpoint}")
-    private String endpoint;
-
-    @Value("${minio.access.key}")
-    private String accessKey;
-
-    @Value("${minio.secret.key}")
-    private String secretKey;
-
     @Bean
-    public MinioClient minioClient(){
+    public MinioClient minioClient(
+            @Value("${minio.endpoint:DEBUG_NOT_FOUND}") String endpoint,
+            @Value("${minio.access.key}") String accessKey,
+            @Value("${minio.secret.key}") String secretKey) {
+
         return MinioClient.builder()
                 .endpoint(endpoint)
                 .credentials(accessKey, secretKey)

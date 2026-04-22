@@ -4,6 +4,7 @@ import com.example.jablog.config.security.CustomAuthorizationManager;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -27,6 +28,9 @@ public class SecurityConfig {
 
     private final CustomAuthorizationManager customAuthorizationManager;
 
+    @Value("${minio.endpoint}")
+    private String minioEndpoint;
+
     @Bean
     public SecurityFilterChain securityFilterChain(@NonNull HttpSecurity http) {
 
@@ -40,7 +44,7 @@ public class SecurityConfig {
                                         "script-src 'self'; " +
                                         "object-src 'none'; " +
                                         "style-src 'self' 'unsafe-inline'; " +
-                                        "img-src http://localhost:9000 'self' data:; " +
+                                        "img-src " + minioEndpoint + " 'self' data:; " +
                                         "connect-src 'self'; " +
                                         "font-src 'self'; " +
                                         "frame-ancestors 'none'; " +
