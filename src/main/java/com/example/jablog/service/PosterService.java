@@ -12,7 +12,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
 import org.jspecify.annotations.NonNull;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PosterService {
 
-    private static final String BUCKET = "images";
     public static final int NUMBER_OF_RULES_GROUPS = 3;
     public static final int SIZE_OF_GROUP = 4;
     public static final int SIZE_OF_ARRAY_OF_RULES = SIZE_OF_GROUP * NUMBER_OF_RULES_GROUPS;
@@ -30,9 +28,6 @@ public class PosterService {
     private final EntityManager entityManager;
     private final MinioService minioService;
     private final PasswordEncoder passwordEncoder;
-
-    @Value("${minio.endpoint}")
-    private String minioEndpoint;
 
     @Transactional
     public long thread(@NonNull Post post, Picture file, String board){
@@ -44,7 +39,7 @@ public class PosterService {
                 .bySimpleNaturalId(Board.class)
                 .getReference(board);
 
-        final String name = buildPictureUrl(file.getName());
+        final String name = MinioService.buildPictureUrl(file.getName());
 
         final Threads threads = new Threads();
         threads.setContent(post.getBody());
@@ -54,7 +49,7 @@ public class PosterService {
 
         final long idOfThread = posterRepository.thread(threads);
 
-        minioService.savePicture(file, BUCKET);
+        minioService.savePicture(file, MinioService.BUCKET);
 
         return idOfThread;
     }
@@ -65,7 +60,7 @@ public class PosterService {
         String name = "";
         boolean savePic = false;
         if (file!=null) {
-            name = buildPictureUrl(file.getName());
+            name = MinioService.buildPictureUrl(file.getName());
             savePic = true;
         }
 
@@ -78,7 +73,7 @@ public class PosterService {
         posterRepository.post(posts);
 
         if (savePic)
-            minioService.savePicture(file, BUCKET);
+            minioService.savePicture(file, MinioService.BUCKET);
     }
 
     @Transactional
@@ -129,9 +124,5 @@ public class PosterService {
         users.setNickname(nickname);
 
         posterRepository.board(board, users);
-    }
-
-    private String buildPictureUrl(String fileName) {
-        return minioEndpoint.replaceAll("/+$", "") + "/" + BUCKET + "/" + fileName;
     }
 }

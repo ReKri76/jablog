@@ -5,6 +5,7 @@ import io.minio.*;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,6 +16,10 @@ public class MinioService {
 
     private static final int MAX_PART_SIZE = 10 * 1024 * 1024;
     private static final int INITIAL_FILE_LIST_CAPACITY = 1000;
+    public static final String BUCKET = "images";
+
+    @Value("${minio.endpoint:DEBUG_NOT_FOUND}")
+    public static  String ENDPOINT;
 
     private final MinioClient minioClient;
 
@@ -66,6 +71,10 @@ public class MinioService {
             }
         });
         return names;
+    }
+
+    public static String buildPictureUrl(String fileName) {
+        return ENDPOINT.replaceAll("/+$", "") + "/" + BUCKET + "/" + fileName;
     }
 
 }

@@ -20,7 +20,6 @@ import java.util.ArrayList;
 public class Cleaner {
 
     private static final Logger LOGGER = (Logger) LoggerFactory.getLogger(Cleaner.class);
-    private static final String BUCKET = "images";
 
     private final CleanerRepository cleanerRepository;
     private final MinioService minioService;
@@ -54,11 +53,12 @@ public class Cleaner {
     @Scheduled(cron ="0 0 4 13 * *")
     public void cleanPics(){
 
-        final ArrayList<String> pics = cleanerRepository.pics();
-        final ArrayList<String> realPics = minioService.getAllFileName(BUCKET);
+        final ArrayList<String> picsInDB = cleanerRepository.pics();
+        final ArrayList<String> picsInS3 = minioService.getAllFileName(MinioService.BUCKET);
 
-        realPics.forEach( pic -> {
-            if (!pics.contains(pic))
+        picsInS3.forEach( pic -> {
+            pic = MinioService.buildPictureUrl(pic);
+            if (!picsInDB.contains(pic))
                 minioService.deletePicture(pic);
         });
     }
