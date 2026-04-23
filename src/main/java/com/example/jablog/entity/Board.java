@@ -1,5 +1,6 @@
 package com.example.jablog.entity;
 
+import com.example.jablog.service.PosterService;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -52,7 +53,7 @@ public class Board {
     private String rules = "rw-xrw-xrw-x";
 
     @Column(name="lifeCycleThreads",  nullable = false)
-    @Max(28)
+    @Max(PosterService.MAX_LIFE_CYCLE_OF_THREADS)
     @Min(2)
     private int lifeCycleThreads = 14;
 

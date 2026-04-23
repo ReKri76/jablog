@@ -35,7 +35,7 @@ public class Deleter {
 
         return ResponseEntity
                 .ok()
-                .header("HX-Redirect", "/"+threadId)
+                .header("HX-Redirect", "/"+boardName+"/"+threadId)
                 .build();
     }
 

@@ -24,6 +24,7 @@ public class PosterService {
     public static final int NUMBER_OF_RULES_GROUPS = 3;
     public static final int SIZE_OF_GROUP = 4;
     public static final int SIZE_OF_ARRAY_OF_RULES = SIZE_OF_GROUP * NUMBER_OF_RULES_GROUPS;
+    public static final int MAX_LIFE_CYCLE_OF_THREADS = 28;
 
     private final PosterRepository posterRepository;
     private final EntityManager entityManager;
@@ -88,6 +89,8 @@ public class PosterService {
             throw new RuntimeException("life cycle of posts cant be longer then threads");
         if (lifeCyclePosts<0)
             throw new RuntimeException("value of life cycle must be positive");
+        if(lifeCycleThreads>MAX_LIFE_CYCLE_OF_THREADS)
+            throw new RuntimeException("value of life cycle of threads cant be more than 28");
 
         if (rule.length()!=SIZE_OF_ARRAY_OF_RULES)
             throw new RuntimeException("incorrect rule");
