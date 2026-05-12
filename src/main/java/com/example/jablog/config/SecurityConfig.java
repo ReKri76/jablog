@@ -1,10 +1,10 @@
 package com.example.jablog.config;
 
-import com.example.jablog.config.security.CustomAuthorizationManager;
+import com.example.jablog.config.security.*;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
-import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -26,7 +26,10 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CustomAuthorizationManager customAuthorizationManager;
+    private final PosterAuthorizationManager posterAuthorizationManager;
+    private final DeleterAuthorizationManager deleterAuthorizationManager;
+    private final UsersAuthorizationManager usersAuthorizationManager;
+    private final GetterAuthorizationManager getterAuthorizationManager;
 
     @Value("${minio.endpoint}")
     private String minioEndpoint;
@@ -94,26 +97,26 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/users/panel").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/poster/{boardName}/{thread}")
-                            .access(customAuthorizationManager)
+                            .access(posterAuthorizationManager)
                         .requestMatchers(HttpMethod.POST, "/poster/{boardName}")
-                            .access(customAuthorizationManager)
+                            .access(posterAuthorizationManager)
 
                         .requestMatchers(HttpMethod.DELETE, "/deleter/{boardName}/{thread}")
-                            .access(customAuthorizationManager)
+                            .access(deleterAuthorizationManager)
                         .requestMatchers(HttpMethod.DELETE, "/deleter/{boardName}/{thread}/{post}")
-                            .access(customAuthorizationManager)
+                            .access(deleterAuthorizationManager)
 
                         .requestMatchers(HttpMethod.DELETE, "/users/panel/{boardName}/{nickname}")
-                            .access(customAuthorizationManager)
+                            .access(usersAuthorizationManager)
                         .requestMatchers(HttpMethod.POST, "/users/panel/{boardName}")
-                            .access(customAuthorizationManager)
+                            .access(usersAuthorizationManager)
                         .requestMatchers(HttpMethod.GET, "/users/panel/{boardName}")
-                            .access(customAuthorizationManager)
+                            .access(usersAuthorizationManager)
 
                         .requestMatchers(HttpMethod.GET, "/{boardName}/{thread}")
-                            .access(customAuthorizationManager)
+                            .access(getterAuthorizationManager)
                         .requestMatchers(HttpMethod.GET, "/{boardName}")
-                            .access(customAuthorizationManager)
+                            .access(getterAuthorizationManager)
 
                         .anyRequest().denyAll()
                 );
