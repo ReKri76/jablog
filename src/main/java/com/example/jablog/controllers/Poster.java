@@ -48,7 +48,7 @@ public class Poster {
             picture = new Picture(file);
         }
 
-        posterService.post(post, picture, threadID, boardName);
+        posterService.post(post, picture, threadID);
 
         return "redirect:/"+boardName+"/"+threadID;
     }

@@ -15,4 +15,32 @@ public class SecurityRepository {
                 .setParameter("boardName", boardName)
                 .getSingleResult();
     }
+
+    public Boolean isThreadInBoard(String boardName, long threadId){
+        Long count = entityManager.createQuery("""
+            select count(t)
+            from Threads t
+            where t.id = :threadId
+              and t.board.name = :boardName
+            """, Long.class)
+                .setParameter("boardName", boardName)
+                .setParameter("threadId", threadId)
+                .getSingleResult();
+
+        return count > 0;
+    }
+
+    public Boolean isPostInBoard(String boardName, long postId){
+        Long count = entityManager.createQuery("""
+            select count(t)
+            from Posts t
+            where t.id = :postId
+              and t.thread.board.name = :boardName
+            """, Long.class)
+                .setParameter("boardName", boardName)
+                .setParameter("postId", postId)
+                .getSingleResult();
+
+        return count > 0;
+    }
 }

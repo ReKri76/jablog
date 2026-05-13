@@ -17,12 +17,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -50,7 +50,6 @@ class PosterServiceTest {
     @BeforeEach
     void setUp() {
         posterService = new PosterService(posterRepository, entityManager, minioService, passwordEncoder);
-        ReflectionTestUtils.setField(posterService, "minioEndpoint", "http://localhost:9000/");
     }
 
     @Test
@@ -67,6 +66,8 @@ class PosterServiceTest {
         when(session.bySimpleNaturalId(Board.class)).thenReturn(naturalIdLoadAccess);
         when(naturalIdLoadAccess.getReference("b")).thenReturn(boardRef);
         when(posterRepository.thread(any(Threads.class))).thenReturn(15L);
+        when(minioService.buildPictureUrl(anyString())).thenAnswer(invocation ->
+                "http://localhost:9000/images/" + invocation.getArgument(0, String.class));
 
         final long result = posterService.thread(post, picture, "b");
 
@@ -93,9 +94,9 @@ class PosterServiceTest {
         post.setBody("message");
 
         final Threads threadRef = new Threads();
-        when(posterRepository.getThreadsById(42L, "b")).thenReturn(threadRef);
+        when(posterRepository.getThreadsById(42L)).thenReturn(threadRef);
 
-        posterService.post(post, null, 42L, "b");
+        posterService.post(post, null, 42L);
 
         verify(minioService, never()).savePicture(any(Picture.class), any(String.class));
 
@@ -117,9 +118,11 @@ class PosterServiceTest {
 
         final Picture picture = picture("cat.jpg");
         final Threads threadRef = new Threads();
-        when(posterRepository.getThreadsById(42L, "b")).thenReturn(threadRef);
+        when(posterRepository.getThreadsById(42L)).thenReturn(threadRef);
+        when(minioService.buildPictureUrl(anyString())).thenAnswer(invocation ->
+                "http://localhost:9000/images/" + invocation.getArgument(0, String.class));
 
-        posterService.post(post, picture, 42L, "b");
+        posterService.post(post, picture, 42L);
 
         verify(minioService).savePicture(picture, "images");
 

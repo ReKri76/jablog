@@ -48,7 +48,7 @@ class PosterMultipartPostTest {
 
     @Test
     void multipartPostWithImageShouldRedirectBackToThread() throws Exception {
-        doNothing().when(posterService).post(any(Post.class), any(Picture.class), eq(777L), eq("b"));
+        doNothing().when(posterService).post(any(Post.class), any(Picture.class), eq(777L));
 
         final MockMultipartFile imagePart = new MockMultipartFile(
                 "image",
@@ -66,7 +66,7 @@ class PosterMultipartPostTest {
                 .andExpect(redirectedUrl("/b/777"));
 
         final ArgumentCaptor<Post> postCaptor = ArgumentCaptor.forClass(Post.class);
-        verify(posterService).post(postCaptor.capture(), any(Picture.class), eq(777L), eq("b"));
+        verify(posterService).post(postCaptor.capture(), any(Picture.class), eq(777L));
         assertThat(postCaptor.getValue().getHead()).isEqualTo("hello");
         assertThat(postCaptor.getValue().getBody()).isEqualTo("world");
     }
@@ -87,12 +87,12 @@ class PosterMultipartPostTest {
                         .with(csrf()))
                 .andExpect(status().isBadRequest());
 
-        verify(posterService, never()).post(any(Post.class), any(Picture.class), eq(777L), eq("b"));
+        verify(posterService, never()).post(any(Post.class), any(Picture.class), eq(777L));
     }
 
     @Test
     void multipartPostWithoutImageShouldPassNullPicture() throws Exception {
-        doNothing().when(posterService).post(any(Post.class), eq(null), eq(777L), eq("b"));
+        doNothing().when(posterService).post(any(Post.class), eq(null), eq(777L));
 
         mockMvc.perform(multipart("/poster/{boardName}/{threadID}", "b", 777L)
                         .param("head", "hello")
@@ -101,7 +101,7 @@ class PosterMultipartPostTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/b/777"));
 
-        verify(posterService).post(any(Post.class), eq(null), eq(777L), eq("b"));
+        verify(posterService).post(any(Post.class), eq(null), eq(777L));
     }
 
     @Test

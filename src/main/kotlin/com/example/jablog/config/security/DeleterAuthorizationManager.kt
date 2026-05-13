@@ -2,6 +2,8 @@ package com.example.jablog.config.security
 
 import com.example.jablog.service.CustomUserDetailsService
 import com.example.jablog.service.SecurityAccessService
+import com.example.jablog.service.SecurityData
+import com.example.jablog.service.security.DeleterAccessService
 import org.springframework.security.authorization.AuthorizationDecision
 import org.springframework.security.authorization.AuthorizationManager
 import org.springframework.security.authorization.AuthorizationResult
@@ -11,8 +13,8 @@ import org.springframework.stereotype.Component
 import java.util.function.Supplier
 
 @Component
-class DeleterAuthorizationManager(private val securityAccessService: SecurityAccessService,
-                                 private val customUserDetailsService: CustomUserDetailsService) :
+class DeleterAuthorizationManager(private val deleterAccessService: DeleterAccessService,
+                                  private val customUserDetailsService: CustomUserDetailsService) :
     AuthorizationManager<RequestAuthorizationContext> {
 
     override fun authorize(
@@ -22,17 +24,17 @@ class DeleterAuthorizationManager(private val securityAccessService: SecurityAcc
         val session = context.request.getSession(false)
 
         val boardName = context.variables["boardName"] as String
-        val isThread = !(context.variables["post"]).isNullOrBlank()
+        val postId = context.variables["post"]
 
         val user = (session.getAttribute(boardName) ?: customUserDetailsService.createDefault())
                 as CustomUserDetails
 
-        val canAccess = securityAccessService.canAccess(
-            boardName,
-            user,
-            "DELETE",
-            isThread,
-            false
+        val canAccess = deleterAccessService.canAccess(
+            data = SecurityData.Deleter(
+                boardName = boardName,
+                user = user,
+                postId = postId
+            )
         )
 
         return AuthorizationDecision(canAccess)

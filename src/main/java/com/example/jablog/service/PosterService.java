@@ -39,7 +39,7 @@ public class PosterService {
                 .bySimpleNaturalId(Board.class)
                 .getReference(board);
 
-        final String name = MinioService.buildPictureUrl(file.getName());
+        final String name = minioService.buildPictureUrl(file.getName());
 
         final Threads threads = new Threads();
         threads.setContent(post.getBody());
@@ -55,19 +55,19 @@ public class PosterService {
     }
 
     @Transactional
-    public void post(@NonNull Post post, Picture file, long threadId, String board){
+    public void post(@NonNull Post post, Picture file, long threadId){
 
         String name = "";
         boolean savePic = false;
         if (file!=null) {
-            name = MinioService.buildPictureUrl(file.getName());
+            name = minioService.buildPictureUrl(file.getName());
             savePic = true;
         }
 
         final Posts posts = new Posts();
         posts.setContent(post.getBody());
         posts.setHeader(post.getHead());
-        posts.setThread(posterRepository.getThreadsById(threadId, board));
+        posts.setThread(posterRepository.getThreadsById(threadId));
         posts.setPicture(name);
 
         posterRepository.post(posts);

@@ -2,6 +2,8 @@ package com.example.jablog.config.security
 
 import com.example.jablog.service.CustomUserDetailsService
 import com.example.jablog.service.SecurityAccessService
+import com.example.jablog.service.SecurityData
+import com.example.jablog.service.security.GetterAccessService
 import org.springframework.security.authorization.AuthorizationDecision
 import org.springframework.security.authorization.AuthorizationManager
 import org.springframework.security.authorization.AuthorizationResult
@@ -11,8 +13,8 @@ import org.springframework.stereotype.Component
 import java.util.function.Supplier
 
 @Component
-class GetterAuthorizationManager(private val securityAccessService: SecurityAccessService,
-                                private val customUserDetailsService: CustomUserDetailsService) :
+class GetterAuthorizationManager(private val getterAccessService: GetterAccessService,
+                                 private val customUserDetailsService: CustomUserDetailsService) :
     AuthorizationManager<RequestAuthorizationContext> {
 
     override fun authorize(
@@ -21,18 +23,18 @@ class GetterAuthorizationManager(private val securityAccessService: SecurityAcce
     ): AuthorizationResult {
         val session = context.request.getSession(false)
 
-        val boardName = context.variables["boardName"]
-        val isThread = !(context.variables["post"]).isNullOrBlank()
+        val boardName = context.variables["boardName"] as String
+        val threadId : String? = context.variables["thread"]
 
         val user = (session.getAttribute(boardName) ?: customUserDetailsService.createDefault())
                 as CustomUserDetails
 
-        val canAccess = securityAccessService.canAccess(
-            boardName,
-            user,
-            "GET",
-            isThread,
-            false
+        val canAccess = getterAccessService.canAccess(
+            data = SecurityData.Getter(
+                boardName = boardName,
+                user = user,
+                threadId = threadId
+            )
         )
 
         return AuthorizationDecision(canAccess)

@@ -37,13 +37,12 @@ public class GetterRepository {
        return new ArrayList<Threads>(threads);
    }
 
-   public Threads thread(long threadId, String boardName){
+   public Threads thread(long threadId){
 
-        final String jpql = "from Threads t left join fetch t.posts where t.id = :threadId and t.board.name = :boardName";
+        final String jpql = "from Threads t left join fetch t.posts where t.id = :threadId";
 
        final Threads posts = entityManager.createQuery(jpql, Threads.class)
                 .setParameter("threadId", threadId)
-                .setParameter("boardName", boardName)
                .getSingleResult();
 
         return posts;

@@ -6,6 +6,8 @@ import com.example.jablog.entity.Board;
 import com.example.jablog.entity.Posts;
 import com.example.jablog.entity.Threads;
 import com.example.jablog.repository.GetterRepository;
+import com.example.jablog.service.security.DeleterAccessService;
+import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +21,7 @@ import java.util.TreeSet;
 public class GetterService {
 
     private final GetterRepository getterRepository;
-    private final SecurityAccessService securityAccessService;
+    private final DeleterAccessService deleterAccessService;
     private final CustomUserDetailsService customUserDetailsService;
 
     @Transactional
@@ -54,9 +56,9 @@ public class GetterService {
     }
 
     @Transactional
-    public ArrayList<PostWithPicture> thread(long threadId, String boardName){
+    public ArrayList<PostWithPicture> thread(long threadId){
 
-        final Threads threads = getterRepository.thread(threadId, boardName);
+        final Threads threads = getterRepository.thread(threadId);
 
         final PostWithPicture main = new PostWithPicture();
         main.setId(threads.getId());
@@ -83,12 +85,12 @@ public class GetterService {
     }
 
     @Transactional
-    public boolean canDelete(String boardName, CustomUserDetails customUserDetails, boolean isThread){
+    public boolean canDelete(String boardName, CustomUserDetails customUserDetails, @Nullable String id){
 
         if (customUserDetails == null)
             customUserDetails = customUserDetailsService.createDefault();
 
-        return securityAccessService.canAccess(boardName, customUserDetails, "DELETE", isThread, false);
+        return deleterAccessService.canAccess(new SecurityData.Deleter(boardName, customUserDetails, id));
     }
 
     private String createAnchor(String text){

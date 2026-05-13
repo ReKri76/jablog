@@ -23,15 +23,18 @@ public class Getter {
     @GetMapping("/{boardName}/{threadId}")
     public String thread(@PathVariable long threadId, @PathVariable String boardName, Model model, HttpSession session){
 
-        final ArrayList<PostWithPicture> posts = getterService.thread(threadId, boardName);
+        final ArrayList<PostWithPicture> posts = getterService.thread(threadId);
         final CustomUserDetails customUserDetails = (CustomUserDetails) session.getAttribute(boardName);
 
-        model.addAttribute("thread", posts.getFirst());
+        PostWithPicture thread =  posts.getFirst();
+
+        model.addAttribute("thread",thread);
         posts.removeFirst();
         model.addAttribute("posts", posts);
         model.addAttribute("boardName", boardName);
         model.addAttribute("post", new Post());
-        model.addAttribute("canDelete", getterService.canDelete(boardName, customUserDetails, true));
+        model.addAttribute("canDelete", getterService.canDelete(boardName, customUserDetails,
+                Long.toString(thread.getId())));
         return "thread";
     }
 
@@ -45,7 +48,7 @@ public class Getter {
         model.addAttribute("threads", threads);
         model.addAttribute("boardName", boardName);
         model.addAttribute("post", new Post());
-        model.addAttribute("canDelete", getterService.canDelete(boardName, customUserDetails, false));
+        model.addAttribute("canDelete", getterService.canDelete(boardName, customUserDetails, null));
         return "board";
     }
 

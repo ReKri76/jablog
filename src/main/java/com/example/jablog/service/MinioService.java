@@ -3,7 +3,6 @@ package com.example.jablog.service;
 import com.example.jablog.DTO.Picture;
 import io.minio.*;
 import io.minio.messages.Item;
-import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -11,17 +10,19 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 
 @Service
-@RequiredArgsConstructor
 public class MinioService {
 
     private static final int MAX_PART_SIZE = 10 * 1024 * 1024;
     private static final int INITIAL_FILE_LIST_CAPACITY = 1000;
     public static final String BUCKET = "images";
 
-    @Value("${minio.endpoint:DEBUG_NOT_FOUND}")
-    public static  String ENDPOINT;
-
+    private final String endpoint;
     private final MinioClient minioClient;
+
+    public MinioService(@Value("${minio.endpoint:DEBUG_NOT_FOUND}") String endpoint, MinioClient minioClient) {
+        this.endpoint = endpoint;
+        this.minioClient = minioClient;
+    }
 
     public void savePicture(@NonNull Picture pic, String bucket){
 
@@ -73,8 +74,8 @@ public class MinioService {
         return names;
     }
 
-    public static String buildPictureUrl(String fileName) {
-        return ENDPOINT.replaceAll("/+$", "") + "/" + BUCKET + "/" + fileName;
+    public String buildPictureUrl(String fileName) {
+        return endpoint.replaceAll("/+$", "") + "/" + BUCKET + "/" + fileName;
     }
 
 }

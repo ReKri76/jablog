@@ -12,12 +12,12 @@ public class DeleterService {
     private final DeleterRepository deleterRepository;
 
     @Transactional
-    public void thread(long threadId, String boardName){
-        deleterRepository.thread(threadId, boardName);
+    public void thread(long threadId){
+        deleterRepository.thread(threadId);
     }
 
     @Transactional
-    public void post(long postId, String boardName){
-        deleterRepository.post(postId, boardName);
+    public void post(long postId){
+        deleterRepository.post(postId);
     }
 }

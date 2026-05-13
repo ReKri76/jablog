@@ -57,7 +57,7 @@ public class Cleaner {
         final ArrayList<String> picsInS3 = minioService.getAllFileName(MinioService.BUCKET);
 
         picsInS3.forEach( pic -> {
-            pic = MinioService.buildPictureUrl(pic);
+            pic = minioService.buildPictureUrl(pic);
             if (!picsInDB.contains(pic))
                 minioService.deletePicture(pic);
         });

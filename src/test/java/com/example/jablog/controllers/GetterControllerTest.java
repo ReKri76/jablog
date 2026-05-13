@@ -57,7 +57,7 @@ class GetterControllerTest {
         session.setAttribute("b", user);
 
         when(getterService.board("b", 2)).thenReturn(threads);
-        when(getterService.canDelete("b", user, false)).thenReturn(true);
+        when(getterService.canDelete("b", user, null)).thenReturn(true);
 
         mockMvc.perform(get("/b").param("page", "2").session(session))
                 .andExpect(status().isOk())
@@ -88,8 +88,8 @@ class GetterControllerTest {
 
         final MockHttpSession session = new MockHttpSession();
 
-        when(getterService.thread(10L, "b")).thenReturn(posts);
-        when(getterService.canDelete("b", null, true)).thenReturn(false);
+        when(getterService.thread(10L)).thenReturn(posts);
+        when(getterService.canDelete("b", null, "11")).thenReturn(false);
 
         mockMvc.perform(get("/b/10").session(session))
                 .andExpect(status().isOk())
@@ -100,6 +100,6 @@ class GetterControllerTest {
                 .andExpect(model().attributeExists("post"))
                 .andExpect(model().attribute("canDelete", false));
 
-        verify(getterService).canDelete("b", null, true);
+        verify(getterService).canDelete("b", null, "11");
     }
 }

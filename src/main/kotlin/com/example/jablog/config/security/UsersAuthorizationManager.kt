@@ -1,7 +1,7 @@
 package com.example.jablog.config.security
 
-import com.example.jablog.service.CustomUserDetailsService
-import com.example.jablog.service.SecurityAccessService
+import com.example.jablog.service.SecurityData
+import com.example.jablog.service.security.UsersAccessService
 import org.springframework.security.authorization.AuthorizationDecision
 import org.springframework.security.authorization.AuthorizationManager
 import org.springframework.security.authorization.AuthorizationResult
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 import java.util.function.Supplier
 
 @Component
-class UsersAuthorizationManager(private val securityAccessService: SecurityAccessService) :
+class UsersAuthorizationManager(private val usersAccessService: UsersAccessService) :
     AuthorizationManager<RequestAuthorizationContext> {
 
     override fun authorize(
@@ -25,12 +25,11 @@ class UsersAuthorizationManager(private val securityAccessService: SecurityAcces
         val user = session.getAttribute(boardName) as? CustomUserDetails ?:
             return AuthorizationDecision(false)
 
-        val canAccess = securityAccessService.canAccess(
-            boardName,
-            user,
-            context.request.requestURI,
-            false,
-            true
+        val canAccess = usersAccessService.canAccess(
+            data = SecurityData.Users(
+                boardName = boardName,
+                user = user
+            )
         )
 
         return AuthorizationDecision(canAccess)

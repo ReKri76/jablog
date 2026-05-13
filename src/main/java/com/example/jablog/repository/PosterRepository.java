@@ -31,11 +31,10 @@ public class PosterRepository {
 
     public void user(Users users){entityManager.persist(users);}
 
-    public Threads getThreadsById(long id, String boardName){
-        return entityManager.createQuery("from Threads t where t.id = :threadId and t.board.name = :boardName",
+    public Threads getThreadsById(long id){
+        return entityManager.createQuery("from Threads t where t.id = :threadId",
                         Threads.class)
                  .setParameter("threadId", id)
-                 .setParameter("boardName", boardName)
                  .getSingleResult();
      }
 }
