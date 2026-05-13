@@ -2,6 +2,7 @@ package com.example.jablog.controllers;
 
 import com.example.jablog.DTO.PostWithPicture;
 import com.example.jablog.config.security.CustomUserDetails;
+import com.example.jablog.entity.Roles;
 import com.example.jablog.service.GetterService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,7 +54,7 @@ class GetterControllerTest {
         threads.add(thread);
 
         final MockHttpSession session = new MockHttpSession();
-        final CustomUserDetails user = new CustomUserDetails("b", "rwdxrw-xr---", "pass", "mod", "ROLE_ADMIN");
+        final CustomUserDetails user = new CustomUserDetails("b", "rwdxrw-xr---", "pass", "mod", Roles.ROLE_ADMIN.name());
         session.setAttribute("b", user);
 
         when(getterService.board("b", 2)).thenReturn(threads);
