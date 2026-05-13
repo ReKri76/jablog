@@ -12,3 +12,4 @@ sealed class SecurityData{
     data class Users(val boardName : String, val user : CustomUserDetails) : SecurityData()
     data class Getter(val boardName : String, val user : CustomUserDetails, val threadId : String?) : SecurityData()
 }
+

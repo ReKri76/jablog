@@ -1,6 +1,5 @@
 package com.example.jablog.service.security
 
-import com.example.jablog.entity.Roles
 import com.example.jablog.repository.SecurityRepository
 import com.example.jablog.service.PosterService
 import com.example.jablog.service.SecurityAccessService
@@ -28,11 +27,11 @@ class DeleterAccessService(private val securityRepository: SecurityRepository)
                 }
 
                 if (data.boardName != data.user.boardName)
-                    data.user.role = Roles.ROLE_ANON.name
+                    data.user.role = "ROLE_ANON"
 
                 val shift = PosterService.SIZE_OF_GROUP * when (data.user.role) {
-                    Roles.ROLE_ADMIN.name -> 0
-                    Roles.ROLE_GROUP.name -> 1
+                    "ROLE_ADMIN" -> 0
+                    "ROLE_GROUP" -> 1
                     else -> 2
                 }
 

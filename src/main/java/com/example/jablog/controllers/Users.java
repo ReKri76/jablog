@@ -2,7 +2,6 @@ package com.example.jablog.controllers;
 
 import com.example.jablog.DTO.Login;
 import com.example.jablog.config.security.CustomUserDetails;
-import com.example.jablog.entity.Roles;
 import com.example.jablog.service.UsersService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -70,7 +69,7 @@ public class Users {
             if (user == null)
                 continue;
 
-            if (user.getRole().equals(Roles.ROLE_ADMIN.name()))
+            if (user.getRole().equals("ROLE_ADMIN"))
                 boardNames.add(boardName);
         }
 

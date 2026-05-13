@@ -1,7 +1,6 @@
 package com.example.jablog.config.security;
 
 import com.example.jablog.entity.Board;
-import com.example.jablog.entity.Roles;
 import com.example.jablog.entity.Users;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,7 +30,7 @@ public class CustomUserDetails implements UserDetails {
             board.getRules(),
             users.getPassword(),
             users.getNickname(),
-            users.isRole() ? Roles.ROLE_ADMIN.name() : Roles.ROLE_GROUP.name()
+            users.isRole() ? "ROLE_ADMIN" : "ROLE_GROUP"
         );
     }
 
