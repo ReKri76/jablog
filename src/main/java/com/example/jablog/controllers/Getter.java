@@ -1,85 +1,62 @@
 package com.example.jablog.controllers;
 
+import com.example.jablog.DTO.Post;
 import com.example.jablog.DTO.PostWithPicture;
 import com.example.jablog.config.security.CustomUserDetails;
 import com.example.jablog.service.GetterService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 
-@RestController
-@RequestMapping("/getter")
+@Controller
 @RequiredArgsConstructor
 public class Getter {
 
     private final GetterService getterService;
 
-    public record Getter_boardName_threadID(
-            PostWithPicture thread,
-            ArrayList<PostWithPicture> posts,
-            String boardName,
-            boolean canDelete
-    ){}
-
     @GetMapping("/{boardName}/{threadId}")
-    public ResponseEntity<Getter_boardName_threadID> thread(@PathVariable long threadId, @PathVariable String boardName, HttpSession session){
+    public String thread(@PathVariable long threadId, @PathVariable String boardName, Model model, HttpSession session){
 
         final ArrayList<PostWithPicture> posts = getterService.thread(threadId);
         final CustomUserDetails customUserDetails = (CustomUserDetails) session.getAttribute(boardName);
 
         PostWithPicture thread =  posts.getFirst();
+
+        model.addAttribute("thread",thread);
         posts.removeFirst();
-
-        Getter_boardName_threadID record = new Getter_boardName_threadID(thread,
-                posts,
-                boardName,
-                getterService.canDelete(boardName, customUserDetails, Long.toString(thread.getId())));
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(record);
+        model.addAttribute("posts", posts);
+        model.addAttribute("boardName", boardName);
+        model.addAttribute("post", new Post());
+        model.addAttribute("canDelete", getterService.canDelete(boardName, customUserDetails,
+                Long.toString(thread.getId())));
+        return "thread";
     }
 
-    public record Getter_boardName(
-            ArrayList<PostWithPicture> threads,
-            String boardName,
-            boolean canDelete
-    ){}
-
     @GetMapping("/{boardName}")
-    public ResponseEntity<Getter_boardName> board(@PathVariable String boardName, @RequestParam(defaultValue = "0") int page,
+    public String board(@PathVariable String boardName, @RequestParam(defaultValue = "0") int page, Model model,
                         HttpSession session){
 
         final ArrayList<PostWithPicture> threads = getterService.board(boardName, page);
         final CustomUserDetails customUserDetails = (CustomUserDetails) session.getAttribute(boardName);
 
-        Getter_boardName record = new Getter_boardName(
-                threads,
-                boardName,
-                getterService.canDelete(boardName, customUserDetails, Long.toString(threads.getFirst().getId()))
-        );
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(record);
+        model.addAttribute("threads", threads);
+        model.addAttribute("boardName", boardName);
+        model.addAttribute("post", new Post());
+        model.addAttribute("canDelete", getterService.canDelete(boardName, customUserDetails, null));
+        return "board";
     }
 
-    public record Getter_(
-            ArrayList<String> boards
-    ){}
-
     @GetMapping("/")
-    public ResponseEntity<Getter_> start(){
+    public String start(Model model){
 
         final ArrayList<String> boards = getterService.start();
-        Getter_ record = new Getter_(boards);
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(record);
+        model.addAttribute("boards", boards);
+        return "index";
     }
 }

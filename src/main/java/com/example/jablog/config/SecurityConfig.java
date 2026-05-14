@@ -92,7 +92,7 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.GET, "/api/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/login/verify").permitAll()
-                        .requestMatchers(HttpMethod.GET,  "/getter/").permitAll()
+                        .requestMatchers(HttpMethod.GET,  "/").permitAll()
                         .requestMatchers(HttpMethod.POST, "/poster/board").permitAll()
                         .requestMatchers(HttpMethod.GET, "/users/panel").permitAll()
 
@@ -113,9 +113,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/users/panel/{boardName}")
                             .access(usersAuthorizationManager)
 
-                        .requestMatchers(HttpMethod.GET, "/getter/{boardName}/{thread}")
+                        .requestMatchers(HttpMethod.GET, "/{boardName}/{thread}")
                             .access(getterAuthorizationManager)
-                        .requestMatchers(HttpMethod.GET, "/getter/{boardName}")
+                        .requestMatchers(HttpMethod.GET, "/{boardName}")
                             .access(getterAuthorizationManager)
 
                         .anyRequest().denyAll()
