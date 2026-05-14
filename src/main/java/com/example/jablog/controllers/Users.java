@@ -7,15 +7,14 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/users")
 public class Users {
@@ -23,16 +22,20 @@ public class Users {
     private final UsersService usersService;
 
     @PostMapping(value = "/panel/{boardName}")
-    public String addUser(@PathVariable("boardName") @NonNull String boardName,
+    public ResponseEntity<String> addUser(@PathVariable("boardName") @NonNull String boardName,
                           @Valid @ModelAttribute("login") Login login) {
 
         usersService.addUser(boardName, login);
 
-        return "redirect:/users/panel/"+boardName;
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .header("Location", "/users/panel/"+boardName)
+                .body("/users/panel/"+boardName);
     }
 
     @DeleteMapping(value = "/panel/{boardName}/{nickname}")
-    public ResponseEntity<Void> deleteUser(@PathVariable("boardName") String boardName, @PathVariable("nickname") String nickname) {
+    public ResponseEntity<Void> deleteUser(@PathVariable("boardName") String boardName,
+                                           @PathVariable("nickname") String nickname) {
 
         usersService.deleteUser(nickname, boardName);
 
@@ -42,20 +45,30 @@ public class Users {
                 .build();
     }
 
+    public record Users_Panel_boardName(
+            ArrayList<String> userNames,
+            String boardName
+    ){}
+
     @GetMapping(value = "/panel/{boardName}")
-    public String viewUsers(@PathVariable("boardName") String boardName, Model model) {
+    public ResponseEntity<Users_Panel_boardName> viewUsers(@PathVariable("boardName") String boardName) {
 
         final ArrayList<String> usersName = usersService.viewUsers(boardName);
 
-        model.addAttribute("users", usersName);
-        model.addAttribute("boardName", boardName);
-        model.addAttribute("login", new Login());
+        final Users_Panel_boardName record = new Users_Panel_boardName(usersName, boardName);
 
-        return "users";
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .header("Cache-Control", "max-age=3600")
+                .body(record);
     }
 
+    public record Users_Panel(
+            ArrayList<String> boardNames
+    ){}
+
     @GetMapping(value = "/panel")
-    public String panel(Model model, HttpSession session){
+    public ResponseEntity<Users_Panel> panel(HttpSession session){
 
         final Enumeration<String> boards = session.getAttributeNames();
         final ArrayList<String> boardNames = new ArrayList<String>();
@@ -73,9 +86,11 @@ public class Users {
                 boardNames.add(boardName);
         }
 
-        model.addAttribute("boardNames", boardNames);
-        model.addAttribute("login", new Login());
+        final Users_Panel record = new Users_Panel(boardNames);
 
-        return "panel";
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .header("Cache-Control", "max-age=3600")
+                .body(record);
     }
 }
