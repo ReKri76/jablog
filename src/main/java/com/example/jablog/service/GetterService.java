@@ -25,12 +25,17 @@ public class GetterService {
     private final CustomUserDetailsService customUserDetailsService;
 
     @Transactional
-    public ArrayList<String> start(){
+    public ArrayList<com.example.jablog.DTO.Board> start(){
 
-        final ArrayList<String> boards = new ArrayList<String>();
+        final ArrayList<com.example.jablog.DTO.Board> boards = new ArrayList<>();
         final ArrayList<Board> input = getterRepository.start();
 
-        input.forEach(board -> boards.add(board.getName()));
+        input.forEach(board -> {
+            var dto = new com.example.jablog.DTO.Board();
+            dto.setTranscription(board.getTranscription());
+            dto.setId(board.getName());
+            boards.add(dto);
+        });
 
         return boards;
     }

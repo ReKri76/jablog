@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
+    <link href="../static/styles/index.css" rel="stylesheet"/>
 </head>
     <body>
         <div>
             <span th:each="board : ${boards}">
                 <span>
-                    <a th:href="@{/{name}(name=${board})}"
-                       th:text="${board}">
+                    <a th:href="@{/{name}(name=${board.id})}"
+                       th:text="${board.transcription}">
                         name
                     </a>
                     <br>
@@ -37,6 +38,9 @@
 
             <label for="lifeCyclePosts">lifeCyclePosts:</label>
             <input type="text" name="lifeCyclePosts" id="lifeCyclePosts" required>
+
+            <label for="transcription">transcription:</label>
+            <input type="text" name="transcription" id="transcription" required>
 
             <button type="submit">create</button>
         </form>

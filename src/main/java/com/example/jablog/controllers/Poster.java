@@ -57,9 +57,10 @@ public class Poster {
     public String board(@RequestParam("boardName") @NonNull String boardName, @RequestParam("rule") @NonNull String rule,
                         @RequestParam("pass") @NonNull String pass, @RequestParam("nickname") @NonNull String nickname,
                         @RequestParam("lifeCycleThreads") int lifeCycleThreads,
-                        @RequestParam("lifeCyclePosts") int lifeCyclePosts){
+                        @RequestParam("lifeCyclePosts") int lifeCyclePosts,
+                        @RequestParam("transcription") @NonNull String transcription){
 
-        posterService.board(boardName, pass, rule, nickname, lifeCycleThreads, lifeCyclePosts);
+        posterService.board(boardName, pass, rule, nickname, lifeCycleThreads, lifeCyclePosts, transcription);
 
         return "redirect:/"+boardName;
     }

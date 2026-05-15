@@ -1,5 +1,6 @@
 package com.example.jablog.controllers;
 
+import com.example.jablog.DTO.Board;
 import com.example.jablog.DTO.Post;
 import com.example.jablog.DTO.PostWithPicture;
 import com.example.jablog.config.security.CustomUserDetails;
@@ -55,7 +56,7 @@ public class Getter {
     @GetMapping("/")
     public String start(Model model){
 
-        final ArrayList<String> boards = getterService.start();
+        final ArrayList<Board> boards = getterService.start();
         model.addAttribute("boards", boards);
         return "index";
     }

@@ -65,6 +65,9 @@ public class Board {
     @Column(name="createdat", nullable = false, updatable = false)
     private long createdAt = System.currentTimeMillis();
 
+    @Column(name="transcription", nullable = false, updatable = true)
+    private String transcription;
+
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Threads> threads = new HashSet<Threads>();
 

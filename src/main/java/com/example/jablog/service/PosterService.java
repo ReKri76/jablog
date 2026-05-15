@@ -78,7 +78,7 @@ public class PosterService {
 
     @Transactional
     public void board(String boardName, String password, String rule,
-                      String nickname, int lifeCycleThreads , int lifeCyclePosts){
+                      String nickname, int lifeCycleThreads , int lifeCyclePosts, String transcription){
 
         if (lifeCyclePosts>=lifeCycleThreads)
             throw new RuntimeException("life cycle of posts cant be longer then threads");
@@ -116,6 +116,7 @@ public class PosterService {
         board.setRules(rule);
         board.setLifeCyclePosts(lifeCyclePosts);
         board.setLifeCycleThreads(lifeCycleThreads);
+        board.setTranscription(transcription);
 
         final Users users = new Users();
         users.setBoard(board);
