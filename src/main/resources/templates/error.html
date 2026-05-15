@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Error</title>
+    <link rel="stylesheet" href="/styles/index.css"/>
+</head>
+<body>
+    <main class="page stack">
+        <header class="page-header">
+            <h1 class="page-title">Ошибка</h1>
+        </header>
+
+        <section class="panel">
+            <h2 class="panel-title">Что-то пошло не так</h2>
+            <div class="panel-body stack">
+
+                <h3 class="error-copy">
+                    Ошибка <span th:text="${status == 418 ? 400 : status}">500</span>
+                    (<span th:text="${status == 418 ? message : error}">Internal Server Error</span>)
+                </h3>
+
+                <div th:switch="${status}" class="error-copy" th:if="${status!=418}">
+                    <p th:case="404">Ресурса по данному пути не существует. Попробуйте другой запрос.</p>
+                    <p th:case="400">Некорректный ввод. Попробуйте снова.</p>
+                    <p th:case="500">Ошибка сервера. Скоро будет исправлено.</p>
+                    <p th:case="403">Вы не имеете права доступа для данной доски. Попробуйте зарегистрироваться.</p>
+                    <p th:case="*">Произошла непредвиденная ошибка. Попробуйте вернуться назад или обновить страницу.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <nav class="footer-links">
+            <a href="/">home</a>
+        </nav>
+    </main>
+</body>
+</html>

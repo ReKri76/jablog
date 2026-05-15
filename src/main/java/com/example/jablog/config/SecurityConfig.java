@@ -64,7 +64,7 @@ public class SecurityConfig {
                 )
 
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/**", "/", "/poster/board", "/script/**", "/styles/**")
+                        .ignoringRequestMatchers("/api/**", "/", "/poster/board", "/script/**", "/styles/**", "/error")
                 )
 
                 .sessionManagement(session ->
@@ -89,8 +89,7 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.GET, "/script/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/styles/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/error/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/error-page/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/error").permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/api/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/login/verify").permitAll()

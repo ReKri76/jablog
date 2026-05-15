@@ -6,6 +6,7 @@ import com.example.jablog.entity.Board;
 import com.example.jablog.entity.Posts;
 import com.example.jablog.entity.Threads;
 import com.example.jablog.entity.Users;
+import com.example.jablog.errors.InvalidRulesException;
 import com.example.jablog.repository.PosterRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -81,14 +82,14 @@ public class PosterService {
                       String nickname, int lifeCycleThreads , int lifeCyclePosts, String transcription){
 
         if (lifeCyclePosts>=lifeCycleThreads)
-            throw new RuntimeException("life cycle of posts cant be longer then threads");
+            throw new InvalidRulesException("life cycle of posts cant be longer then threads");
         if (lifeCyclePosts<0)
-            throw new RuntimeException("value of life cycle must be positive");
+            throw new InvalidRulesException("value of life cycle must be positive");
         if(lifeCycleThreads>MAX_LIFE_CYCLE_OF_THREADS)
-            throw new RuntimeException("value of life cycle of threads cant be more than 28");
+            throw new InvalidRulesException("value of life cycle of threads cant be more than 28");
 
         if (rule.length()!=SIZE_OF_ARRAY_OF_RULES)
-            throw new RuntimeException("incorrect rule");
+            throw new InvalidRulesException("incorrect rule");
 
         for (int i = 0; i < SIZE_OF_ARRAY_OF_RULES; i += SIZE_OF_GROUP){
             if (
@@ -108,7 +109,7 @@ public class PosterService {
                         default -> true;
                     }
             )
-                throw new RuntimeException("incorrect rule");
+                throw new InvalidRulesException("incorrect rule");
         }
 
         final Board board = new Board();
