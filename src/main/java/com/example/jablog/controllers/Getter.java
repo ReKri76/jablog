@@ -21,7 +21,7 @@ public class Getter {
 
     private final GetterService getterService;
 
-    @GetMapping("/{boardName}/{threadId}")
+    @GetMapping("/{boardName:[^.\\/]+}/{threadId:\\d+}")
     public String thread(@PathVariable long threadId, @PathVariable String boardName, Model model, HttpSession session){
 
         final ArrayList<PostWithPicture> posts = getterService.thread(threadId);
@@ -39,7 +39,7 @@ public class Getter {
         return "thread";
     }
 
-    @GetMapping("/{boardName}")
+    @GetMapping("/{boardName:[^.\\/]+}")
     public String board(@PathVariable String boardName, @RequestParam(defaultValue = "0") int page, Model model,
                         HttpSession session){
 

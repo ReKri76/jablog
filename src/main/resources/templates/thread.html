@@ -3,48 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <title>Thread</title>
+    <link rel="stylesheet" th:href="@{/styles/index.css}"/>
     <script th:src="@{/script/js/htmx.min.js}" type="text/javascript"></script>
 </head>
-    <body th:hx-headers='|{"X-CSRF-TOKEN": "${_csrf.token}"}|'>
-        <div>
-            <span th:text="${thread.head}">head</span>
-            <span th:text="${thread.body}">body</span>
-            <img th:src="${thread.url}" alt="picture"/>
-            <br>
+<body th:hx-headers='|{"X-CSRF-TOKEN": "${_csrf.token}"}|'>
+    <main class="page stack">
+        <header class="page-header">
+            <h1 class="page-title" th:text="'/' + ${boardName} + '/'">/board/</h1>
+        </header>
+
+        <div class="split-layout">
+            <div class="stack">
+                <section class="panel">
+                    <h2 class="panel-title">OP</h2>
+                    <div class="panel-body">
+                        <article class="post-card">
+                            <div class="post-meta">
+                                <span class="post-id" th:text="${thread.id}">id</span>
+                                <span class="post-head" th:text="${thread.head}">head</span>
+                            </div>
+                            <p class="post-body" th:text="${thread.body}">body</p>
+                            <img class="post-image" th:if="${thread.url}" th:src="${thread.url}" alt="picture"/>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="panel">
+                    <h2 class="panel-title">Ответы</h2>
+                    <div class="panel-body">
+                        <div class="post-list">
+                            <article class="post-card" th:each="currentPost : ${posts}" th:id="'p' + ${currentPost.id}">
+                                <div class="post-meta">
+                                    <span class="post-id" th:text="${currentPost.id}">id</span>
+                                    <span class="post-head" th:text="${currentPost.head}">head</span>
+                                </div>
+                                <div class="post-body" th:utext="${currentPost.body}">body</div>
+                                <img class="post-image" th:if="${currentPost.url}" th:src="${currentPost.url}" alt="picture"/>
+                                <div class="post-actions" th:if="${canDelete}">
+                                    <button
+                                        th:hx-delete="@{/deleter/{boardName}/{threadId}/{postId}(boardName=${boardName}, threadId=${thread.id}, postId=${currentPost.id})}">
+                                        delete post
+                                    </button>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <section class="panel">
+                <h2 class="panel-title">Новый ответ</h2>
+                <div class="panel-body">
+                    <form method="post"
+                          th:action="@{/poster/{boardName}/{threadId}(boardName=${boardName}, threadId=${thread.id})}"
+                          enctype="multipart/form-data"
+                          th:object="${post}"
+                          class="form-grid">
+
+                        <label class="field" for="head">
+                            <span>Head</span>
+                            <input type="text" th:field="*{head}" id="head">
+                        </label>
+
+                        <label class="field" for="body">
+                            <span>Body</span>
+                            <textarea th:field="*{body}" id="body" rows="6"></textarea>
+                        </label>
+
+                        <label class="field" for="image">
+                            <span>Image</span>
+                            <input class="file-input" type="file" name="image" id="image" accept="image/*"/>
+                        </label>
+
+                        <div class="form-actions">
+                            <button type="submit">Создать</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
         </div>
 
-        <div th:each="currentPost :${posts}">
-            <span th:id="'p' + ${currentPost.id}">
-                <span th:text="${currentPost.id}">id</span>
-                <span th:text="${currentPost.head}">head</span>
-                <span th:utext="${currentPost.body}">body</span>
-                <img th:src="${currentPost.url}"/>
-                <span th:if="${canDelete}">
-                    <button
-                         th:hx-delete="@{/deleter/{boardName}/{threadId}/{postId}
-                        (boardName=${boardName}, threadId=${thread.id}, postId=${currentPost.id})}">
-                    delete post
-                    </button>
-                </span>
-                <br>
-            </span>
-        </div>
-
-        <form method="post"
-              th:action="@{/poster/{boardName}/{threadId}(boardName=${boardName}, threadId=${thread.id})}"
-              enctype="multipart/form-data"
-              th:object="${post}">
-
-            <label for="head">head:</label>
-            <input type="text" th:field="*{head}" id="head">
-
-            <label for="body">body</label>
-            <textarea th:field="*{body}" id="body" rows="6"></textarea>
-
-            <input type="file" name="image" accept="image/*"/>
-
-            <button type="submit">create</button>
-        </form>
-        <a href="/">home</a>
-    </body>
+        <nav class="footer-links">
+            <a href="/">home</a>
+            <a th:href="@{/{boardName}(boardName=${boardName})}" th:text="'/' + ${boardName} + '/'">board</a>
+        </nav>
+    </main>
+</body>
 </html>

@@ -44,7 +44,7 @@ public class SecurityConfig {
                         .contentSecurityPolicy(csp -> csp
                                 .policyDirectives(
                                         "default-src 'none'; " +
-                                        "script-src 'self'; " +
+                                        "script-src 'self' 'unsafe-inline'; " +
                                         "object-src 'none'; " +
                                         "style-src 'self' 'unsafe-inline'; " +
                                         "img-src " + minioEndpoint + " 'self' data:; " +
@@ -89,6 +89,8 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.GET, "/script/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/styles/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/error/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/error-page/**").permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/api/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/login/verify").permitAll()

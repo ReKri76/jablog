@@ -3,49 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
-    <link href="../static/styles/index.css" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/styles/index.css}"/>
 </head>
-    <body>
-        <div>
-            <span th:each="board : ${boards}">
-                <span>
-                    <a th:href="@{/{name}(name=${board.id})}"
-                       th:text="${board.transcription}">
-                        name
-                    </a>
-                    <br>
-                </span>
-            </span>
-        </div>
+<body>
+    <main class="page">
+        <header class="page-header">
+            <h1 class="page-title">JABLOG</h1>
+        </header>
 
-        <form method="post"
-              th:action="@{/poster/board}">
+        <nav class="topbar">
+            <a href="/api/login">Залогиниться</a>
+            <a href="/users/panel">Админская панель</a>
+        </nav>
 
-            <label for="boardName">boardName:</label>
-            <input type="text" name="boardName" id="boardName" required>
-
-            <label for="rule">rule:</label>
-            <input type="text" name="rule" id="rule" required>
-
-            <label for="pass">pass:</label>
-            <input type="text" name="pass" id="pass" required>
-
-            <label for="nickname">nickname:</label>
-            <input type="text" name="nickname" id="nickname" required>
-
-            <label for="lifeCycleThreads">lifeCycleThreads:</label>
-            <input type="text" name="lifeCycleThreads" id="lifeCycleThreads" required>
-
-            <label for="lifeCyclePosts">lifeCyclePosts:</label>
-            <input type="text" name="lifeCyclePosts" id="lifeCyclePosts" required>
-
-            <label for="transcription">transcription:</label>
-            <input type="text" name="transcription" id="transcription" required>
-
-            <button type="submit">create</button>
-        </form>
-
-        <a href ="/api/login">login</a>
-        <a href ="/users/panel">panel</a>
-    </body>
+        <section class="panel">
+            <h2 class="panel-title">ДОСКИ</h2>
+            <div class="panel-body">
+                <ul class="board-list">
+                    <li th:each="board : ${boards}">
+                        <a th:href="@{/{name}(name=${board.id})}"
+                           th:text="${board.transcription}">
+                            name
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </section>
+    </main>
+</body>
 </html>

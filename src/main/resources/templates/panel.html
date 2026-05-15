@@ -2,15 +2,89 @@
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Панель</title>
+    <link rel="stylesheet" th:href="@{/styles/index.css}"/>
 </head>
-    <body>
-        <span th:each="boardName : ${boardNames}">
-            <a th:href="@{/users/panel/{boardName}(boardName=${boardName})}"
-               th:text="${boardName}">
-                board
-            </a>
-        </span>
-        <a href="/">home</a>
-    </body>
+<body>
+    <main class="page stack">
+        <header class="page-header">
+            <h1 class="page-title">Админская панель</h1>
+        </header>
+
+        <section class="panel">
+            <h2 class="panel-title">Доступные доски</h2>
+            <div class="panel-body">
+                <div class="link-list">
+                    <a class="chip-link"
+                       th:each="boardName : ${boardNames}"
+                       th:href="@{/users/panel/{boardName}(boardName=${boardName})}"
+                       th:text="${boardName}">
+                        board
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2 class="panel-title">Создать доску</h2>
+            <div class="panel-body">
+                <form method="post"
+                      th:action="@{/poster/board}"
+                      class="form-grid">
+
+                    <div class="field-inline">
+                        <label class="field" for="boardName">
+                            <span>Board name</span>
+                            <input type="text" name="boardName" id="boardName" required>
+                        </label>
+
+                        <label class="field" for="transcription">
+                            <span>Transcription</span>
+                            <input type="text" name="transcription" id="transcription" required>
+                        </label>
+                    </div>
+
+                    <div class="field">
+                        <label class="field" for="rule">
+                            <span>Rule</span>
+                            <input type="text" name="rule" id="rule" required>
+                        </label>
+                    </div>
+
+                    <div class="field-inline">
+                        <label class="field" for="pass">
+                            <span>Password</span>
+                            <input type="text" name="pass" id="pass" required>
+                        </label>
+
+                        <label class="field" for="nickname">
+                            <span>Nickname</span>
+                            <input type="text" name="nickname" id="nickname" required>
+                        </label>
+                    </div>
+
+                    <div class="field-inline">
+                        <label class="field" for="lifeCycleThreads">
+                            <span>Thread lifecycle</span>
+                            <input type="text" name="lifeCycleThreads" id="lifeCycleThreads" required>
+                        </label>
+
+                        <label class="field" for="lifeCyclePosts">
+                            <span>Post lifecycle</span>
+                            <input type="text" name="lifeCyclePosts" id="lifeCyclePosts" required>
+                        </label>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit">Создать</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <nav class="footer-links">
+            <a href="/">home</a>
+        </nav>
+    </main>
+</body>
 </html>

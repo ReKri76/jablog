@@ -102,4 +102,10 @@ class GetterControllerTest {
 
         verify(getterService).canDelete("b", null, "11");
     }
+
+    @Test
+    void staticResourcePathShouldNotMatchGetterRoutes() throws Exception {
+        mockMvc.perform(get("/styles/index.css"))
+                .andExpect(status().isNotFound());
+    }
 }

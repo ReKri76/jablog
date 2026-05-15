@@ -2,32 +2,63 @@
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Пользователи</title>
+    <link rel="stylesheet" th:href="@{/styles/index.css}"/>
     <script th:src="@{/script/js/htmx.min.js}" type="text/javascript"></script>
 </head>
-    <body th:hx-headers='|{"X-CSRF-TOKEN": "${_csrf.token}"}|'>
-        <div>
-            <span th:each="user : ${users}">
-                <span th:text="${user}" th:id="'username_' + ${user}">user</span>
-                <button
-                th:hx-delete="@{/users/panel/{boardName}/{nickname}
-                (boardName=${boardName}, nickname=${user})}">
-                    delete user
-                </button>
-            </span>
+<body th:hx-headers='|{"X-CSRF-TOKEN": "${_csrf.token}"}|'>
+    <main class="page stack">
+        <header class="page-header">
+            <h1 class="page-title" th:text="'Пользователи /' + ${boardName} + '/'">Пользователи</h1>
+        </header>
+
+        <div class="split-layout">
+            <section class="panel">
+                <h2 class="panel-title">Список пользователей</h2>
+                <div class="panel-body">
+                    <div class="user-list" th:if="${!#lists.isEmpty(users)}">
+                        <div class="user-row" th:each="user : ${users}">
+                            <span th:text="${user}" th:id="'username_' + ${user}">user</span>
+                            <button
+                                th:hx-delete="@{/users/panel/{boardName}/{nickname}(boardName=${boardName}, nickname=${user})}">
+                                delete user
+                            </button>
+                        </div>
+                    </div>
+                    <p class="empty-state" th:if="${#lists.isEmpty(users)}">Пользователей пока нет.</p>
+                </div>
+            </section>
+
+            <section class="panel">
+                <h2 class="panel-title">Создать пользователя</h2>
+                <div class="panel-body">
+                    <form method="post"
+                          th:action="@{/users/panel/{boardName}(boardName=${boardName})}"
+                          th:object="${login}"
+                          class="form-grid">
+
+                        <label class="field" for="nickname">
+                            <span>Nickname</span>
+                            <input type="text" th:field="*{nickname}" id="nickname">
+                        </label>
+
+                        <label class="field" for="password">
+                            <span>Password</span>
+                            <input type="text" th:field="*{password}" id="password">
+                        </label>
+
+                        <div class="form-actions">
+                            <button type="submit">Создать</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
         </div>
-        <form method="post"
-              th:action="@{/users/panel/{boardName}(boardName=${boardName})}"
-              th:object="${login}">
 
-            <label for="password">password:</label>
-            <input type="text" th:field="*{password}" id="password">
-
-            <label for="nickname">nickname:</label>
-            <input type="text" th:field="*{nickname}" id="nickname">
-
-            <button type="submit">create user</button>
-        </form>
-        <a href="/">home</a>
-    </body>
+        <nav class="footer-links">
+            <a href="/">home</a>
+            <a href="/users/panel">panel</a>
+        </nav>
+    </main>
+</body>
 </html>

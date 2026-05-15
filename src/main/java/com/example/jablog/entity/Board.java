@@ -65,7 +65,7 @@ public class Board {
     @Column(name="createdat", nullable = false, updatable = false)
     private long createdAt = System.currentTimeMillis();
 
-    @Column(name="transcription", nullable = false, updatable = true)
+    @Column(name="transcription", nullable = false, updatable = false)
     private String transcription;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
