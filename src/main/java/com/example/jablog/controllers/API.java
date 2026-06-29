@@ -8,11 +8,15 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+/**
+ * Вспомогательные публичные эндпоинты
+ * */
 @Controller
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -26,8 +30,10 @@ public class API {
     }
 
     @PostMapping("/login/verify")
-    public String login(HttpSession session,
-                        @Valid @ModelAttribute("login") Login login) {
+    public String login(HttpSession session, @Valid @ModelAttribute("login") Login login, BindingResult result) {
+
+        if (result.hasErrors())
+            return "redirect:/api/login";
 
         CustomUserDetails customUserDetails;
         try {

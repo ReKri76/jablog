@@ -17,14 +17,13 @@ class DeleterAuthorizationManager(private val deleterAccessService: DeleterAcces
                                   private val customUserDetailsService: CustomUserDetailsService) :
     AuthorizationManager<RequestAuthorizationContext> {
 
-    override fun authorize(
-        auth: Supplier<out Authentication?>,
-        context: RequestAuthorizationContext
-    ): AuthorizationResult {
+    override fun authorize(auth: Supplier<out Authentication?>, context: RequestAuthorizationContext):
+            AuthorizationResult {
+
         val session = context.request.getSession(false)
 
         val boardName = context.variables["boardName"] as String
-        val postId = context.variables["post"]
+        val postId = context.variables["post"] //может прийти запрос как на удаление треда, таки на удаление поста
 
         val user = (session.getAttribute(boardName) ?: customUserDetailsService.createDefault())
                 as CustomUserDetails
@@ -39,5 +38,4 @@ class DeleterAuthorizationManager(private val deleterAccessService: DeleterAcces
 
         return AuthorizationDecision(canAccess)
     }
-
 }

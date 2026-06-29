@@ -1,6 +1,7 @@
 package com.example.jablog.service;
 
 import com.example.jablog.config.security.CustomUserDetails;
+import com.example.jablog.config.security.Roles;
 import com.example.jablog.entity.Board;
 import com.example.jablog.entity.Users;
 import com.example.jablog.repository.UserDetailsRepository;
@@ -40,7 +41,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             user.setBoard(board);
 
             customUserDetails = CustomUserDetails.build(user);
-            customUserDetails.setRole("ROLE_ANON");
+            customUserDetails.setRole(Roles.ROLE_ANON);
         }
 
         return customUserDetails;
@@ -52,7 +53,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 "------------",
                 "{noop}",
                 "ANON",
-                "ROLE_ANON"
+                Roles.ROLE_ANON
         );
     }
 }

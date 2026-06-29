@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+/**
+ * Эндпоинты с правами доступа к удалению
+ * */
 @Controller
 @RequestMapping("/deleter")
 @RequiredArgsConstructor
@@ -16,7 +19,7 @@ public class Deleter {
     private final DeleterService deleterService;
 
     @DeleteMapping(value = "/{boardName}/{threadId}")
-    public ResponseEntity<Void> thread(@PathVariable("boardName") String boardName,
+    public ResponseEntity<Void> thread(@PathVariable(value = "boardName") String boardName,
                                        @PathVariable("threadId") long threadId){
 
         deleterService.thread(threadId);
@@ -28,7 +31,7 @@ public class Deleter {
     }
 
     @DeleteMapping(value = "/{boardName}/{threadId}/{postId}")
-    public  ResponseEntity<Void> post(@PathVariable("boardName") String boardName, @PathVariable("postId") long postId,
+    public ResponseEntity<Void> post(@PathVariable("boardName") String boardName, @PathVariable("postId") long postId,
                                       @PathVariable("threadId") long threadId){
 
         deleterService.post(postId);

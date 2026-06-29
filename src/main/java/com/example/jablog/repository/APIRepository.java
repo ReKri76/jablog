@@ -17,5 +17,4 @@ public class APIRepository {
                 .setParameter("nickname", nickname)
                 .getSingleResult();
     }
-
 }

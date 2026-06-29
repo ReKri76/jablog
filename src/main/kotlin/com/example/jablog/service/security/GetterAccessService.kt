@@ -7,8 +7,8 @@ import com.example.jablog.service.SecurityData
 import org.springframework.stereotype.Service
 
 @Service
-class GetterAccessService(private val securityRepository: SecurityRepository)
-    : SecurityAccessService {
+class GetterAccessService(private val securityRepository: SecurityRepository) : XAccessService(securityRepository) {
+
     override fun canAccess(data: SecurityData): Boolean {
         return when(data){
             is SecurityData.Getter -> {
@@ -21,23 +21,9 @@ class GetterAccessService(private val securityRepository: SecurityRepository)
 
                 val isThread = !data.threadId.isNullOrBlank()
 
-                if (data.user.boardName.equals("ANON")) {
-                    data.user.boardName = data.boardName
-                    data.user.boardRules = securityRepository.getRulesByBoardName(data.boardName)
-                }
+                val currentRules = getCurrentRules(boardName = data.boardName , user = data.user)
 
-                if (data.boardName != data.user.boardName)
-                    data.user.role = "ROLE_ANON"
-
-                val shift = PosterService.SIZE_OF_GROUP * when (data.user.role) {
-                    "ROLE_ADMIN" -> 0
-                    "ROLE_GROUP" -> 1
-                    else -> 2
-                }
-
-                val currentRules = data.user.boardRules.substring(shift, shift + PosterService.SIZE_OF_GROUP)
-
-                if (currentRules[0] != 'r') return false
+                if (currentRules[0] != 'r') return false //если нету прав на чтение, то ничего не получится сделать
 
                 return !isThread || !anyOtherFlagsIsEmpty(currentRules)
             }

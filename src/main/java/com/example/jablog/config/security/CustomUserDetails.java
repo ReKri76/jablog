@@ -20,7 +20,7 @@ public class CustomUserDetails implements UserDetails {
     private String boardRules;
     private String password;
     private String nickname;
-    private String role;
+    private Roles role;
 
     public static CustomUserDetails build(Users users){
         final Board board = users.getBoard();
@@ -30,13 +30,13 @@ public class CustomUserDetails implements UserDetails {
             board.getRules(),
             users.getPassword(),
             users.getNickname(),
-            users.isRole() ? "ROLE_ADMIN" : "ROLE_GROUP"
+            users.isRole() ? Roles.ROLE_ADMIN : Roles.ROLE_GROUP
         );
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of (new SimpleGrantedAuthority(this.role));
+        return List.of (new SimpleGrantedAuthority(this.role.name()));
     }
 
     @Override
