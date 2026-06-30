@@ -1,15 +1,15 @@
 package com.example.jablog.repository;
 
 import jakarta.persistence.EntityManager;
-import lombok.RequiredArgsConstructor;
+import jakarta.persistence.PersistenceContext;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Repository;
 
 @Repository
-@RequiredArgsConstructor
 public class SecurityRepository {
 
-    final private EntityManager entityManager;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @NotNull
     public String getRulesByBoardName(String boardName){
