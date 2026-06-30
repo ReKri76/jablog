@@ -1,12 +1,11 @@
 package com.example.jablog.service;
 
-import ch.qos.logback.classic.Logger;
 import com.example.jablog.entity.Board;
 import com.example.jablog.entity.Posts;
 import com.example.jablog.entity.Threads;
 import com.example.jablog.repository.CleanerRepository;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +15,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class Cleaner {
-
-    private static final Logger LOGGER = (Logger) LoggerFactory.getLogger(Cleaner.class);
 
     private final CleanerRepository cleanerRepository;
     private final MinioService minioService;
@@ -33,7 +31,7 @@ public class Cleaner {
 
         deletedThreads.forEach( thread -> minioService.deletePicture(thread.getPicture()));
 
-        LOGGER.info("{} threads deleted in {}.", deletedThreads.size(), LocalDateTime.now());
+        log.info("{} threads deleted in {}.", deletedThreads.size(), LocalDateTime.now());
     }
 
     @Scheduled(cron = "0 0 4 * * MON")
@@ -47,7 +45,7 @@ public class Cleaner {
                 minioService.deletePicture(url);
         });
 
-        LOGGER.info("{} posts deleted in {}.", deletedPosts.size(), LocalDateTime.now());
+        log.info("{} posts deleted in {}.", deletedPosts.size(), LocalDateTime.now());
     }
 
     @Scheduled(cron ="0 0 4 13 * *")
@@ -71,10 +69,10 @@ public class Cleaner {
         final ArrayList<Board> deletedBoards = cleanerRepository.boards(oldBoard);
 
         deletedBoards.forEach(board ->
-            LOGGER.info("{} board was deleted. This board has a {} users", board.getName(), board.getUsers().size())
+                log.info("{} board was deleted. This board has a {} users", board.getName(), board.getUsers().size())
         );
 
-        LOGGER.info("{} boards deleted in {}.", deletedBoards.size(), LocalDateTime.now());
+        log.info("{} boards deleted in {}.", deletedBoards.size(), LocalDateTime.now());
 
     }
 }
