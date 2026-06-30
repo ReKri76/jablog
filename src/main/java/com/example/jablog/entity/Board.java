@@ -1,6 +1,5 @@
 package com.example.jablog.entity;
 
-import com.example.jablog.service.PosterService;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -17,6 +16,12 @@ import java.util.Set;
 @Getter
 @Setter
 public class Board {
+
+    public static final int NUMBER_OF_RULES_GROUPS = 3;
+    public static final int SIZE_OF_GROUP = 4;
+    public static final int SIZE_OF_ARRAY_OF_RULES = SIZE_OF_GROUP * NUMBER_OF_RULES_GROUPS;
+    public static final int MAX_LIFE_CYCLE_OF_THREADS = 28;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -53,7 +58,7 @@ public class Board {
     private String rules = "rw-xrw-xrw-x";
 
     @Column(name="lifeCycleThreads",  nullable = false)
-    @Max(PosterService.MAX_LIFE_CYCLE_OF_THREADS)
+    @Max(MAX_LIFE_CYCLE_OF_THREADS)
     @Min(2)
     private int lifeCycleThreads = 14;
 

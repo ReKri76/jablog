@@ -7,9 +7,10 @@ import com.example.jablog.entity.Posts;
 import com.example.jablog.entity.Threads;
 import com.example.jablog.repository.GetterRepository;
 import com.example.jablog.service.security.DeleterAccessService;
-import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.HtmlUtils;
 
@@ -26,6 +27,7 @@ public class GetterService {
     private final CustomUserDetailsService customUserDetailsService;
 
     @Transactional
+    @NotNull
     public ArrayList<com.example.jablog.DTO.Board> start(){
 
         final ArrayList<com.example.jablog.DTO.Board> boards = new ArrayList<>();
@@ -42,14 +44,15 @@ public class GetterService {
     }
 
     @Transactional
-    public ArrayList<PostWithPicture> board(String boardName, int page){
+    @NotNull
+    public ArrayList<PostWithPicture> board(@NotNull String boardName, int page){
 
         final ArrayList<PostWithPicture> threads = new ArrayList<PostWithPicture>();
         final ArrayList<Threads> input = getterRepository.board(boardName, page);
 
         input.forEach(thread -> {
 
-            final PostWithPicture postWithPicture= new PostWithPicture();
+            final PostWithPicture postWithPicture = new PostWithPicture();
             postWithPicture.setId(thread.getId());
             postWithPicture.setUrl(thread.getPicture());
             postWithPicture.setHead(thread.getHeader());
@@ -62,6 +65,7 @@ public class GetterService {
     }
 
     @Transactional
+    @NotNull
     public ArrayList<PostWithPicture> thread(long threadId){
 
         final Threads threads = getterRepository.thread(threadId);
@@ -92,7 +96,7 @@ public class GetterService {
     }
 
     @Transactional
-    public boolean canDelete(String boardName, CustomUserDetails customUserDetails, @Nullable String id){
+    public boolean canDelete(@NotNull String boardName, @Nullable CustomUserDetails customUserDetails, @Nullable String id){
 
         if (customUserDetails == null)
             customUserDetails = customUserDetailsService.createDefault();
@@ -100,12 +104,11 @@ public class GetterService {
         return deleterAccessService.canAccess(new SecurityData.Deleter(boardName, customUserDetails, id));
     }
 
-    private String createAnchor(String text){
+    private String createAnchor(String text){//ссылки на другой пост
         text = HtmlUtils.htmlEscape(text);
 
         text = text.replaceAll("&gt;&gt;(\\d+)", "<a class=\"anchor\" href=\"#p$1\">&gt;&gt;$1</a>");
 
         return text;
     }
-
 }

@@ -23,7 +23,7 @@ class DeleterAccessService(private val securityRepository: SecurityRepository) :
 
                 if (currentRules[0] != 'r') return false //если нету прав на чтение, то ничего не получится сделать
 
-                return currentRules[2] == 'd' && (isPost || currentRules[3] == 'x')
+                return currentRules[2] == 'd' && (!isPost || currentRules[3] == 'x')
 
             }
             else -> false

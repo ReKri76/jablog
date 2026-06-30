@@ -8,6 +8,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,7 @@ public class UsersService {
     private final UsersRepository usersRepository;
 
     @Transactional
-    public void addUser(String boardName, Login login){
+    public void addUser(@NotNull String boardName, @NotNull Login login){
 
         final String password = login.getPassword();
         final String nickname = login.getNickname();
@@ -40,12 +41,13 @@ public class UsersService {
     }
 
     @Transactional
-    public void deleteUser(String nickname, String boardName){
+    public void deleteUser(@NotNull String nickname, @NotNull String boardName){
         usersRepository.deleteUser(nickname, boardName);
     }
 
     @Transactional
-    public ArrayList<String> viewUsers(String boardName){
+    @NotNull
+    public ArrayList<String> viewUsers(@NotNull String boardName){
         return usersRepository.viewUsers(boardName);
     }
 }

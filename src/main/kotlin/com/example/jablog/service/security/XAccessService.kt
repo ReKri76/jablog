@@ -2,6 +2,7 @@ package com.example.jablog.service.security
 
 import com.example.jablog.config.security.CustomUserDetails
 import com.example.jablog.config.security.Roles
+import com.example.jablog.entity.Board
 import com.example.jablog.repository.SecurityRepository
 import com.example.jablog.service.PosterService
 import com.example.jablog.service.SecurityAccessService
@@ -24,9 +25,9 @@ abstract class XAccessService(private val securityRepository: SecurityRepository
         /**
          * см [com.example.jablog.entity.Board]
          * */
-        val shift = PosterService.SIZE_OF_GROUP * user.role.ordinal
+        val shift = Board.SIZE_OF_GROUP * user.role.ordinal
 
-        val currentRules = user.boardRules.substring(shift, shift + PosterService.SIZE_OF_GROUP)
+        val currentRules = user.boardRules.substring(shift, shift + Board.SIZE_OF_GROUP)
 
         return currentRules
     }

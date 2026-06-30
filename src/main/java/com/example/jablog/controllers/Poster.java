@@ -4,6 +4,7 @@ import com.example.jablog.DTO.Picture;
 import com.example.jablog.DTO.Post;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -27,10 +28,10 @@ public class Poster {
     public String thread(@PathVariable String boardName, @Valid @ModelAttribute("post") Post post,
                          @RequestPart("image") @NonNull MultipartFile file) throws IOException {
 
-        chekFile(file);
-
         if (file.isEmpty())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "dosent upload image");
+
+        chekFile(file);
 
         final Picture picture = new Picture(file);
         final long ifOfPost = posterService.thread(post, picture, boardName);
@@ -40,7 +41,7 @@ public class Poster {
 
     @PostMapping(value = "/{boardName}/{threadID}", consumes = "multipart/form-data")
     public String post(@PathVariable String boardName, @PathVariable long threadID, @Valid @ModelAttribute("post") Post post,
-                       @RequestPart(value = "image", required = false) MultipartFile file) throws IOException {
+                       @RequestPart(value = "image", required = false) @Nullable MultipartFile file) throws IOException {
 
         Picture picture = null;
         if (file != null && !file.isEmpty()) {
@@ -58,7 +59,7 @@ public class Poster {
                         @RequestParam("pass") @NonNull String pass, @RequestParam("nickname") @NonNull String nickname,
                         @RequestParam("lifeCycleThreads") int lifeCycleThreads,
                         @RequestParam("lifeCyclePosts") int lifeCyclePosts,
-                        @RequestParam("transcription") @NonNull String transcription){
+                        @RequestParam("transcription") @Nullable String transcription){
 
         posterService.board(boardName, pass, rule, nickname, lifeCycleThreads, lifeCyclePosts, transcription);
 
@@ -70,7 +71,7 @@ public class Poster {
         if (file.getSize() > MAX_IMAGE_SIZE)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "file is too big");
         if (!fileType.equals("image/png") && !fileType.equals("image/jpeg")
-                && !fileType.equals("image/jpg") && !fileType.equals("image/gif"))
+                && !fileType.equals("image/jpg") && !fileType.equals("image/gif") && !fileType.equals("image/wepb"))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "file is not image");
     }
 }

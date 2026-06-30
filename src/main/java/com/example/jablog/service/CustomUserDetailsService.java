@@ -7,7 +7,7 @@ import com.example.jablog.entity.Users;
 import com.example.jablog.repository.UserDetailsRepository;
 import jakarta.persistence.NoResultException;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,7 +20,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserDetailsRepository userDetailsRepository;
 
     @Override
-    public @NonNull UserDetails loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
+    @NotNull
+    public UserDetails loadUserByUsername(@NotNull String username) throws UsernameNotFoundException {
 
         Users user = new Users();
         CustomUserDetails customUserDetails;
@@ -47,7 +48,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         return customUserDetails;
     }
 
-    public @NonNull CustomUserDetails createDefault(){
+    @NotNull
+    public CustomUserDetails createDefault(){
         return new CustomUserDetails(
                 "ANON",
                 "------------",

@@ -3,7 +3,8 @@ package com.example.jablog.service;
 import com.example.jablog.DTO.Picture;
 import io.minio.*;
 import io.minio.messages.Item;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -12,9 +13,10 @@ import java.util.ArrayList;
 @Service
 public class MinioService {
 
-    private static final int MAX_PART_SIZE = 10 * 1024 * 1024;
+    private static final int MAX_PART_SIZE = 2 * 1024 * 1024;
     private static final int INITIAL_FILE_LIST_CAPACITY = 1000;
     public static final String BUCKET = "images";
+    public static final String DEFAULT_BUCKET = BUCKET;
 
     private final String endpoint;
     private final MinioClient minioClient;
@@ -24,7 +26,10 @@ public class MinioService {
         this.minioClient = minioClient;
     }
 
-    public void savePicture(@NonNull Picture pic, String bucket){
+    public void savePicture(@NotNull Picture pic, @Nullable String bucket){
+
+        if  (bucket==null)
+            bucket=DEFAULT_BUCKET;
 
         try {
             minioClient.putObject(PutObjectArgs.builder()
@@ -38,7 +43,7 @@ public class MinioService {
         }
     }
 
-    public void deletePicture(@NonNull String pathToPic){
+    public void deletePicture(@NotNull String pathToPic){
 
         final String[] parts = pathToPic.split("/");
         final String objectName = parts[parts.length - 1];
@@ -54,7 +59,8 @@ public class MinioService {
         }
     }
 
-    public ArrayList<String> getAllFileName(String bucket){
+    @NotNull
+    public ArrayList<String> getAllFileName(@NotNull String bucket){
 
         final ArrayList<String> names = new ArrayList<String>(INITIAL_FILE_LIST_CAPACITY);
 
@@ -74,7 +80,8 @@ public class MinioService {
         return names;
     }
 
-    public String buildPictureUrl(String fileName) {
+    @NotNull
+    public String buildPictureUrl(@NotNull String fileName) {
         return endpoint.replaceAll("/+$", "") + "/" + BUCKET + "/" + fileName;
     }
 

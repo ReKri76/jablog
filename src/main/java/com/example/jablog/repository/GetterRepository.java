@@ -4,6 +4,7 @@ import com.example.jablog.entity.Board;
 import com.example.jablog.entity.Threads;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ public class GetterRepository {
 
     private final EntityManager entityManager;
 
+    @NotNull
     public ArrayList<Board> start(){
 
         final List<Board> result = entityManager.createQuery("from Board", Board.class).getResultList();
@@ -24,6 +26,7 @@ public class GetterRepository {
         return new ArrayList<Board>(result);
     }
 
+   @NotNull
    public ArrayList<Threads> board(String boardName, int page){
 
        final String jpql = "from Threads t where t.board.name = :boardName order by t.id desc";
@@ -37,6 +40,7 @@ public class GetterRepository {
        return new ArrayList<Threads>(threads);
    }
 
+   @NotNull
    public Threads thread(long threadId){
 
         final String jpql = "from Threads t left join fetch t.posts where t.id = :threadId";

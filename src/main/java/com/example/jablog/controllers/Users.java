@@ -6,7 +6,6 @@ import com.example.jablog.config.security.Roles;
 import com.example.jablog.service.UsersService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -24,7 +23,7 @@ public class Users {
     private final UsersService usersService;
 
     @PostMapping(value = "/panel/{boardName}")
-    public String addUser(@PathVariable("boardName") @NonNull String boardName,
+    public String addUser(@PathVariable("boardName") String boardName,
                           @Valid @ModelAttribute("login") Login login) {
 
         usersService.addUser(boardName, login);
@@ -55,7 +54,7 @@ public class Users {
         return "users";
     }
 
-    @GetMapping(value = "/panel")
+    @GetMapping(value = "/panel") //на этой странице есть поле для логина и для управления в залогиненных досках как админ
     public String panel(Model model, HttpSession session){
 
         final Enumeration<String> boards = session.getAttributeNames();

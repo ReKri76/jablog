@@ -10,9 +10,11 @@ import com.example.jablog.errors.InvalidRulesException;
 import com.example.jablog.repository.PosterRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,18 +22,13 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PosterService {
 
-    public static final int NUMBER_OF_RULES_GROUPS = 3;
-    public static final int SIZE_OF_GROUP = 4;
-    public static final int SIZE_OF_ARRAY_OF_RULES = SIZE_OF_GROUP * NUMBER_OF_RULES_GROUPS;
-    public static final int MAX_LIFE_CYCLE_OF_THREADS = 28;
-
     private final PosterRepository posterRepository;
     private final EntityManager entityManager;
     private final MinioService minioService;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public long thread(@NonNull Post post, Picture file, String board){
+    public long thread(@NotNull @Valid Post post, @NotNull Picture file, @NotNull String board){
 
         if (post.getHead().isEmpty())
             post.setHead(post.getBody().substring(0,Math.min(120, post.getBody().length())));
@@ -56,7 +53,7 @@ public class PosterService {
     }
 
     @Transactional
-    public void post(@NonNull Post post, Picture file, long threadId){
+    public void post(@NotNull Post post, @Nullable Picture file, long threadId){
 
         String name = "";
         boolean savePic = false;
@@ -77,21 +74,24 @@ public class PosterService {
             minioService.savePicture(file, MinioService.BUCKET);
     }
 
+    /**
+     * @see {@link com.example.jablog.entity.Board}
+     * */
     @Transactional
-    public void board(String boardName, String password, String rule,
-                      String nickname, int lifeCycleThreads , int lifeCyclePosts, String transcription){
+    public void board(@NotNull String boardName, @NotNull String password, @NotNull String rule,
+                      @NotNull String nickname, int lifeCycleThreads , int lifeCyclePosts, @Nullable String transcription){
 
         if (lifeCyclePosts>=lifeCycleThreads)
             throw new InvalidRulesException("life cycle of posts cant be longer then threads");
         if (lifeCyclePosts<0)
             throw new InvalidRulesException("value of life cycle must be positive");
-        if(lifeCycleThreads>MAX_LIFE_CYCLE_OF_THREADS)
+        if(lifeCycleThreads>Board.MAX_LIFE_CYCLE_OF_THREADS)
             throw new InvalidRulesException("value of life cycle of threads cant be more than 28");
 
-        if (rule.length()!=SIZE_OF_ARRAY_OF_RULES)
+        if (rule.length()!=Board.SIZE_OF_ARRAY_OF_RULES)
             throw new InvalidRulesException("incorrect rule");
 
-        for (int i = 0; i < SIZE_OF_ARRAY_OF_RULES; i += SIZE_OF_GROUP){
+        for (int i = 0; i < Board.SIZE_OF_ARRAY_OF_RULES; i += Board.SIZE_OF_GROUP){
             if (
                     switch (rule.charAt(i)) {
                         case 'r' ->
@@ -100,7 +100,7 @@ public class PosterService {
                                 (rule.charAt(i + 3) != 'x' && rule.charAt(i + 3) != '-');
 
                         case '-' -> {
-                            for (int k = i; k < i + SIZE_OF_GROUP; k++)
+                            for (int k = i; k < i + Board.SIZE_OF_GROUP; k++)
                                 if (rule.charAt(k) != '-')
                                     yield true;
                             yield false;
@@ -111,6 +111,9 @@ public class PosterService {
             )
                 throw new InvalidRulesException("incorrect rule");
         }
+
+        if (transcription==null)
+            transcription=boardName;
 
         final Board board = new Board();
         board.setName(boardName);
