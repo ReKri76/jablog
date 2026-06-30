@@ -7,11 +7,13 @@ import com.example.jablog.repository.APIRepository;
 import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class APIService {
 
     private final APIRepository apiRepository;
@@ -20,16 +22,23 @@ public class APIService {
     @Transactional
     public CustomUserDetails login (Login login) throws NoResultException {
 
+        log.info("User {} is starting login", login.getNickname());
+
         Users user;
 
         try {
             user = apiRepository.login(login.getNickname());
         } catch (NoResultException e){
+            log.warn("User {} not found. Error: {}", login.getNickname(), e.getMessage());
+            throw e;
+        }
+
+        if (!passwordEncoder.matches(login.getPassword(), user.getPassword())) {
+            log.warn("User {} password does not match password.", login.getNickname());
             throw new NoResultException();
         }
 
-        if (!passwordEncoder.matches(login.getPassword(), user.getPassword()))
-            throw new NoResultException();
+        log.info("User {} is log in", login.getNickname());
 
         return CustomUserDetails.build(user);
     }

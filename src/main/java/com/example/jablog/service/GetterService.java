@@ -25,6 +25,7 @@ public class GetterService {
     private final GetterRepository getterRepository;
     private final DeleterAccessService deleterAccessService;
     private final CustomUserDetailsService customUserDetailsService;
+    private final MinioService minioService;
 
     @Transactional
     @NotNull
@@ -54,7 +55,7 @@ public class GetterService {
 
             final PostWithPicture postWithPicture = new PostWithPicture();
             postWithPicture.setId(thread.getId());
-            postWithPicture.setUrl(thread.getPicture());
+            postWithPicture.setUrl(minioService.buildPictureUrl(thread.getPicture()));
             postWithPicture.setHead(thread.getHeader());
             postWithPicture.setBody(thread.getContent());
 
@@ -72,7 +73,7 @@ public class GetterService {
 
         final PostWithPicture main = new PostWithPicture();
         main.setId(threads.getId());
-        main.setUrl(threads.getPicture());
+        main.setUrl(minioService.buildPictureUrl(threads.getPicture()));
         main.setHead(threads.getHeader());
         main.setBody(threads.getContent());
 
@@ -85,7 +86,7 @@ public class GetterService {
             final PostWithPicture postWithPicture= new PostWithPicture();
             postWithPicture.setId(post.getId());
             String pic = post.getPicture();
-            postWithPicture.setUrl(!Objects.equals(pic, "") ? pic : null);
+            postWithPicture.setUrl(!Objects.equals(pic, "") ? minioService.buildPictureUrl(pic) : null);
             postWithPicture.setHead(post.getHeader());
             postWithPicture.setBody(createAnchor(post.getContent()));
 

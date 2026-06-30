@@ -2,6 +2,8 @@ package com.example.jablog.controllers;
 
 import com.example.jablog.DTO.Picture;
 import com.example.jablog.DTO.Post;
+import com.example.jablog.config.security.Roles;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Nullable;
@@ -59,10 +61,11 @@ public class Poster {
                         @RequestParam("pass") @NonNull String pass, @RequestParam("nickname") @NonNull String nickname,
                         @RequestParam("lifeCycleThreads") int lifeCycleThreads,
                         @RequestParam("lifeCyclePosts") int lifeCyclePosts,
-                        @RequestParam("transcription") @Nullable String transcription){
+                        @RequestParam("transcription") @Nullable String transcription, HttpSession session){
 
         posterService.board(boardName, pass, rule, nickname, lifeCycleThreads, lifeCyclePosts, transcription);
 
+        session.setAttribute(boardName, Roles.ROLE_ADMIN);
         return "redirect:/"+boardName;
     }
 

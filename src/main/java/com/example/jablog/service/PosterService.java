@@ -37,7 +37,7 @@ public class PosterService {
                 .bySimpleNaturalId(Board.class)
                 .getReference(board);
 
-        final String name = minioService.buildPictureUrl(file.getName());
+        final String name = file.getName();
 
         final Threads threads = new Threads();
         threads.setContent(post.getBody());
@@ -58,7 +58,7 @@ public class PosterService {
         String name = "";
         boolean savePic = false;
         if (file!=null) {
-            name = minioService.buildPictureUrl(file.getName());
+            name = file.getName();
             savePic = true;
         }
 
@@ -112,7 +112,7 @@ public class PosterService {
                 throw new InvalidRulesException("incorrect rule");
         }
 
-        if (transcription==null)
+        if (transcription == null || transcription.isEmpty())
             transcription=boardName;
 
         final Board board = new Board();
@@ -129,5 +129,10 @@ public class PosterService {
         users.setNickname(nickname);
 
         posterRepository.board(board, users);
+    }
+
+    private String makePictureName(Picture picture){
+        String res = picture.getName();
+        return res;
     }
 }

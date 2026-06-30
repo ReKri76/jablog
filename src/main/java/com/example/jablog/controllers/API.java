@@ -7,6 +7,7 @@ import jakarta.persistence.NoResultException;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,17 +21,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@Slf4j
 public class API {
 
     private final APIService apiService;
 
     @GetMapping("/login")
     public String loginPage() {
+        log.debug("/api/login page is required");
         return "login";
     }
 
     @PostMapping("/login/verify")
     public String login(HttpSession session, @Valid @ModelAttribute("login") Login login, BindingResult result) {
+
+        log.debug("/api/login/verify page is required");
 
         if (result.hasErrors())
             return "redirect:/api/login";

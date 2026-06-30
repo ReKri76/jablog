@@ -1,18 +1,21 @@
 <configuration>
 
+    <!-- ================= INFO ================= -->
     <appender name="INFO_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <level>INFO</level>
-        <onMatch>ACCEPT</onMatch>
-        <onMismatch>DENY</onMismatch>
-        <file>logs/info.log</file>
+        <file>logs/info/main.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>logs/info-%d{yyyy-MM-dd HH:mm:ss.SSS}.log</fileNamePattern>
+            <fileNamePattern>logs/info/l-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxHistory>7</maxHistory>
             <totalSizeCap>2GB</totalSizeCap>
             <maxFileSize>128MB</maxFileSize>
         </rollingPolicy>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-8level %logger{32} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{32} - %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -22,30 +25,48 @@
         <queueSize>128</queueSize>
     </appender>
 
-    <appender name="ERROR_LOG" class="ch.qos.logback.core.FileAppender">
-        <level>ERROR</level>
-        <onMatch>ACCEPT</onMatch>
-        <onMismatch>DENY</onMismatch>
-        <file>logs/error.log</file>
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-8level %logger{32} - %msg%n</pattern>
-        </encoder>
-    </appender>
-
-    <appender name="DEBUG_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <level>DEBUG</level>
-        <onMatch>ACCEPT</onMatch>
-        <onMismatch>DENY</onMismatch>
-        <file>logs/debug.log</file>
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-8level %logger{32} - %msg%n</pattern>
-        </encoder>
+    <!-- ================= WARN ================= -->
+    <appender name="WARN_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/warn/main.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>logs/debug-%d{yyyy-MM-dd HH:mm:ss.SSS}.log</fileNamePattern>
+            <fileNamePattern>logs/warn/l-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxHistory>7</maxHistory>
             <totalSizeCap>4GB</totalSizeCap>
             <maxFileSize>128MB</maxFileSize>
         </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{32} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ASYNC_WARN_LOG" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="WARN_LOG"/>
+        <neverBlock>true</neverBlock>
+        <queueSize>128</queueSize>
+    </appender>
+
+    <!-- ================= DEBUG ================= -->
+    <appender name="DEBUG_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/debug/main.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/debug/l-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>4GB</totalSizeCap>
+            <maxFileSize>128MB</maxFileSize>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{32} - %msg%n</pattern>
+        </encoder>
     </appender>
 
     <appender name="ASYNC_DEBUG_LOG" class="ch.qos.logback.classic.AsyncAppender">
@@ -54,8 +75,23 @@
         <queueSize>128</queueSize>
     </appender>
 
-    <root level="ERROR">
+    <!-- ================= ERROR ================= -->
+    <appender name="ERROR_LOG" class="ch.qos.logback.core.FileAppender">
+        <file>logs/error/main.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{32} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ================= ROOT ================= -->
+    <root level="DEBUG">
         <appender-ref ref="ASYNC_INFO_LOG"/>
+        <appender-ref ref="ASYNC_WARN_LOG"/>
         <appender-ref ref="ASYNC_DEBUG_LOG"/>
         <appender-ref ref="ERROR_LOG"/>
     </root>

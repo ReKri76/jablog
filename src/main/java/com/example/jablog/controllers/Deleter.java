@@ -41,5 +41,4 @@ public class Deleter {
                 .header("HX-Redirect", "/"+boardName+"/"+threadId)
                 .build();
     }
-
 }

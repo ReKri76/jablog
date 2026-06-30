@@ -2,6 +2,7 @@ package com.example.jablog.service;
 
 import com.example.jablog.DTO.Picture;
 import io.minio.*;
+import io.minio.http.Method;
 import io.minio.messages.Item;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -9,11 +10,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class MinioService {
 
-    private static final int MAX_PART_SIZE = 2 * 1024 * 1024;
+    private static final int MAX_PART_SIZE = 5 * 1024 * 1024;
     private static final int INITIAL_FILE_LIST_CAPACITY = 1000;
     public static final String BUCKET = "images";
     public static final String DEFAULT_BUCKET = BUCKET;
@@ -82,7 +84,18 @@ public class MinioService {
 
     @NotNull
     public String buildPictureUrl(@NotNull String fileName) {
-        return endpoint.replaceAll("/+$", "") + "/" + BUCKET + "/" + fileName;
-    }
+        try {
+            GetPresignedObjectUrlArgs args = GetPresignedObjectUrlArgs.builder()
+                    .method(Method.GET)
+                    .bucket(BUCKET)
+                    .object(fileName)
+                    .expiry(1, TimeUnit.MINUTES)
+                    .build();
 
+            return minioClient.getPresignedObjectUrl(args);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error when creating link:", e);
+        }
+    }
 }

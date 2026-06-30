@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @Service
@@ -31,7 +30,7 @@ public class Cleaner {
 
         deletedThreads.forEach( thread -> minioService.deletePicture(thread.getPicture()));
 
-        log.info("{} threads deleted in {}.", deletedThreads.size(), LocalDateTime.now());
+        log.info("{} threads deleted.", deletedThreads.size());
     }
 
     @Scheduled(cron = "0 0 4 * * MON")
@@ -45,7 +44,7 @@ public class Cleaner {
                 minioService.deletePicture(url);
         });
 
-        log.info("{} posts deleted in {}.", deletedPosts.size(), LocalDateTime.now());
+        log.info("{} posts deleted in.", deletedPosts.size());
     }
 
     @Scheduled(cron ="0 0 4 13 * *")
@@ -55,7 +54,6 @@ public class Cleaner {
         final ArrayList<String> picsInS3 = minioService.getAllFileName(MinioService.BUCKET);
 
         picsInS3.forEach( pic -> {
-            pic = minioService.buildPictureUrl(pic);
             if (!picsInDB.contains(pic))
                 minioService.deletePicture(pic);
         });
@@ -72,7 +70,7 @@ public class Cleaner {
                 log.info("{} board was deleted. This board has a {} users", board.getName(), board.getUsers().size())
         );
 
-        log.info("{} boards deleted in {}.", deletedBoards.size(), LocalDateTime.now());
+        log.info("{} boards deleted.", deletedBoards.size());
 
     }
 }
