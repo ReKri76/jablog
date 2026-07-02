@@ -7,6 +7,7 @@ import com.example.jablog.repository.UsersRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UsersService {
 
     private final EntityManager entityManager;
@@ -24,6 +26,8 @@ public class UsersService {
 
     @Transactional
     public void addUser(@NotNull String boardName, @NotNull Login login){
+
+        log.info("Start add user.");
 
         final String password = login.getPassword();
         final String nickname = login.getNickname();
@@ -38,11 +42,15 @@ public class UsersService {
         users.setNickname(nickname);
 
         usersRepository.addUser(users);
+
+        log.info("User {} was added.", users.getNickname());
     }
 
     @Transactional
     public void deleteUser(@NotNull String nickname, @NotNull String boardName){
+        log.info("Start deleting user {}", nickname);
         usersRepository.deleteUser(nickname, boardName);
+        log.info("User {} was deleted", nickname);
     }
 
     @Transactional

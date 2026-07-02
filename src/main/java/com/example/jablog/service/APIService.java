@@ -5,7 +5,6 @@ import com.example.jablog.config.security.CustomUserDetails;
 import com.example.jablog.entity.Users;
 import com.example.jablog.repository.APIRepository;
 import jakarta.persistence.NoResultException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,7 +18,6 @@ public class APIService {
     private final APIRepository apiRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional
     public CustomUserDetails login (Login login) throws NoResultException {
 
         log.info("User {} is starting login", login.getNickname());
@@ -42,5 +40,4 @@ public class APIService {
 
         return CustomUserDetails.build(user);
     }
-
 }

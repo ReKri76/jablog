@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -12,6 +13,7 @@ public class APIRepository {
 
     private final EntityManager entityManager;
 
+    @Transactional(readOnly = true)
     public Users login (String nickname) throws NoResultException {
         return entityManager.createQuery("from Users u where u.nickname = :nickname", Users.class)
                 .setParameter("nickname", nickname)

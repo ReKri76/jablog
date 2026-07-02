@@ -12,6 +12,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PosterService {
 
     private final PosterRepository posterRepository;
@@ -81,6 +83,8 @@ public class PosterService {
     public void board(@NotNull String boardName, @NotNull String password, @NotNull String rule,
                       @NotNull String nickname, int lifeCycleThreads , int lifeCyclePosts, @Nullable String transcription){
 
+        log.info("Start creating board");
+
         if (lifeCyclePosts>=lifeCycleThreads)
             throw new InvalidRulesException("life cycle of posts cant be longer then threads");
         if (lifeCyclePosts<0)
@@ -108,8 +112,10 @@ public class PosterService {
 
                         default -> true;
                     }
-            )
-                throw new InvalidRulesException("incorrect rule");
+            ){
+                log.warn("Invalid board rule : {}", rule);
+                throw new InvalidRulesException("incorrect board rule");
+            }
         }
 
         if (transcription == null || transcription.isEmpty())
@@ -129,10 +135,7 @@ public class PosterService {
         users.setNickname(nickname);
 
         posterRepository.board(board, users);
-    }
 
-    private String makePictureName(Picture picture){
-        String res = picture.getName();
-        return res;
+        log.info("Board {} is created", boardName);
     }
 }

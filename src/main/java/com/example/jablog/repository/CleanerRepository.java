@@ -6,10 +6,10 @@ import com.example.jablog.entity.Threads;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -20,7 +20,8 @@ public class CleanerRepository {
 
     private final EntityManager entityManager;
 
-    public ArrayList<Posts> posts() {
+    @Transactional(readOnly = true)
+    public List<Posts> posts() {
         final long now = Instant.now().toEpochMilli();
 
         final String selectJpql = "from Posts p where p.createdAt < :now - p.thread.board.lifeCyclePosts * :unxtm";
@@ -35,10 +36,11 @@ public class CleanerRepository {
                 .setParameter("unxtm", UNIX_TIME_DAY)
                 .executeUpdate();
 
-        return new ArrayList<Posts>(posts);
+        return posts;
     }
 
-    public ArrayList<Threads> threads(long oldThread){
+    @Transactional(readOnly = true)
+    public List<Threads> threads(long oldThread){
         final long now = Instant.now().toEpochMilli();
 
         final String selectJpql =
@@ -69,18 +71,20 @@ public class CleanerRepository {
                 .setParameter("now", now)
                 .executeUpdate();
 
-        return new ArrayList<Threads>(threads);
+        return threads;
     }
 
-    public ArrayList<String> pics(){
+    @Transactional(readOnly = true)
+    public List<String> pics(){
 
         final List<String> pics = entityManager.createQuery("select t.picture from Threads t", String.class).getResultList();
         pics.addAll(entityManager.createQuery("select p.picture from Posts p", String.class).getResultList());
 
-        return new ArrayList<String>(pics);
+        return pics;
     }
 
-    public ArrayList<Board> boards(long oldBoard){
+    @Transactional(readOnly = true)
+    public List<Board> boards(long oldBoard){
 
         final String selectJpql = "from Board b left join fetch b.users where not exists(select 1 from Threads t where t.board = b) " +
                 "and b.createdAt < :oldBoard";
@@ -94,7 +98,7 @@ public class CleanerRepository {
                 .setParameter("oldBoard", oldBoard)
                 .executeUpdate();
 
-        return new ArrayList<Board>(boards);
+        return boards;
     }
 
 }

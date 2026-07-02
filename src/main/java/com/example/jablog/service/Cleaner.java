@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @Slf4j
@@ -24,9 +27,11 @@ public class Cleaner {
     @Scheduled(cron = "0 0 4 * * WED")
     public void cleanThreads(){
 
+        log.info("start to clean threads");
+
         final long oldThread = Instant.now().toEpochMilli()- Duration.ofMinutes(30).toMillis();
 
-        final ArrayList<Threads> deletedThreads = cleanerRepository.threads(oldThread);
+        final List<Threads> deletedThreads = cleanerRepository.threads(oldThread);
 
         deletedThreads.forEach( thread -> minioService.deletePicture(thread.getPicture()));
 
@@ -36,7 +41,9 @@ public class Cleaner {
     @Scheduled(cron = "0 0 4 * * MON")
     public void cleanPosts(){
 
-        final ArrayList<Posts> deletedPosts = cleanerRepository.posts();
+        log.info("start to clean posts");
+
+        final List<Posts> deletedPosts = cleanerRepository.posts();
 
         deletedPosts.forEach(post->{
             final String url = post.getPicture();
@@ -50,21 +57,32 @@ public class Cleaner {
     @Scheduled(cron ="0 0 4 13 * *")
     public void cleanPics(){
 
-        final ArrayList<String> picsInDB = cleanerRepository.pics();
+        log.info("start to clean pictures");
+
+        final List<String> picsInDB = cleanerRepository.pics();
+        final HashSet<String> picsSet = new HashSet<>(picsInDB);
         final ArrayList<String> picsInS3 = minioService.getAllFileName(MinioService.BUCKET);
+        AtomicInteger count = new AtomicInteger();
 
         picsInS3.forEach( pic -> {
-            if (!picsInDB.contains(pic))
+            if (!picsSet.contains(pic)){
                 minioService.deletePicture(pic);
+                count.incrementAndGet();
+            }
         });
+
+        log.info("{} pictures was deleted.", count.get());
+
     }
 
     @Scheduled(cron="0 0 5 24 * *")
     public void cleanBoards(){
 
+        log.info("start to clean boards");
+
         final long oldBoard = Instant.now().toEpochMilli()-Duration.ofDays(1).toMillis();
 
-        final ArrayList<Board> deletedBoards = cleanerRepository.boards(oldBoard);
+        final List<Board> deletedBoards = cleanerRepository.boards(oldBoard);
 
         deletedBoards.forEach(board ->
                 log.info("{} board was deleted. This board has a {} users", board.getName(), board.getUsers().size())

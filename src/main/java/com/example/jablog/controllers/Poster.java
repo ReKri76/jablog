@@ -74,7 +74,7 @@ public class Poster {
         if (file.getSize() > MAX_IMAGE_SIZE)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "file is too big");
         if (!fileType.equals("image/png") && !fileType.equals("image/jpeg")
-                && !fileType.equals("image/jpg") && !fileType.equals("image/gif") && !fileType.equals("image/wepb"))
+                && !fileType.equals("image/jpg") && !fileType.equals("image/gif") && !fileType.equals("image/webp"))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "file is not image");
     }
 }
