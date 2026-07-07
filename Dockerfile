@@ -13,7 +13,13 @@ FROM bellsoft/liberica-openjre-alpine:21
 
 WORKDIR /master
 
+RUN addgroup -S dev && adduser -S main -G spring
+
 COPY --from=builder /master_builder/target/*.war app.war
+
+RUN chown -R dev:main /master
+
+USER main
 
 EXPOSE 8080
 
