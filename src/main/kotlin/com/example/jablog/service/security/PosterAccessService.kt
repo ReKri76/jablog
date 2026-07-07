@@ -23,7 +23,8 @@ class PosterAccessService(private val securityRepository: SecurityRepository) : 
 
                 val currentRules = getCurrentRules(boardName = data.boardName , user = data.user)
 
-                if (currentRules[0] != 'r') return false //если нету прав на чтение, то ничего не получится сделать
+                if (currentRules[0] != 'r')
+                    return false //если нету прав на чтение, то ничего не получится сделать
 
                 return currentRules[1] == 'w' && (isThread || currentRules[3] == 'x')
             }

@@ -2,7 +2,8 @@ package com.example.jablog.controllers;
 
 import com.example.jablog.DTO.Picture;
 import com.example.jablog.DTO.Post;
-import com.example.jablog.config.security.Roles;
+import com.example.jablog.service.CustomUserDetailsService;
+import com.example.jablog.service.PosterService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import com.example.jablog.service.PosterService;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
@@ -25,6 +25,7 @@ public class Poster {
     public static final long MAX_IMAGE_SIZE = 1024 * 1024 * 10 - 1;
 
     private final PosterService posterService;
+    private final CustomUserDetailsService customUserDetailsService;
 
     @PostMapping(value = "/{boardName}", consumes = "multipart/form-data")
     public String thread(@PathVariable String boardName, @Valid @ModelAttribute("post") Post post,
@@ -65,7 +66,7 @@ public class Poster {
 
         posterService.board(boardName, pass, rule, nickname, lifeCycleThreads, lifeCyclePosts, transcription);
 
-        session.setAttribute(boardName, Roles.ROLE_ADMIN);
+        session.setAttribute(boardName, customUserDetailsService.loadUserByUsername(nickname));
         return "redirect:/"+boardName;
     }
 

@@ -24,9 +24,9 @@ class DeleterAuthorizationManager(private val deleterAccessService: DeleterAcces
 
         val boardName = context.variables["boardName"] as String
         val postId = context.variables["post"] //может прийти запрос как на удаление треда, таки на удаление поста
+        val sessionAttr = session?.getAttribute(boardName)
 
-        val user = (session.getAttribute(boardName) ?: customUserDetailsService.createDefault())
-                as CustomUserDetails
+        val user = (sessionAttr ?: customUserDetailsService.createDefault()) as CustomUserDetails
 
         val canAccess = deleterAccessService.canAccess(
             data = SecurityData.Deleter(

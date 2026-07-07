@@ -12,8 +12,10 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.springframework.web.util.HtmlUtils;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.TreeSet;
@@ -55,7 +57,7 @@ public class GetterService {
 
             final PostWithPicture postWithPicture = new PostWithPicture();
             postWithPicture.setId(thread.getId());
-            postWithPicture.setUrl(minioService.buildPictureUrl(thread.getPicture()));
+            postWithPicture.setUrl(minioService.buildPictureUrl(thread.getPicture(), boardName));
             postWithPicture.setHead(thread.getHeader());
             postWithPicture.setBody(thread.getContent());
 
@@ -70,10 +72,11 @@ public class GetterService {
     public ArrayList<PostWithPicture> thread(long threadId){
 
         final Threads threads = getterRepository.thread(threadId);
+        final String boardName = threads.getBoard().getName();
 
         final PostWithPicture main = new PostWithPicture();
         main.setId(threads.getId());
-        main.setUrl(minioService.buildPictureUrl(threads.getPicture()));
+        main.setUrl(minioService.buildPictureUrl(threads.getPicture(), boardName));
         main.setHead(threads.getHeader());
         main.setBody(threads.getContent());
 
@@ -83,10 +86,10 @@ public class GetterService {
         final TreeSet<Posts> input = new TreeSet<Posts>(threads.getPosts());
         input.forEach(post -> {
 
-            final PostWithPicture postWithPicture= new PostWithPicture();
+            final PostWithPicture postWithPicture = new PostWithPicture();
             postWithPicture.setId(post.getId());
             String pic = post.getPicture();
-            postWithPicture.setUrl(!Objects.equals(pic, "") ? minioService.buildPictureUrl(pic) : null);
+            postWithPicture.setUrl(!Objects.equals(pic, "") ? minioService.buildPictureUrl(pic, boardName) : null);
             postWithPicture.setHead(post.getHeader());
             postWithPicture.setBody(createAnchor(post.getContent()));
 
@@ -103,6 +106,13 @@ public class GetterService {
             customUserDetails = customUserDetailsService.createDefault();
 
         return deleterAccessService.canAccess(new SecurityData.Deleter(boardName, customUserDetails, id));
+    }
+
+    @NotNull
+    public StreamingResponseBody file(@NotNull String filename){
+        InputStream file = minioService.getFile(filename);
+
+        return file::transferTo;
     }
 
     private String createAnchor(String text){//ссылки на другой пост

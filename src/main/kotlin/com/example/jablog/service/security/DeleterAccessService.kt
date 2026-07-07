@@ -21,7 +21,8 @@ class DeleterAccessService(private val securityRepository: SecurityRepository) :
 
                 val currentRules = getCurrentRules(boardName = data.boardName , user = data.user)
 
-                if (currentRules[0] != 'r') return false //если нету прав на чтение, то ничего не получится сделать
+                if (currentRules[0] != 'r')
+                    return false //если нету прав на чтение, то ничего не получится сделать
 
                 return currentRules[2] == 'd' && (!isPost || currentRules[3] == 'x')
 

@@ -9,8 +9,7 @@ import com.example.jablog.service.SecurityAccessService
 
 abstract class XAccessService(private val securityRepository: SecurityRepository) : SecurityAccessService{
 
-    protected fun getCurrentRules(boardName : String, user : CustomUserDetails)
-    : String{
+    protected fun getCurrentRules(boardName : String, user : CustomUserDetails) : String{
 
         //мутации объекта для гарантирования консистентности данных в случае какого-либо сбоя
 

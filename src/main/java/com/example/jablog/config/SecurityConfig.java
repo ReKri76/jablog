@@ -114,6 +114,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/users/panel/{boardName}")
                             .access(usersAuthorizationManager)
 
+                        .requestMatchers(HttpMethod.GET, "/{boardName}/img/{fileName}")
+                            .access(getterAuthorizationManager)
                         .requestMatchers(HttpMethod.GET, "/{boardName}/{thread}")
                             .access(getterAuthorizationManager)
                         .requestMatchers(HttpMethod.GET, "/{boardName}")

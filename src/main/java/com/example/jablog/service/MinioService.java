@@ -2,15 +2,16 @@ package com.example.jablog.service;
 
 import com.example.jablog.DTO.Picture;
 import io.minio.*;
-import io.minio.http.Method;
 import io.minio.messages.Item;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class MinioService {
@@ -23,12 +24,13 @@ public class MinioService {
     private final String endpoint;
     private final MinioClient minioClient;
 
-    public MinioService(@Value("${minio.endpoint:DEBUG_NOT_FOUND}") String endpoint, MinioClient minioClient) {
+    public MinioService(@Value("${minio.endpoint:DEBUG_NOT_FOUND}") String endpoint,
+                        MinioClient privateMinioClient) {
         this.endpoint = endpoint;
-        this.minioClient = minioClient;
+        this.minioClient = privateMinioClient;
     }
 
-    public void savePicture(@NotNull Picture pic, @Nullable String bucket){
+    public void savePicture(@NotNull Picture pic, @Nullable String bucket) throws RuntimeException{
 
         if  (bucket==null)
             bucket=DEFAULT_BUCKET;
@@ -45,7 +47,7 @@ public class MinioService {
         }
     }
 
-    public void deletePicture(@NotNull String pathToPic){
+    public void deletePicture(@NotNull String pathToPic) throws RuntimeException{
 
         final String[] parts = pathToPic.split("/");
         final String objectName = parts[parts.length - 1];
@@ -62,7 +64,7 @@ public class MinioService {
     }
 
     @NotNull
-    public ArrayList<String> getAllFileName(@NotNull String bucket){
+    public ArrayList<String> getAllFileName(@NotNull String bucket) throws RuntimeException{
 
         final ArrayList<String> names = new ArrayList<String>(INITIAL_FILE_LIST_CAPACITY);
 
@@ -83,19 +85,22 @@ public class MinioService {
     }
 
     @NotNull
-    public String buildPictureUrl(@NotNull String fileName) {
+    public InputStream getFile(@NotNull String fileName){
         try {
-            GetPresignedObjectUrlArgs args = GetPresignedObjectUrlArgs.builder()
-                    .method(Method.GET)
-                    .bucket(BUCKET)
-                    .object(fileName)
-                    .expiry(1, TimeUnit.MINUTES)
-                    .build();
-
-            return minioClient.getPresignedObjectUrl(args);
-
+            return minioClient.getObject(GetObjectArgs.builder()
+                            .bucket(BUCKET)
+                            .object(fileName)
+                            .build());
         } catch (Exception e) {
-            throw new RuntimeException("Error when creating link:", e);
+            throw new RuntimeException("Error when getting file: " + e);
         }
+    }
+
+    @Nullable
+    public String buildPictureUrl(@Nullable String fileName, @NotNull String boardName) {
+        if (fileName == null)
+            return null;
+
+        return "/" + boardName + "/img/"+ URLEncoder.encode(fileName, StandardCharsets.UTF_8);
     }
 }

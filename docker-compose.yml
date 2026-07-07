@@ -1,0 +1,60 @@
+services:
+  server:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+      - s3
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+
+      MINIO_ENDPOINT: http://s3:9000
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+    volumes:
+      - ./logs:/master/logs
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME}
+      POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init_db.sql:/docker-entrypoint-initdb.d/init.sql
+      - pg_data:/var/lib/postgresql/data
+
+  s3:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      - s3
+    entrypoint: >
+      sh -c "
+      until mc alias set minio http://s3:9000 ${MINIO_ACCESS_KEY} '${MINIO_SECRET_KEY}'; do
+        echo 'Waiting for MinIO to start...';
+        sleep 2;
+      done;
+      mc mb --ignore-existing minio/images;
+      exit 0;
+      "
+
+volumes:
+  pg_data:
+  minio_data:

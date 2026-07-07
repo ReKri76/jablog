@@ -1,9 +1,9 @@
 package com.example.jablog.config;
 
+import io.minio.MinioClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import io.minio.MinioClient;
 
 @Configuration
 public class MinioConfig {
@@ -17,6 +17,7 @@ public class MinioConfig {
         return MinioClient.builder()
                 .endpoint(endpoint)
                 .credentials(accessKey, secretKey)
+                .region("us-east-1")
                 .build();
     }
 }

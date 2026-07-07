@@ -25,9 +25,9 @@ class GetterAuthorizationManager(private val getterAccessService: GetterAccessSe
 
         val boardName = context.variables["boardName"] as String
         val threadId : String? = context.variables["thread"]
+        val sessionAttr = session?.getAttribute(boardName)
 
-        val user = (session.getAttribute(boardName) ?: customUserDetailsService.createDefault())
-                as CustomUserDetails
+        val user = (sessionAttr ?: customUserDetailsService.createDefault()) as CustomUserDetails
 
         val canAccess = getterAccessService.canAccess(
             data = SecurityData.Getter(

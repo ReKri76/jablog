@@ -7,11 +7,14 @@ import com.example.jablog.config.security.CustomUserDetails;
 import com.example.jablog.service.GetterService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.util.ArrayList;
 
@@ -51,6 +54,13 @@ public class Getter {
         model.addAttribute("post", new Post());
         model.addAttribute("canDelete", getterService.canDelete(boardName, customUserDetails, null));
         return "board";
+    }
+
+    @GetMapping("/{boardName}/img/{fileName}")
+    @ResponseBody
+    @NotNull
+    public StreamingResponseBody file(@PathVariable String fileName){
+        return getterService.file(fileName);
     }
 
     @GetMapping("/")
