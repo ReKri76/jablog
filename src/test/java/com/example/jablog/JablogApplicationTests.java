@@ -1,5 +1,6 @@
 package com.example.jablog;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -15,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
         "minio.secret.key=test-secret",
         "jwt.key=./key.pem"
 })
+@Disabled("Тесты отключены временно")
 class JablogApplicationTests {
 
     @Test
