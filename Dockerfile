@@ -15,6 +15,8 @@ WORKDIR /master
 
 RUN addgroup -S dev && adduser -S main -G dev
 
+RUN mkdir -p /master/logs
+
 COPY --from=builder /master_builder/target/*.war app.war
 
 RUN chown -R main:dev /master
