@@ -6,13 +6,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.UUID;
 
 @Data
 public class Picture {
 
     public Picture(@NotNull MultipartFile file) throws IOException {
         this.setInputStream(file.getInputStream());
-        this.setName("["+file.getOriginalFilename()+"]["+System.currentTimeMillis()+"]");
+        this.setName(UUID.randomUUID() + "_" + System.currentTimeMillis());
         this.setSize(file.getSize());
         this.setContentType(file.getContentType() != null ? file.getContentType() : "application/octet-stream");
     }
