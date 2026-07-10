@@ -25,7 +25,8 @@
                                    th:id="${thread.id}">
                                     id
                                 </a>
-                                <span class="post-head" th:text="${thread.head}">head</span>
+                                <span th:href="@{/{boardName}/{threadId}(boardName=${boardName}, threadId=${thread.id})}"
+                                      class="post-head" th:text="${thread.head}">head</span>
                             </div>
                             <p class="post-body" th:text="${thread.body}">body</p>
                             <img class="post-image" th:if="${thread.url}" th:src="${thread.url}" alt="picture"/>
