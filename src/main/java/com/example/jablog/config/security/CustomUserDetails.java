@@ -1,7 +1,5 @@
 package com.example.jablog.config.security;
 
-import com.example.jablog.entity.Board;
-import com.example.jablog.entity.Users;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.jspecify.annotations.Nullable;
@@ -21,18 +19,6 @@ public class CustomUserDetails implements UserDetails {
     private String password;
     private String nickname;
     private Roles role;
-
-    public static CustomUserDetails build(Users users){
-        final Board board = users.getBoard();
-
-        return new CustomUserDetails(
-            board.getName(),
-            board.getRules(),
-            users.getPassword(),
-            users.getNickname(),
-            users.isRole() ? Roles.ROLE_ADMIN : Roles.ROLE_GROUP
-        );
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

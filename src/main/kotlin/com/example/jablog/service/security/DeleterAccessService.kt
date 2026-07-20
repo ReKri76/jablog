@@ -5,7 +5,7 @@ import com.example.jablog.service.SecurityData
 import org.springframework.stereotype.Service
 
 @Service
-class DeleterAccessService(private val securityRepository: SecurityRepository) : XAccessService(securityRepository) {
+open class DeleterAccessService(private val securityRepository: SecurityRepository) : XAccessService(securityRepository) {
 
     override fun canAccess(data: SecurityData): Boolean {
         return when(data){

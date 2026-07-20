@@ -7,6 +7,7 @@ import com.example.jablog.repository.APIRepository;
 import jakarta.persistence.NoResultException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +18,10 @@ public class APIService {
 
     private final APIRepository apiRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CustomUserDetailsService customUserDetailsService;
 
-    public CustomUserDetails login (Login login) throws NoResultException {
+    @NotNull
+    public CustomUserDetails login (@NotNull Login login) throws NoResultException {
 
         log.info("User {} is starting login", login.getNickname());
 
@@ -38,6 +41,6 @@ public class APIService {
 
         log.info("User {} is log in", login.getNickname());
 
-        return CustomUserDetails.build(user);
+        return customUserDetailsService.build(user);
     }
 }

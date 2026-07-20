@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class MinioService {
@@ -19,7 +20,6 @@ public class MinioService {
     private static final int MAX_PART_SIZE = 5 * 1024 * 1024;
     private static final int INITIAL_FILE_LIST_CAPACITY = 1000;
     public static final String BUCKET = "images";
-    public static final String DEFAULT_BUCKET = BUCKET;
 
     private final String endpoint;
     private final MinioClient minioClient;
@@ -32,8 +32,8 @@ public class MinioService {
 
     public void savePicture(@NotNull Picture pic, @Nullable String bucket) throws RuntimeException{
 
-        if  (bucket==null)
-            bucket=DEFAULT_BUCKET;
+        if (bucket==null)
+            bucket=BUCKET;
 
         try {
             minioClient.putObject(PutObjectArgs.builder()
@@ -47,16 +47,15 @@ public class MinioService {
         }
     }
 
-    public void deletePicture(@NotNull String pathToPic) throws RuntimeException{
+    public void deletePicture(@NotNull String fileName, @Nullable String bucket) throws RuntimeException{
 
-        final String[] parts = pathToPic.split("/");
-        final String objectName = parts[parts.length - 1];
-        final String bucketName = parts[parts.length - 2];
+        if (bucket==null)
+            bucket=BUCKET;
 
         try {
             minioClient.removeObject(RemoveObjectArgs.builder()
-                    .bucket(bucketName)
-                    .object(objectName)
+                    .bucket(bucket)
+                    .object(fileName)
                     .build());
         } catch (Exception e) {
             throw new RuntimeException("error to delete file:" , e);
@@ -64,9 +63,9 @@ public class MinioService {
     }
 
     @NotNull
-    public ArrayList<String> getAllFileName(@NotNull String bucket) throws RuntimeException{
+    public List<String> getAllFileName(@NotNull String bucket) throws RuntimeException{
 
-        final ArrayList<String> names = new ArrayList<String>(INITIAL_FILE_LIST_CAPACITY);
+        final List<String> names = new ArrayList<String>(INITIAL_FILE_LIST_CAPACITY);
 
         Iterable<Result<Item>> results = minioClient.listObjects(ListObjectsArgs.builder()
                 .bucket(bucket)

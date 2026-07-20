@@ -29,7 +29,7 @@
                                       class="post-head" th:text="${thread.head}">head</span>
                             </div>
                             <p class="post-body" th:text="${thread.body}">body</p>
-                            <img class="post-image" th:if="${thread.url}" th:src="${thread.url}" alt="picture"/>
+                            <img class="post-image" th:if="${thread.url}" th:src="${thread.url}" alt="picture" loading="lazy"/>
                             <div class="post-actions" th:if="${canDelete}">
                                 <button
                                     th:hx-delete="@{/deleter/{boardName}/{threadId}(boardName=${boardName}, threadId=${thread.id})}">

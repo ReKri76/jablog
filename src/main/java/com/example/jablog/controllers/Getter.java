@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -66,7 +67,7 @@ public class Getter {
     @GetMapping("/")
     public String start(Model model){
 
-        final ArrayList<Board> boards = getterService.start();
+        final List<Board> boards = getterService.start();
         model.addAttribute("boards", boards);
         return "index";
     }

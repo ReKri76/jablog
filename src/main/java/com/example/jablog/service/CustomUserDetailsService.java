@@ -23,29 +23,29 @@ public class CustomUserDetailsService implements UserDetailsService {
     @NotNull
     public UserDetails loadUserByUsername(@NotNull String username) throws UsernameNotFoundException {
 
-        Users user = new Users();
         CustomUserDetails customUserDetails;
 
         try {
-            user = userDetailsRepository.user(username);
-            customUserDetails = CustomUserDetails.build(user);
+            Users user = userDetailsRepository.user(username);
+            customUserDetails = build(user);
         } catch (NoResultException e ){
-            user.setId(0);
-            user.setRole(false);
-            user.setNickname("ANON");
-            user.setPassword("{noop}");
-
-            final Board board = new Board();
-            board.setName("ANON");
-            board.setRules("------------");
-
-            user.setBoard(board);
-
-            customUserDetails = CustomUserDetails.build(user);
-            customUserDetails.setRole(Roles.ROLE_ANON);
+            customUserDetails = createDefault();
         }
 
         return customUserDetails;
+    }
+
+    @NotNull
+    public CustomUserDetails build(@NotNull Users users){
+        final Board board = users.getBoard();
+
+        return new CustomUserDetails(
+                board.getName(),
+                board.getRules(),
+                users.getPassword(),
+                users.getNickname(),
+                users.isRole() ? Roles.ROLE_ADMIN : Roles.ROLE_GROUP
+        );
     }
 
     @NotNull

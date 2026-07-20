@@ -23,7 +23,7 @@
                                 <span class="post-head" th:text="${thread.head}">head</span>
                             </div>
                             <p class="post-body" th:text="${thread.body}">body</p>
-                            <img class="post-image" th:if="${thread.url}" th:src="${thread.url}" alt="picture"/>
+                            <img class="post-image" th:if="${thread.url}" th:src="${thread.url}" alt="picture" loading="lazy"/>
                         </article>
                     </div>
                 </section>
@@ -38,7 +38,7 @@
                                     <span class="post-head" th:text="${currentPost.head}">head</span>
                                 </div>
                                 <div class="post-body" th:utext="${currentPost.body}">body</div>
-                                <img class="post-image" th:if="${currentPost.url}" th:src="${currentPost.url}" alt="picture"/>
+                                <img class="post-image" th:if="${currentPost.url}" th:src="${currentPost.url}" alt="picture" loading="lazy"/>
                                 <div class="post-actions" th:if="${canDelete}">
                                     <button
                                         th:hx-delete="@{/deleter/{boardName}/{threadId}/{postId}(boardName=${boardName}, threadId=${thread.id}, postId=${currentPost.id})}">

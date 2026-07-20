@@ -32,7 +32,10 @@ public class PosterService {
     @Transactional
     public long thread(@NotNull @Valid Post post, @NotNull Picture file, @NotNull String board){
 
-        if (post.getHead().isEmpty())
+        if (file == null)
+            throw new IllegalArgumentException();
+
+        if (post.getHead() == null || post.getHead().isEmpty())
             post.setHead(post.getBody().substring(0,Math.min(120, post.getBody().length())));
 
         final Board boardRef = entityManager.unwrap(Session.class)

@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -33,7 +32,7 @@ public class Cleaner {
 
         final List<Threads> deletedThreads = cleanerRepository.threads(oldThread);
 
-        deletedThreads.forEach( thread -> minioService.deletePicture(thread.getPicture()));
+        deletedThreads.forEach( thread -> minioService.deletePicture(thread.getPicture(), MinioService.BUCKET));
 
         log.info("{} threads deleted.", deletedThreads.size());
     }
@@ -47,8 +46,8 @@ public class Cleaner {
 
         deletedPosts.forEach(post->{
             final String url = post.getPicture();
-            if (!url.isEmpty())
-                minioService.deletePicture(url);
+            if (url!=null && !url.isEmpty())
+                minioService.deletePicture(url, MinioService.BUCKET);
         });
 
         log.info("{} posts deleted in.", deletedPosts.size());
@@ -61,12 +60,12 @@ public class Cleaner {
 
         final List<String> picsInDB = cleanerRepository.pics();
         final HashSet<String> picsSet = new HashSet<>(picsInDB);
-        final ArrayList<String> picsInS3 = minioService.getAllFileName(MinioService.BUCKET);
-        AtomicInteger count = new AtomicInteger();
+        final List<String> picsInS3 = minioService.getAllFileName(MinioService.BUCKET);
 
+        AtomicInteger count = new AtomicInteger();
         picsInS3.forEach( pic -> {
             if (!picsSet.contains(pic)){
-                minioService.deletePicture(pic);
+                minioService.deletePicture(pic, MinioService.BUCKET);
                 count.incrementAndGet();
             }
         });

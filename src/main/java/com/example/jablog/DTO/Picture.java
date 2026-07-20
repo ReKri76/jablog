@@ -18,6 +18,8 @@ public class Picture {
         this.setContentType(file.getContentType() != null ? file.getContentType() : "application/octet-stream");
     }
 
+    public Picture(){}
+
     @NotNull
     private InputStream inputStream;
     private long size;

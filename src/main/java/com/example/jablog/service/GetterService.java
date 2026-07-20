@@ -17,6 +17,7 @@ import org.springframework.web.util.HtmlUtils;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.TreeSet;
 
@@ -31,7 +32,7 @@ public class GetterService {
 
     @Transactional
     @NotNull
-    public ArrayList<com.example.jablog.DTO.Board> start(){
+    public List<com.example.jablog.DTO.Board> start(){
 
         final ArrayList<com.example.jablog.DTO.Board> boards = new ArrayList<>();
         final ArrayList<Board> input = getterRepository.start();

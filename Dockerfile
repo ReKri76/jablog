@@ -7,7 +7,7 @@ COPY mvnw pom.xml ./
 RUN ./mvnw dependency:go-offline
 
 COPY src ./src
-RUN ./mvnw clean package -DskipTests -Dmaven.test.skip=true
+RUN ./mvnw clean package
 
 FROM bellsoft/liberica-openjre-alpine:21
 
