@@ -37,9 +37,9 @@ public class Poster {
         chekFile(file);
 
         final Picture picture = new Picture(file);
-        final long ifOfPost = posterService.thread(post, picture, boardName);
+        final long idOfPost = posterService.thread(post, picture, boardName);
 
-        return "redirect:/"+boardName+"/"+ifOfPost;
+        return "redirect:/"+boardName+"/"+idOfPost;
     }
 
     @PostMapping(value = "/{boardName}/{threadID}", consumes = "multipart/form-data")

@@ -109,7 +109,7 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.DELETE, "/users/panel/{boardName}/{nickname}")
                             .access(usersAuthorizationManager)
-                        .requestMatchers(HttpMethod.POST, "/users/panel/{boardName}")
+                        .requestMatchers(HttpMethod.POST, "/users/panel/{boardName}/add")
                             .access(usersAuthorizationManager)
                         .requestMatchers(HttpMethod.GET, "/users/panel/{boardName}")
                             .access(usersAuthorizationManager)

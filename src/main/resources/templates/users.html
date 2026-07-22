@@ -33,7 +33,7 @@
                 <h2 class="panel-title">Создать пользователя</h2>
                 <div class="panel-body">
                     <form method="post"
-                          th:action="@{/users/panel/{boardName}(boardName=${boardName})}"
+                          th:action="@{/users/panel/{boardName}/add(boardName=${boardName})}"
                           th:object="${login}"
                           class="form-grid">
 

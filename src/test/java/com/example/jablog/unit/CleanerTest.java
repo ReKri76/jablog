@@ -45,7 +45,7 @@ public class CleanerTest {
         cleaner.cleanThreads();
 
         verify(cleanerRepository).threads(anyLong());
-        verify(minioService, times(2)).deletePicture(anyString(),MinioService.BUCKET);
+        verify(minioService, times(2)).deletePicture(anyString(),eq(MinioService.BUCKET));
         verifyNoMoreInteractions(minioService);
     }
 
@@ -63,7 +63,7 @@ public class CleanerTest {
         cleaner.cleanPosts();
 
         verify(cleanerRepository).posts();
-        verify(minioService, times(2)).deletePicture(anyString(), MinioService.BUCKET);
+        verify(minioService, times(2)).deletePicture(anyString(), eq(MinioService.BUCKET));
         verifyNoMoreInteractions(minioService);
     }
 
@@ -91,7 +91,7 @@ public class CleanerTest {
 
         verify(minioService).getAllFileName(MinioService.BUCKET);
         verify(cleanerRepository).pics();
-        verify(minioService, times(4)).deletePicture(anyString(), MinioService.BUCKET);
+        verify(minioService, times(4)).deletePicture(anyString(), eq(MinioService.BUCKET));
         verifyNoMoreInteractions(minioService);
     }
 

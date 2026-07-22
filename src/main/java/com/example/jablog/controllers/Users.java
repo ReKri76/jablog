@@ -22,9 +22,8 @@ public class Users {
 
     private final UsersService usersService;
 
-    @PostMapping(value = "/panel/{boardName}")
-    public String addUser(@PathVariable("boardName") String boardName,
-                          @Valid @ModelAttribute("login") Login login) {
+    @PostMapping(value = "/panel/{boardName}/add")
+    public String addUser(@PathVariable("boardName") String boardName, @Valid @ModelAttribute("login") Login login) {
 
         usersService.addUser(boardName, login);
 
