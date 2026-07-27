@@ -71,7 +71,6 @@ public class PosterService {
         final Posts posts = new Posts();
         posts.setContent(post.getBody());
         posts.setHeader(post.getHead());
-        posts.setCarma(0);
         posts.setThread(posterRepository.getThreadsById(threadId));
         posts.setPicture(name);
 
