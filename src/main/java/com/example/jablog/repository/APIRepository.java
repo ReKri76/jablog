@@ -22,14 +22,14 @@ public class APIRepository {
 
     @Transactional
     public void likeThread(int threadId){
-        entityManager.createQuery("update from Threads t set t.carma = t.carma+1 where t.id = :threadId")
+        entityManager.createQuery("update Threads t set t.carma = t.carma+1 where t.id = :threadId")
                 .setParameter("threadId", threadId)
                 .executeUpdate();
     }
 
     @Transactional
     public void dislikeThread(int threadId){
-        entityManager.createQuery("update from Threads t set t.carma = t.carma-1 where t.id = :threadId")
+        entityManager.createQuery("update Threads t set t.carma = t.carma-1 where t.id = :threadId")
                 .setParameter("threadId", threadId)
                 .executeUpdate();
     }
