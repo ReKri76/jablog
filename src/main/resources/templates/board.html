@@ -32,22 +32,26 @@
                         <img class="post-image" th:if="${thread.url}" th:src="${thread.url}" alt="picture" loading="lazy"/>
 
                         <div class="post-actions">
-                            <div th:id="'carma-container-' + ${thread.id}" class="carma-box">
-
-                                <button th:hx-patch="@{/carma/minus/{board}/{id}(board=${boardName}, id=${thread.id})}"
-                                        th:hx-target="'#carma-container-' + ${thread.id}"
+                            <div class="post-karma">
+                                <button type="button"
+                                        class="karma-btn"
+                                        title="Повысить карму"
+                                        th:hx-patch="@{/api/carma/plus/{boardName}/{threadId}(boardName=${boardName}, threadId=${thread.id})}"
+                                        hx-target="closest .post-karma"
                                         hx-swap="outerHTML">
-                                    -
+                                    ▲
                                 </button>
 
-                                <span th:text="${thread.carma}">0</span>
+                                <span class="karma-value" th:text="${thread.karma != null ? thread.karma : 0}">0</span>
 
-                                <button th:hx-patch="@{/carma/plus/{board}/{id}(board=${boardName}, id=${thread.id})}"
-                                        th:hx-target="'#carma-container-' + ${thread.id}"
+                                <button type="button"
+                                        class="karma-btn"
+                                        title="Понизить карму"
+                                        th:hx-patch="@{/api/carma/minus/{boardName}/{threadId}(boardName=${boardName}, threadId=${thread.id})}"
+                                        hx-target="closest .post-karma"
                                         hx-swap="outerHTML">
-                                    +
+                                    ▼
                                 </button>
-
                             </div>
 
                             <button th:if="${canDelete}"
