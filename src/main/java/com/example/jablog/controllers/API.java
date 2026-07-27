@@ -51,7 +51,7 @@ public class API {
     }
 
     @PatchMapping("/carma/minus/{boardName}/{threadId}")
-    public void dislikeThread(@PathVariable int threadId, @PathVariable String boardName){
+    public String dislikeThread(@PathVariable int threadId, @PathVariable String boardName){
         apiService.dislikeThread(threadId);
         return "redirect:/"+boardName;
     }
