@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict mw2rrau5UfoIyvdKERmzGtEvjyCQsPRgH0tkyu6rGLk6KVTF4J1qoEfln2L9b1q
+\restrict vGNzzC9d9jRFGi2jqNGHO2b9Y6UEDRCLVJdLleiZDvJ8Lqelj3bvKdBjltqZ8hD
 
 -- Dumped from database version 15.18
 -- Dumped by pg_dump version 15.18
@@ -105,7 +105,8 @@ CREATE TABLE public.threads (
     createdat bigint,
     header character varying(200) NOT NULL,
     picture character varying(255),
-    board character varying(3)
+    board character varying(3),
+    carma integer DEFAULT 0 NOT NULL
 );
 
 
@@ -179,16 +180,16 @@ COPY public.posts (id, content, createdat, header, picture, thread) FROM stdin;
 -- Data for Name: threads; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.threads (id, content, createdat, header, picture, board) FROM stdin;
-1	Hello, Threads!	1783673157714	Hello, Threads!	[photo_2026-04-21_16-11-37.jpg][1783673157681]	a
-2	1-st private thread.	1783673726472	Some head.	[photo_2026-04-21_16-13-04.jpg][1783673726469]	b
-3	Summer	1783687263741	Hellow, summer	[Без имени-1.jpg][1783687263737]	a
-4	Summer	1783687269644	Hellow, summer	[Без имени-1.jpg][1783687269641]	a
-5	Summer	1783687274261	Hellow, summer	[Без имени-1.jpg][1783687274258]	a
-6	Summer	1783687289825	Hellow, summer	[Без имени-1.jpg][1783687289821]	a
-7	Summer	1783687832114	Summer	[noname.jpg][1783687832110]	a
-8	Test	1783688914163	Test	[photo_2026-04-21_16-13-04.jpg][1783688914159]	a
-9	Файл с кириллицей в названии	1783690189662	Файл с кириллицей в названии	d9f3c9df-d7ad-4de2-9f56-9b6f9a940829_1783690189648	a
+COPY public.threads (id, content, createdat, header, picture, board, carma) FROM stdin;
+1	Hello, Threads!	1783673157714	Hello, Threads!	[photo_2026-04-21_16-11-37.jpg][1783673157681]	a	0
+2	1-st private thread.	1783673726472	Some head.	[photo_2026-04-21_16-13-04.jpg][1783673726469]	b	0
+3	Summer	1783687263741	Hellow, summer	[Без имени-1.jpg][1783687263737]	a	0
+4	Summer	1783687269644	Hellow, summer	[Без имени-1.jpg][1783687269641]	a	0
+5	Summer	1783687274261	Hellow, summer	[Без имени-1.jpg][1783687274258]	a	0
+6	Summer	1783687289825	Hellow, summer	[Без имени-1.jpg][1783687289821]	a	0
+7	Summer	1783687832114	Summer	[noname.jpg][1783687832110]	a	0
+8	Test	1783688914163	Test	[photo_2026-04-21_16-13-04.jpg][1783688914159]	a	0
+9	Файл с кириллицей в названии	1783690189662	Файл с кириллицей в названии	d9f3c9df-d7ad-4de2-9f56-9b6f9a940829_1783690189648	a	0
 \.
 
 
@@ -315,5 +316,5 @@ ALTER TABLE ONLY public.threads
 -- PostgreSQL database dump complete
 --
 
-\unrestrict mw2rrau5UfoIyvdKERmzGtEvjyCQsPRgH0tkyu6rGLk6KVTF4J1qoEfln2L9b1q
+\unrestrict vGNzzC9d9jRFGi2jqNGHO2b9Y6UEDRCLVJdLleiZDvJ8Lqelj3bvKdBjltqZ8hD
 

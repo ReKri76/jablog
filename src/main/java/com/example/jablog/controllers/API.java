@@ -9,10 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Вспомогательные публичные эндпоинты
@@ -45,5 +42,15 @@ public class API {
         session.setAttribute(boardName, customUserDetails);
 
         return "redirect:/" + boardName;
+    }
+
+    @PatchMapping("/carma/plus/{boardName}/{threadId}")
+    public void likeThread(@PathVariable int threadId){
+        apiService.likeThread(threadId);
+    }
+
+    @PatchMapping("/carma/minus/{boardName}/{threadId}")
+    public void dislikeThread(@PathVariable int threadId){
+        apiService.dislikeThread(threadId);
     }
 }

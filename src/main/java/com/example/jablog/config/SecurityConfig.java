@@ -121,6 +121,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/{boardName}")
                             .access(getterAuthorizationManager)
 
+                        .requestMatchers(HttpMethod.PATCH, "/api/carma/plus/{boardName}/{thread")
+                            .access(getterAuthorizationManager)
+                        .requestMatchers(HttpMethod.PATCH, "/api/carma/plus/{boardName}/{thread")
+                            .access(getterAuthorizationManager)
+
                         .anyRequest().denyAll()
                 );
 

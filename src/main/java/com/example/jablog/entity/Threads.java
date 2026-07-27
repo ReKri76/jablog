@@ -17,6 +17,9 @@ public class Threads extends PostBase {
     @JoinColumn(name="board", referencedColumnName = "name")
     private Board board;
 
+    @Column(name = "carma", nullable = false)
+    private int carma = 0;
+
     @OneToMany(mappedBy = "thread", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Posts> posts = new TreeSet<Posts>();
 }

@@ -47,6 +47,7 @@ public class PosterService {
         final Threads threads = new Threads();
         threads.setContent(post.getBody());
         threads.setHeader(post.getHead());
+        threads.setCarma(0);
         threads.setPicture(name);
         threads.setBoard(boardRef);
 
@@ -70,6 +71,7 @@ public class PosterService {
         final Posts posts = new Posts();
         posts.setContent(post.getBody());
         posts.setHeader(post.getHead());
+        posts.setCarma(0);
         posts.setThread(posterRepository.getThreadsById(threadId));
         posts.setPicture(name);
 
