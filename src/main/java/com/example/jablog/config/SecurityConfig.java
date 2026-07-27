@@ -123,7 +123,7 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.PATCH, "/api/carma/plus/{boardName}/{thread}")
                             .access(getterAuthorizationManager)
-                        .requestMatchers(HttpMethod.PATCH, "/api/carma/plus/{boardName}/{thread}")
+                        .requestMatchers(HttpMethod.PATCH, "/api/carma/minus/{boardName}/{thread}")
                             .access(getterAuthorizationManager)
 
                         .anyRequest().denyAll()

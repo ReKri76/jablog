@@ -29,7 +29,7 @@ public class GetterRepository {
    @NotNull
    public ArrayList<Threads> board(String boardName, int page){
 
-       final String jpql = "from Threads t where t.board.name = :boardName order by t.carma asc, t.id desc";
+       final String jpql = "from Threads t where t.board.name = :boardName order by t.carma desc, t.id desc";
 
        final List<Threads> threads = entityManager.createQuery(jpql, Threads.class)
                .setParameter("boardName", boardName)
