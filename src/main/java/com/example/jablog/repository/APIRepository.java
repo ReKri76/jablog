@@ -1,22 +1,19 @@
 package com.example.jablog.repository;
 
 import com.example.jablog.entity.Users;
-import jakarta.persistence.EntityManager;
+import com.example.jablog.repository.api.UserRepo;
 import jakarta.persistence.NoResultException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
 public class APIRepository {
 
-    private final EntityManager entityManager;
+    private final UserRepo userRepo;
 
-    @Transactional(readOnly = true)
-    public Users login (String nickname) throws NoResultException {
-        return entityManager.createQuery("from Users u where u.nickname = :nickname", Users.class)
-                .setParameter("nickname", nickname)
-                .getSingleResult();
+    public Users login(String nickname) throws NoResultException {
+        return userRepo.findUserByNickname(nickname)
+                .orElseThrow(NoResultException::new);
     }
 }
