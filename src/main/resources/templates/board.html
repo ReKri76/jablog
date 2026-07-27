@@ -37,8 +37,8 @@
                                         class="karma-btn"
                                         title="Повысить карму"
                                         th:hx-patch="@{/api/carma/plus/{boardName}/{threadId}(boardName=${boardName}, threadId=${thread.id})}"
-                                        th:hx-target="closest .post-karma"
-                                        th:hx-swap="outerHTML">
+                                        hx-target="closest .post-karma"
+                                        hx-swap="outerHTML">
                                     ▲
                                 </button>
 
@@ -48,8 +48,8 @@
                                         class="karma-btn"
                                         title="Понизить карму"
                                         th:hx-patch="@{/api/carma/minus/{boardName}/{threadId}(boardName=${boardName}, threadId=${thread.id})}"
-                                        th:hx-target="closest .post-karma"
-                                        th:hx-swap="outerHTML">
+                                        hx-target="closest .post-karma"
+                                        hx-swap="outerHTML">
                                     ▼
                                 </button>
                             </div>
