@@ -1,7 +1,9 @@
 package com.example.jablog.service;
 
 import com.example.jablog.DTO.Login;
+import com.example.jablog.DTO.PostWithPicture;
 import com.example.jablog.config.security.CustomUserDetails;
+import com.example.jablog.entity.Threads;
 import com.example.jablog.entity.Users;
 import com.example.jablog.repository.APIRepository;
 import jakarta.persistence.NoResultException;
@@ -44,13 +46,29 @@ public class APIService {
         return customUserDetailsService.build(user);
     }
 
-    public void likeThread(int threadId){
-        apiRepository.likeThread(threadId);
+    public PostWithPicture likeThread(int threadId){
+        Threads threads = apiRepository.likeThread(threadId);
         log.info("Thread {} was liked", threadId);
+
+        PostWithPicture res = new PostWithPicture();
+        res.setKarma(threads.getCarma());
+        res.setId(threads.getId());
+        res.setUrl(threads.getPicture());
+        res.setBody(threads.getContent());
+        res.setHead(threads.getHeader());
+        return res;
     }
 
-    public void dislikeThread(int threadId){
-        apiRepository.dislikeThread(threadId);
+    public PostWithPicture dislikeThread(int threadId){
+        Threads threads = apiRepository.dislikeThread(threadId);
         log.info("Thread {} was disliked", threadId);
+
+        PostWithPicture res = new PostWithPicture();
+        res.setKarma(threads.getCarma());
+        res.setId(threads.getId());
+        res.setUrl(threads.getPicture());
+        res.setBody(threads.getContent());
+        res.setHead(threads.getHeader());
+        return res;
     }
 }
