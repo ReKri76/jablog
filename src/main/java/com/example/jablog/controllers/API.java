@@ -1,7 +1,6 @@
 package com.example.jablog.controllers;
 
 import com.example.jablog.DTO.Login;
-import com.example.jablog.DTO.PostWithPicture;
 import com.example.jablog.config.security.CustomUserDetails;
 import com.example.jablog.service.APIService;
 import jakarta.persistence.NoResultException;
@@ -9,8 +8,8 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -47,22 +46,14 @@ public class API {
     }
 
     @PatchMapping("/carma/plus/{boardName}/{threadId}")
-    public String likeThread(@PathVariable int threadId, @PathVariable String boardName, Model model){
-        PostWithPicture thread = apiService.likeThread(threadId);
-
-        model.addAttribute("thread", thread);
-        model.addAttribute("boardName", boardName);
-
-        return "fragments/thread :: carma-box";
+    public ResponseEntity<Void> likeThread(@PathVariable int threadId){
+        apiService.likeThread(threadId);
+        return ResponseEntity.ok().header("HX-Refresh", "true").build();
     }
 
     @PatchMapping("/carma/minus/{boardName}/{threadId}")
-    public String dislikeThread(@PathVariable int threadId, @PathVariable String boardName, Model model){
-        PostWithPicture thread = apiService.dislikeThread(threadId);
-
-        model.addAttribute("thread", thread);
-        model.addAttribute("boardName", boardName);
-
-        return "fragments/thread :: carma-box";
+    public ResponseEntity<Void> dislikeThread(@PathVariable int threadId){
+        apiService.dislikeThread(threadId);
+        return ResponseEntity.ok().header("HX-Refresh", "true").build();
     }
 }

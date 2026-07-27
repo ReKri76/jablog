@@ -1,6 +1,5 @@
 package com.example.jablog.repository;
 
-import com.example.jablog.entity.Threads;
 import com.example.jablog.entity.Users;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -22,24 +21,16 @@ public class APIRepository {
     }
 
     @Transactional
-    public Threads likeThread(int threadId){
+    public void likeThread(int threadId){
         entityManager.createQuery("update Threads t set t.carma = t.carma+1 where t.id = :threadId")
                 .setParameter("threadId", threadId)
                 .executeUpdate();
-
-        return entityManager.createQuery("from Threads t where t.id = :threadId", Threads.class)
-                .setParameter("threadId", threadId)
-                .getSingleResult();
     }
 
     @Transactional
-    public Threads dislikeThread(int threadId){
+    public void dislikeThread(int threadId){
         entityManager.createQuery("update Threads t set t.carma = t.carma-1 where t.id = :threadId")
                 .setParameter("threadId", threadId)
                 .executeUpdate();
-
-        return entityManager.createQuery("from Threads t where t.id = :threadId", Threads.class)
-                .setParameter("threadId", threadId)
-                .getSingleResult();
     }
 }
