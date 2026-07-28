@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,14 +45,12 @@ public class API {
     }
 
     @PatchMapping("/carma/plus/{boardName}/{threadId}")
-    public ResponseEntity<Void> likeThread(@PathVariable int threadId){
+    public void likeThread(@PathVariable int threadId){
         apiService.likeThread(threadId);
-        return ResponseEntity.ok().header("HX-Refresh", "true").build();
     }
 
     @PatchMapping("/carma/minus/{boardName}/{threadId}")
-    public ResponseEntity<Void> dislikeThread(@PathVariable int threadId){
+    public void dislikeThread(@PathVariable int threadId){
         apiService.dislikeThread(threadId);
-        return ResponseEntity.ok().header("HX-Refresh", "true").build();
     }
 }

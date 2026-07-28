@@ -37,8 +37,7 @@
                                         class="karma-btn"
                                         title="Повысить карму"
                                         th:hx-patch="@{/api/carma/plus/{boardName}/{threadId}(boardName=${boardName}, threadId=${thread.id})}"
-                                        hx-target="closest .post-karma"
-                                        hx-swap="outerHTML">
+                                        onclick="let val = this.nextElementSibling; val.innerText = parseInt(val.innerText) + 1;">
                                     ▲
                                 </button>
 
@@ -48,8 +47,7 @@
                                         class="karma-btn"
                                         title="Понизить карму"
                                         th:hx-patch="@{/api/carma/minus/{boardName}/{threadId}(boardName=${boardName}, threadId=${thread.id})}"
-                                        hx-target="closest .post-karma"
-                                        hx-swap="outerHTML">
+                                        onclick="let val = this.previousElementSibling; val.innerText = parseInt(val.innerText) - 1;">
                                     ▼
                                 </button>
                             </div>
