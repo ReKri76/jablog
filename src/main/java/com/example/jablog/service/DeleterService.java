@@ -30,7 +30,7 @@ public class DeleterService {
         Posts posts = deleterRepository.post(postId);
         String pic = posts.getPicture();
         if (pic!=null && !pic.isEmpty())
-            minioService.deletePicture(posts.getPicture(), MinioService.BUCKET);
+            minioService.deletePicture(pic, MinioService.BUCKET);
         log.info("Post number {} is deleted.",postId);
     }
 }
