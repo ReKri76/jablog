@@ -3,6 +3,7 @@ package com.example.jablog.repository.cleaner;
 import com.example.jablog.entity.Threads;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public interface ThreadRepo extends JpaRepository<Threads,Long> {
             "and p.thread = t" +
             ") " +
             "and t.createdAt < :oldThread")
-    List<Threads> findExpiresThreads(long now, long unxtm, long oldThread);
+    List<Threads> findExpiresThreads(@Param("now")long now, @Param("unxtm") long unxtm, @Param("oldThread")long oldThread);
 
     @Query("select t.picture from Threads t")
     List<String> findAllPics();

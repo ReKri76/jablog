@@ -2,7 +2,8 @@ package com.example.jablog.repository;
 
 import com.example.jablog.entity.Posts;
 import com.example.jablog.entity.Threads;
-import jakarta.persistence.EntityManager;
+import com.example.jablog.repository.deleter.PostRepo;
+import com.example.jablog.repository.deleter.ThreadRepo;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Repository;
@@ -11,16 +12,15 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class DeleterRepository {
 
-    private final EntityManager entityManager;
+    private final PostRepo postRepo;
+    private final ThreadRepo threadRepo;
 
     @NotNull
     public Threads thread(long threadId){
 
-        Threads res = entityManager.find(Threads.class,threadId);
+        Threads res = threadRepo.findThreadsById(threadId);
 
-        entityManager.createQuery("delete from Threads t where t.id = :threadId")
-                .setParameter("threadId", threadId)
-                .executeUpdate();
+        threadRepo.delete(res);
 
         return res;
     }
@@ -28,11 +28,9 @@ public class DeleterRepository {
     @NotNull
     public Posts post(long postId){
 
-        Posts res = entityManager.find(Posts.class,postId);
+        Posts res = postRepo.findPostsById(postId);
 
-        entityManager.createQuery("delete from Posts p where p.id = :postId")
-                .setParameter("postId", postId)
-                .executeUpdate();
+        postRepo.delete(res);
 
         return res;
     }
