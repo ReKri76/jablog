@@ -33,7 +33,7 @@ public class GetterRepository {
    @Transactional
    public List<Threads> board(String boardName, int page){
         return threadRepoGetter.findThreadsByBoardNameByPageable(boardName, PageRequest.of(
-                page*LIMIT_OF_PAGINATION, LIMIT_OF_PAGINATION, Sort.by("id").descending()
+                page*LIMIT_OF_PAGINATION, LIMIT_OF_PAGINATION, Sort.by("id").ascending()
         ));
    }
 

@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface ThreadRepoGetter extends JpaRepository<Threads, Long> {
     @Query("from Threads t left join fetch t.posts where t.id = :threadId")
-    Optional<Threads> findThreadsByIdWithPosts(@Param("threadID")long threadId);
+    Optional<Threads> findThreadsByIdWithPosts(@Param("threadId")long threadId);
 
     @Query("from Threads t where t.board.name = :boardName")
     List<Threads> findThreadsByBoardNameByPageable(@Param("boardName") String boardName, Pageable pageable);
