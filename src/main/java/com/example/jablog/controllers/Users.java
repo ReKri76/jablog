@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -44,7 +45,7 @@ public class Users {
     @GetMapping(value = "/panel/{boardName}")
     public String viewUsers(@PathVariable("boardName") String boardName, Model model) {
 
-        final ArrayList<String> usersName = usersService.viewUsers(boardName);
+        final List<String> usersName = usersService.viewUsers(boardName);
 
         model.addAttribute("users", usersName);
         model.addAttribute("boardName", boardName);

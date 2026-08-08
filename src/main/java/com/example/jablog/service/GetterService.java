@@ -35,7 +35,7 @@ public class GetterService {
     public List<com.example.jablog.DTO.Board> start(){
 
         final ArrayList<com.example.jablog.DTO.Board> boards = new ArrayList<>();
-        final ArrayList<Board> input = getterRepository.start();
+        final List<Board> input = getterRepository.start();
 
         input.forEach(board -> {
             var dto = new com.example.jablog.DTO.Board();
@@ -52,7 +52,7 @@ public class GetterService {
     public ArrayList<PostWithPicture> board(@NotNull String boardName, int page){
 
         final ArrayList<PostWithPicture> threads = new ArrayList<PostWithPicture>();
-        final ArrayList<Threads> input = getterRepository.board(boardName, page);
+        final List<Threads> input = getterRepository.board(boardName, page);
 
         input.forEach(thread -> {
 

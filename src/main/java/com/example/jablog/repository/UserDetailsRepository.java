@@ -1,8 +1,9 @@
 package com.example.jablog.repository;
 
 import com.example.jablog.entity.Users;
-import jakarta.persistence.EntityManager;
+import com.example.jablog.repository.userdetails.UserRepo;
 import jakarta.persistence.NoResultException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Repository;
@@ -11,12 +12,11 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class UserDetailsRepository {
 
-    private final EntityManager entityManager;
+    private final UserRepo userRepo;
 
     @NotNull
+    @Transactional
     public Users user (@NotNull String username) throws NoResultException {
-        return entityManager.createQuery("from Users u where u.nickname = :username", Users.class)
-                .setParameter("username", username)
-                .getSingleResult();
+        return userRepo.findByNickname(username).orElseThrow(NoResultException::new);
     }
 }
