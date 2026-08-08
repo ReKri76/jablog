@@ -16,7 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -63,7 +63,7 @@ public class UsersService {
 
     @Transactional
     @NotNull
-    public ArrayList<String> viewUsers(@NotNull String boardName){
+    public List<String> viewUsers(@NotNull String boardName){
         return usersRepository.viewUsers(boardName);
     }
 }
