@@ -60,6 +60,7 @@ public class GetterService {
             postWithPicture.setId(thread.getId());
             postWithPicture.setUrl(minioService.buildPictureUrl(thread.getPicture(), boardName));
             postWithPicture.setHead(thread.getHeader());
+            postWithPicture.setKarma(thread.getCarma());
             postWithPicture.setBody(thread.getContent());
 
             threads.add(postWithPicture);

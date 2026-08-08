@@ -28,7 +28,9 @@ public class DeleterService {
     public void post(long postId){
         log.info("Post number {} is start deleting.",postId);
         Posts posts = deleterRepository.post(postId);
-        minioService.deletePicture(posts.getPicture(), MinioService.BUCKET);
+        String pic = posts.getPicture();
+        if (pic!=null && !pic.isEmpty())
+            minioService.deletePicture(pic, MinioService.BUCKET);
         log.info("Post number {} is deleted.",postId);
     }
 }

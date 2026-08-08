@@ -43,4 +43,14 @@ public class APIService {
 
         return customUserDetailsService.build(user);
     }
+
+    public void likeThread(int threadId){
+        apiRepository.likeThread(threadId);
+        log.info("Thread {} was liked", threadId);
+    }
+
+    public void dislikeThread(int threadId) {
+        apiRepository.dislikeThread(threadId);
+        log.info("Thread {} was disliked", threadId);
+    }
 }
