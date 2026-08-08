@@ -5,6 +5,7 @@ import com.example.jablog.entity.Threads;
 import com.example.jablog.repository.getter.BoardRepo;
 import com.example.jablog.repository.getter.ThreadRepo;
 import jakarta.persistence.NoResultException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
@@ -23,11 +24,13 @@ public class GetterRepository {
     private final ThreadRepo threadRepo;
 
     @NotNull
+    @Transactional
     public List<Board> start(){
         return boardRepo.findAll();
     }
 
    @NotNull
+   @Transactional
    public List<Threads> board(String boardName, int page){
         return threadRepo.findThreadsByBoardNameByPageable(boardName, PageRequest.of(
                 page*LIMIT_OF_PAGINATION, LIMIT_OF_PAGINATION, Sort.by("id").descending()
@@ -35,6 +38,7 @@ public class GetterRepository {
    }
 
    @NotNull
+   @Transactional
    public Threads thread(long threadId){
         return threadRepo.findThreadsByIdWithPosts(threadId).orElseThrow(NoResultException::new);
     }
