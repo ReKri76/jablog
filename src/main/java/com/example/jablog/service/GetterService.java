@@ -52,7 +52,7 @@ public class GetterService {
     public ArrayList<PostWithPicture> board(@NotNull String boardName, int page){
 
         final ArrayList<PostWithPicture> threads = new ArrayList<PostWithPicture>();
-        final ArrayList<Threads> input = getterRepository.board(boardName, page);
+        final List<Threads> input = getterRepository.board(boardName, page);
 
         input.forEach(thread -> {
 
