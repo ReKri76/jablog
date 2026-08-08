@@ -15,7 +15,7 @@ public class APIRepository {
     private final ThreadRepo threadRepo;
 
     public Users login(String nickname) throws NoResultException {
-        return userRepo.findUserByNickname(nickname)
+        return userRepo.findByNickname(nickname)
                 .orElseThrow(NoResultException::new);
     }
 

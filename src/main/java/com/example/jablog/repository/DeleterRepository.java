@@ -4,6 +4,7 @@ import com.example.jablog.entity.Posts;
 import com.example.jablog.entity.Threads;
 import com.example.jablog.repository.deleter.PostRepo;
 import com.example.jablog.repository.deleter.ThreadRepo;
+import jakarta.persistence.NoResultException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Repository;
@@ -18,7 +19,7 @@ public class DeleterRepository {
     @NotNull
     public Threads thread(long threadId){
 
-        Threads res = threadRepo.findThreadsById(threadId);
+        Threads res = threadRepo.findById(threadId).orElseThrow(NoResultException::new);
 
         threadRepo.delete(res);
 
@@ -28,7 +29,7 @@ public class DeleterRepository {
     @NotNull
     public Posts post(long postId){
 
-        Posts res = postRepo.findPostsById(postId);
+        Posts res = postRepo.findById(postId).orElseThrow(NoResultException::new);
 
         postRepo.delete(res);
 
