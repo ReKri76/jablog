@@ -26,18 +26,4 @@ public class APIRepository {
     public void dislikeThread(int threadId){
         threadRepo.dislikeThread(threadId);
     }
-
-    @Transactional
-    public void likeThread(int threadId){
-        entityManager.createQuery("update Threads t set t.carma = t.carma+1 where t.id = :threadId")
-                .setParameter("threadId", threadId)
-                .executeUpdate();
-    }
-
-    @Transactional
-    public void dislikeThread(int threadId){
-        entityManager.createQuery("update Threads t set t.carma = t.carma-1 where t.id = :threadId")
-                .setParameter("threadId", threadId)
-                .executeUpdate();
-    }
 }
