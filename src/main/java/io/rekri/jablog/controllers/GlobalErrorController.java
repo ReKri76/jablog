@@ -1,59 +1,30 @@
 package io.rekri.jablog.controllers;
 
-import jakarta.servlet.RequestDispatcher;
-import jakarta.servlet.http.HttpServletRequest;
+import io.rekri.jablog.DTO.SimpleResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.error.ErrorAttributeOptions;
-import org.springframework.boot.webmvc.error.ErrorAttributes;
-import org.springframework.boot.webmvc.error.ErrorController;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.request.ServletWebRequest;
-import org.springframework.web.context.request.WebRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.Map;
-
-@Controller
+@RestControllerAdvice
 @Slf4j
 @RequiredArgsConstructor
-public class GlobalErrorController implements ErrorController {
+public class GlobalErrorController{
 
-    private final ErrorAttributes errorAttributes;
+    public static class BadCredentialsResponse extends SimpleResponse{}
 
-    @RequestMapping("/error")
-    public String handleError(HttpServletRequest request, Model model) {
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<BadCredentialsResponse> badCredentialsHandler(BadCredentialsException e){
 
-        WebRequest webRequest = new ServletWebRequest(request);
+        BadCredentialsResponse res = new BadCredentialsResponse();
+        res.setStatus(401);
+        res.setMessage(e.getMessage());
 
-        Map<String, Object> errors = errorAttributes.getErrorAttributes(
-                webRequest,
-                ErrorAttributeOptions.of(ErrorAttributeOptions.Include.MESSAGE)
-        );
-
-        Object statusAttr = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
-        Integer statusCode = 500;
-        if (statusAttr != null) {
-            try {
-                statusCode = Integer.valueOf(statusAttr.toString());
-            } catch (NumberFormatException ignored) {}
-        }
-
-
-        String message = (String) errors.get("message");
-        String error = (String) errors.get("error");
-
-
-        model.addAttribute("status", statusCode);
-        model.addAttribute("error", error);
-        model.addAttribute("message", message);
-
-
-        if (statusCode == 500) {
-            log.error("Internal Server Error occurred. Message: {}", message);
-        }
-
-        return "error";
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(res);
     }
 }

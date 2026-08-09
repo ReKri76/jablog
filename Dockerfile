@@ -17,7 +17,7 @@ RUN addgroup -S dev && adduser -S main -G dev
 
 RUN mkdir -p /master/logs
 
-COPY --from=builder /master_builder/target/*.war app.war
+COPY --from=builder /master_builder/target/*.jar app.jar
 
 RUN chown -R main:dev /master
 

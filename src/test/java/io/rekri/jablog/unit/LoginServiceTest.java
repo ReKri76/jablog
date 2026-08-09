@@ -5,25 +5,26 @@ import io.rekri.jablog.config.security.CustomUserDetails;
 import io.rekri.jablog.config.security.Roles;
 import io.rekri.jablog.entity.Board;
 import io.rekri.jablog.entity.Users;
-import io.rekri.jablog.repository.APIRepository;
-import io.rekri.jablog.service.APIService;
+import io.rekri.jablog.repository.LoginRepository;
 import io.rekri.jablog.service.CustomUserDetailsService;
+import io.rekri.jablog.service.LoginService;
 import jakarta.persistence.NoResultException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class APIServiceTest {
+class LoginServiceTest {
 
     @Mock
-    private APIRepository apiRepository;
+    private LoginRepository loginRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -32,7 +33,7 @@ class APIServiceTest {
     private CustomUserDetailsService customUserDetailsService;
 
     @InjectMocks
-    private APIService apiService;
+    private LoginService loginService;
 
     @Test
     void login_Success() {
@@ -53,33 +54,33 @@ class APIServiceTest {
                 Roles.ROLE_GROUP
         );
 
-        when(apiRepository.login("testUser")).thenReturn(mockUser);
+        when(loginRepository.login("testUser")).thenReturn(mockUser);
         when(passwordEncoder.matches("correctPassword", "encodedPasswordFromDB")).thenReturn(true);
         when(customUserDetailsService.build(any(Users.class))).thenReturn(mockCustomUserDetails);
 
-        CustomUserDetails result = apiService.login(login);
+        CustomUserDetails result = loginService.login(login);
 
         assertNotNull(result);
         assertEquals(mockCustomUserDetails, result);
-        verify(apiRepository).login("testUser");
+        verify(loginRepository).login("testUser");
         verify(passwordEncoder).matches("correctPassword", "encodedPasswordFromDB");
     }
 
     @Test
-    void login_UserNotFound_ThrowsNoResultException() {
+    void login_UserNotFound_ThrowsBadCredentialsException() {
         Login loginDto = new Login();
         loginDto.setNickname("unknownUser");
 
-        when(apiRepository.login("unknownUser")).thenThrow(new NoResultException("User not found"));
+        when(loginRepository.login("unknownUser")).thenThrow(new NoResultException("User not found"));
 
-        assertThrows(NoResultException.class, () -> apiService.login(loginDto));
+        assertThrows(BadCredentialsException.class, () -> loginService.login(loginDto));
 
-        verify(apiRepository).login("unknownUser");
+        verify(loginRepository).login("unknownUser");
         verifyNoInteractions(passwordEncoder);
     }
 
     @Test
-    void login_WrongPassword_ThrowsNoResultException() {
+    void login_WrongPassword_ThrowsBadCredentialsException() {
         Login login = new Login();
         login.setNickname("testUser");
         login.setPassword("incorrectPassword");
@@ -91,12 +92,12 @@ class APIServiceTest {
         mockUser.setRole(false);
         mockUser.setBoard(null);
 
-        when(apiRepository.login("testUser")).thenReturn(mockUser);
+        when(loginRepository.login("testUser")).thenReturn(mockUser);
         when(passwordEncoder.matches("incorrectPassword", "encodedPasswordFromDB")).thenReturn(false);
 
-        assertThrows(NoResultException.class, () -> apiService.login(login));
+        assertThrows(BadCredentialsException.class, () -> loginService.login(login));
 
-        verify(apiRepository).login("testUser");
+        verify(loginRepository).login("testUser");
         verify(passwordEncoder).matches("incorrectPassword", "encodedPasswordFromDB");
     }
 }

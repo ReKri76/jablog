@@ -9,6 +9,7 @@ import io.rekri.jablog.repository.GetterRepository;
 import io.rekri.jablog.service.security.DeleterAccessService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.TreeSet;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GetterService {
 
     private final GetterRepository getterRepository;
@@ -115,6 +117,16 @@ public class GetterService {
         InputStream file = minioService.getFile(filename);
 
         return file::transferTo;
+    }
+
+    public void likeThread(int threadId){
+        getterRepository.likeThread(threadId);
+        log.info("Thread {} was liked", threadId);
+    }
+
+    public void dislikeThread(int threadId) {
+        getterRepository.dislikeThread(threadId);
+        log.info("Thread {} was disliked", threadId);
     }
 
     private String createAnchor(String text){//ссылки на другой пост

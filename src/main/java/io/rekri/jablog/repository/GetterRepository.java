@@ -42,4 +42,12 @@ public class GetterRepository {
    public Threads thread(long threadId){
         return threadRepoGetter.findThreadsByIdWithPosts(threadId).orElseThrow(NoResultException::new);
     }
+
+    public void likeThread(int threadId){
+        threadRepoGetter.likeThread(threadId);
+    }
+
+    public void dislikeThread(int threadId){
+        threadRepoGetter.dislikeThread(threadId);
+    }
 }
