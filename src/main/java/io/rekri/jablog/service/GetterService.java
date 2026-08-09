@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
-import org.springframework.web.util.HtmlUtils;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -95,7 +94,7 @@ public class GetterService {
             String pic = post.getPicture();
             postWithPicture.setUrl(!Objects.equals(pic, "") ? minioService.buildPictureUrl(pic, boardName) : null);
             postWithPicture.setHead(post.getHeader());
-            postWithPicture.setBody(createAnchor(post.getContent()));
+            postWithPicture.setBody(post.getContent());
 
             posts.add(postWithPicture);
         });
@@ -129,11 +128,4 @@ public class GetterService {
         log.info("Thread {} was disliked", threadId);
     }
 
-    private String createAnchor(String text){//ссылки на другой пост
-        text = HtmlUtils.htmlEscape(text);
-
-        text = text.replaceAll("&gt;&gt;(\\d+)", "<a class=\"anchor\" href=\"#p$1\">&gt;&gt;$1</a>");
-
-        return text;
-    }
 }

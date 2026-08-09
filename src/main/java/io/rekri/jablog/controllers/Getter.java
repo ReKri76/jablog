@@ -1,57 +1,88 @@
 package io.rekri.jablog.controllers;
 
 import io.rekri.jablog.DTO.Board;
-import io.rekri.jablog.DTO.Post;
 import io.rekri.jablog.DTO.PostWithPicture;
+import io.rekri.jablog.DTO.SimpleResponse;
 import io.rekri.jablog.config.security.CustomUserDetails;
 import io.rekri.jablog.service.GetterService;
 import jakarta.servlet.http.HttpSession;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import java.util.ArrayList;
 import java.util.List;
 
-@Controller
+@RestController("/api")
 @RequiredArgsConstructor
 public class Getter {
 
     private final GetterService getterService;
 
-    @GetMapping("/{boardName:[^.\\/]+}/{threadId:\\d+}")
-    public String thread(@PathVariable long threadId, @PathVariable String boardName, Model model, HttpSession session){
+    @EqualsAndHashCode(callSuper = true)
+    @Data
+    public static class ThreadResponse extends SimpleResponse{
+        private PostWithPicture thread;
+        private List<PostWithPicture> posts;
+        private boolean canDelete;
+        private String boardName;
+    }
 
-        final ArrayList<PostWithPicture> posts = getterService.thread(threadId);
+    @GetMapping("/{boardName:[^.\\/]+}/{threadId:\\d+}")
+    public ResponseEntity<ThreadResponse> thread(@PathVariable long threadId, @PathVariable String boardName, HttpSession session){
+
+        ThreadResponse res = new ThreadResponse();
+
+        final List<PostWithPicture> posts = getterService.thread(threadId);
         final CustomUserDetails customUserDetails = (CustomUserDetails) session.getAttribute(boardName);
 
         PostWithPicture thread =  posts.getFirst();
 
-        model.addAttribute("thread",thread);
+        res.setThread(thread);
         posts.removeFirst();
-        model.addAttribute("posts", posts);
-        model.addAttribute("boardName", boardName);
-        model.addAttribute("post", new Post());
-        model.addAttribute("canDelete", getterService.canDelete(boardName, customUserDetails,
-                Long.toString(thread.getId())));
-        return "thread";
+        res.setPosts(posts);
+        res.setBoardName(boardName);
+        res.setCanDelete(getterService.canDelete(boardName, customUserDetails, Long.toString(thread.getId())));
+
+        res.setStatus(200);
+        res.setMessage("ok");
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(res);
+    }
+
+    @EqualsAndHashCode(callSuper = true)
+    @Data
+    public static class BoardResponse extends SimpleResponse{
+        private List<PostWithPicture> threads;
+        private String boardName;
+        private boolean canDelete;
     }
 
     @GetMapping("/{boardName:[^.\\/]+}")
-    public String board(@PathVariable String boardName, @RequestParam(defaultValue = "0") int page, Model model,
+    public ResponseEntity<BoardResponse> board(@PathVariable String boardName, @RequestParam(defaultValue = "0") int page,
                         HttpSession session){
 
-        final ArrayList<PostWithPicture> threads = getterService.board(boardName, page);
+        BoardResponse res = new BoardResponse();
+
+        final List<PostWithPicture> threads = getterService.board(boardName, page);
         final CustomUserDetails customUserDetails = (CustomUserDetails) session.getAttribute(boardName);
 
-        model.addAttribute("threads", threads);
-        model.addAttribute("boardName", boardName);
-        model.addAttribute("post", new Post());
-        model.addAttribute("canDelete", getterService.canDelete(boardName, customUserDetails, null));
-        return "board";
+        res.setThreads(threads);
+        res.setBoardName(boardName);
+        res.setCanDelete(getterService.canDelete(boardName, customUserDetails, null));
+
+        res.setMessage("ok");
+        res.setStatus(200);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(res);
     }
 
     @GetMapping("/{boardName}/img/{fileName}")
@@ -61,21 +92,36 @@ public class Getter {
         return getterService.file(fileName);
     }
 
+    @EqualsAndHashCode(callSuper = true)
+    @Data
+    public static class RootResponse extends SimpleResponse{
+        private List<Board> boards;
+    }
+
     @GetMapping("/")
-    public String start(Model model){
+    public ResponseEntity<RootResponse> start(){
+
+        RootResponse res = new RootResponse();
 
         final List<Board> boards = getterService.start();
-        model.addAttribute("boards", boards);
-        return "index";
+        res.setBoards(boards);
+        res.setStatus(200);
+        res.setMessage("ok");
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(res);
     }
 
     @PatchMapping("/carma/plus/{boardName}/{threadId}")
-    public void likeThread(@PathVariable int threadId){
+    public ResponseEntity<Void> likeThread(@PathVariable int threadId){
         getterService.likeThread(threadId);
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/carma/minus/{boardName}/{threadId}")
-    public void dislikeThread(@PathVariable int threadId){
+    public ResponseEntity<Void> dislikeThread(@PathVariable int threadId){
         getterService.dislikeThread(threadId);
+        return ResponseEntity.ok().build();
     }
 }

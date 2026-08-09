@@ -96,7 +96,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/error").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/api/public/login/verify").permitAll()
-                        .requestMatchers(HttpMethod.GET,  "/").permitAll()
+                        .requestMatchers(HttpMethod.GET,  "/api").permitAll()
                         .requestMatchers(HttpMethod.POST, "/poster/board").permitAll()
                         .requestMatchers(HttpMethod.GET, "/users/panel").permitAll()
 
@@ -117,11 +117,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/users/panel/{boardName}")
                             .access(usersAuthorizationManager)
 
-                        .requestMatchers(HttpMethod.GET, "/{boardName}/img/{fileName}")
+                        .requestMatchers(HttpMethod.GET, "/api/{boardName}/img/{fileName}")
                             .access(getterAuthorizationManager)
-                        .requestMatchers(HttpMethod.GET, "/{boardName}/{thread}")
+                        .requestMatchers(HttpMethod.GET, "/api/{boardName}/{thread}")
                             .access(getterAuthorizationManager)
-                        .requestMatchers(HttpMethod.GET, "/{boardName}")
+                        .requestMatchers(HttpMethod.GET, "/api/{boardName}")
                             .access(getterAuthorizationManager)
 
                         .requestMatchers(HttpMethod.PATCH, "/api/carma/plus/{boardName}/{thread}")

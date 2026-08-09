@@ -1,5 +1,7 @@
 package io.rekri.jablog.http;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import io.rekri.jablog.DTO.Board;
 import io.rekri.jablog.DTO.PostWithPicture;
 import io.rekri.jablog.config.security.CustomUserDetails;
@@ -35,6 +37,7 @@ public class GetterTest {
     private Getter getter;
 
     private MockMvc mockMvc;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     final private String DEFAULT_BOARD_NAME = "boardName";
 
@@ -65,12 +68,12 @@ public class GetterTest {
                         .session(session)
                 )
                 .andExpect(status().isOk())
-                .andExpect(view().name("thread"))
-                .andExpect(model().attribute("posts", expectedReplies))
-                .andExpect(model().attribute("thread", expectedThread))
-                .andExpect(model().attribute("boardName", DEFAULT_BOARD_NAME))
-                .andExpect(model().attributeExists("post"))
-                .andExpect(model().attribute("canDelete", false));
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").value("ok"))
+                .andExpect(jsonPath("$.boardName").value(DEFAULT_BOARD_NAME))
+                .andExpect(jsonPath("$.thread").value(toJsonPathObject(expectedThread)))
+                .andExpect(jsonPath("$.posts").value(toJsonPathObject(expectedReplies)))
+                .andExpect(jsonPath("$.canDelete").value(false));
 
         verify(getterService).thread(threadId);
     }
@@ -97,12 +100,12 @@ public class GetterTest {
                         .session(session)
                 )
                 .andExpect(status().isOk())
-                .andExpect(view().name("thread"))
-                .andExpect(model().attribute("posts", expectedReplies))
-                .andExpect(model().attribute("thread", expectedThread))
-                .andExpect(model().attribute("boardName", DEFAULT_BOARD_NAME))
-                .andExpect(model().attributeExists("post"))
-                .andExpect(model().attribute("canDelete", true));
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").value("ok"))
+                .andExpect(jsonPath("$.boardName").value(DEFAULT_BOARD_NAME))
+                .andExpect(jsonPath("$.thread").value(toJsonPathObject(expectedThread)))
+                .andExpect(jsonPath("$.posts").value(toJsonPathObject(expectedReplies)))
+                .andExpect(jsonPath("$.canDelete").value(true));
 
         verify(getterService).thread(threadId);
     }
@@ -123,11 +126,11 @@ public class GetterTest {
                         .session(session)
                 )
                 .andExpect(status().isOk())
-                .andExpect(view().name("board"))
-                .andExpect(model().attribute("threads", posts))
-                .andExpect(model().attribute("boardName", DEFAULT_BOARD_NAME))
-                .andExpect(model().attributeExists("post"))
-                .andExpect(model().attribute("canDelete", false));
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").value("ok"))
+                .andExpect(jsonPath("$.boardName").value(DEFAULT_BOARD_NAME))
+                .andExpect(jsonPath("$.threads").value(toJsonPathObject(posts)))
+                .andExpect(jsonPath("$.canDelete").value(false));
 
         verify(getterService).board(DEFAULT_BOARD_NAME, 0);
     }
@@ -148,11 +151,11 @@ public class GetterTest {
                         .session(session)
                 )
                 .andExpect(status().isOk())
-                .andExpect(view().name("board"))
-                .andExpect(model().attribute("threads", posts))
-                .andExpect(model().attribute("boardName", DEFAULT_BOARD_NAME))
-                .andExpect(model().attributeExists("post"))
-                .andExpect(model().attribute("canDelete", true));
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").value("ok"))
+                .andExpect(jsonPath("$.boardName").value(DEFAULT_BOARD_NAME))
+                .andExpect(jsonPath("$.threads").value(toJsonPathObject(posts)))
+                .andExpect(jsonPath("$.canDelete").value(true));
 
         verify(getterService).board(DEFAULT_BOARD_NAME, 0);
     }
@@ -166,7 +169,9 @@ public class GetterTest {
 
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("boards", boards));
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").value("ok"))
+                .andExpect(jsonPath("$.boards").value(toJsonPathObject(boards)));
         verify(getterService).start();
     }
 
@@ -183,5 +188,11 @@ public class GetterTest {
         Board res = new Board();
         res.setId(id);
         return res;
+    }
+
+    @NotNull
+    private Object toJsonPathObject(@NotNull Object obj) throws Exception {
+        String json = objectMapper.writeValueAsString(obj);
+        return JsonPath.parse(json).read("$");
     }
 }
