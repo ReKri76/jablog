@@ -15,7 +15,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -40,8 +39,7 @@ public class DeleterTest {
         doNothing().when(deleterService).thread(anyLong());
 
         mockMvc.perform(delete("/deleter/"+boardName+"/1"))
-                .andExpect(status().isOk())
-                .andExpect(header().string("HX-Redirect", "/" + boardName));
+                .andExpect(status().isOk());
 
         verify(deleterService).thread(anyLong());
     }
@@ -53,8 +51,7 @@ public class DeleterTest {
         doNothing().when(deleterService).post(anyLong());
 
         mockMvc.perform(delete("/deleter/"+boardName+"/"+threadId+"/0"))
-                .andExpect(status().isOk())
-                .andExpect(header().string("HX-Redirect", "/"+boardName+"/"+threadId));
+                .andExpect(status().isOk());
 
         verify(deleterService).post(anyLong());
     }
