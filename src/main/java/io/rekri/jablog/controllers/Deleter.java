@@ -3,15 +3,15 @@ package io.rekri.jablog.controllers;
 import io.rekri.jablog.service.DeleterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Эндпоинты с правами доступа к удалению
  * */
-@Controller
+@RestController
 @RequestMapping("/deleter")
 @RequiredArgsConstructor
 public class Deleter {
@@ -21,13 +21,9 @@ public class Deleter {
     @DeleteMapping(value = "/{boardName}/{threadId}")
     public ResponseEntity<Void> thread(@PathVariable(value = "boardName") String boardName,
                                        @PathVariable("threadId") long threadId){
-
         deleterService.thread(threadId);
 
-        return ResponseEntity
-                .ok()
-                .header("HX-Redirect", "/"+boardName)
-                .build();
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping(value = "/{boardName}/{threadId}/{postId}")
@@ -36,9 +32,6 @@ public class Deleter {
 
         deleterService.post(postId);
 
-        return ResponseEntity
-                .ok()
-                .header("HX-Redirect", "/"+boardName+"/"+threadId)
-                .build();
+        return ResponseEntity.ok().build();
     }
 }
