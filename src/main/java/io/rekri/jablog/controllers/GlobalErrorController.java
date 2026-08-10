@@ -42,6 +42,19 @@ public class GlobalErrorController{
                 .body(res);
     }
 
+    @ExceptionHandler(IllegalAccessException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalAccessException(IllegalAccessException e) {
+        log.warn("Invalid arguments: {}", e.getMessage());
+
+        ErrorResponse res = new ErrorResponse();
+        res.setMessage("Invalid arguments");
+        res.setStatus(400);
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(res);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> runtimeExceptionHandler(RuntimeException e){
 
