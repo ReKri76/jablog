@@ -38,7 +38,7 @@ public class DeleterTest {
         String boardName = "placeholder";
         doNothing().when(deleterService).thread(anyLong());
 
-        mockMvc.perform(delete("/deleter/"+boardName+"/1"))
+        mockMvc.perform(delete("/api/deleter/"+boardName+"/1"))
                 .andExpect(status().isOk());
 
         verify(deleterService).thread(anyLong());
@@ -50,7 +50,7 @@ public class DeleterTest {
         String threadId = "0";
         doNothing().when(deleterService).post(anyLong());
 
-        mockMvc.perform(delete("/deleter/"+boardName+"/"+threadId+"/0"))
+        mockMvc.perform(delete("/api/deleter/"+boardName+"/"+threadId+"/0"))
                 .andExpect(status().isOk());
 
         verify(deleterService).post(anyLong());

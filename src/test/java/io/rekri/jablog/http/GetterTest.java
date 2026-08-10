@@ -64,7 +64,7 @@ public class GetterTest {
         String expectedThreadIdString = String.valueOf(expectedThread.getId());
         when(getterService.canDelete(DEFAULT_BOARD_NAME, mockUser, expectedThreadIdString)).thenReturn(false);
 
-        mockMvc.perform(get("/" + DEFAULT_BOARD_NAME + "/" + threadId)
+        mockMvc.perform(get("/api/" + DEFAULT_BOARD_NAME + "/" + threadId)
                         .session(session)
                 )
                 .andExpect(status().isOk())
@@ -96,7 +96,7 @@ public class GetterTest {
         String expectedThreadIdString = String.valueOf(expectedThread.getId());
         when(getterService.canDelete(DEFAULT_BOARD_NAME, mockUser, expectedThreadIdString)).thenReturn(true);
 
-        mockMvc.perform(get("/" + DEFAULT_BOARD_NAME + "/" + threadId)
+        mockMvc.perform(get("/api/" + DEFAULT_BOARD_NAME + "/" + threadId)
                         .session(session)
                 )
                 .andExpect(status().isOk())
@@ -122,7 +122,7 @@ public class GetterTest {
         session.setAttribute(DEFAULT_BOARD_NAME, mockUser);
         when(getterService.canDelete(DEFAULT_BOARD_NAME, mockUser, null)).thenReturn(false);
 
-        mockMvc.perform(get("/" + DEFAULT_BOARD_NAME)
+        mockMvc.perform(get("/api/" + DEFAULT_BOARD_NAME)
                         .session(session)
                 )
                 .andExpect(status().isOk())
@@ -147,7 +147,7 @@ public class GetterTest {
         session.setAttribute(DEFAULT_BOARD_NAME, mockUser);
         when(getterService.canDelete(DEFAULT_BOARD_NAME, mockUser, null)).thenReturn(true);
 
-        mockMvc.perform(get("/" + DEFAULT_BOARD_NAME)
+        mockMvc.perform(get("/api/" + DEFAULT_BOARD_NAME)
                         .session(session)
                 )
                 .andExpect(status().isOk())
@@ -167,7 +167,7 @@ public class GetterTest {
             boards.add(createBoard(Integer.toString(i)));
         when(getterService.start()).thenReturn(boards);
 
-        mockMvc.perform(get("/"))
+        mockMvc.perform(get("/api/"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.message").value("ok"))
