@@ -18,7 +18,7 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping(value = "/users")
+@RequestMapping(value = "/api/users")
 public class Users {
 
     private final UsersService usersService;

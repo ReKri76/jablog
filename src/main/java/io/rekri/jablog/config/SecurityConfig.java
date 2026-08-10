@@ -97,24 +97,24 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.POST, "/api/public/login/verify").permitAll()
                         .requestMatchers(HttpMethod.GET,  "/api").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/poster/board").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/users/panel").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/poster/board").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/users/panel").permitAll()
 
-                        .requestMatchers(HttpMethod.POST, "/poster/{boardName}/{thread}")
+                        .requestMatchers(HttpMethod.POST, "/api/poster/{boardName}/{thread}")
                             .access(posterAuthorizationManager)
-                        .requestMatchers(HttpMethod.POST, "/poster/{boardName}")
+                        .requestMatchers(HttpMethod.POST, "/api/poster/{boardName}")
                             .access(posterAuthorizationManager)
 
-                        .requestMatchers(HttpMethod.DELETE, "/deleter/{boardName}/{thread}")
+                        .requestMatchers(HttpMethod.DELETE, "/api/deleter/{boardName}/{thread}")
                             .access(deleterAuthorizationManager)
-                        .requestMatchers(HttpMethod.DELETE, "/deleter/{boardName}/{thread}/{post}")
+                        .requestMatchers(HttpMethod.DELETE, "/api/deleter/{boardName}/{thread}/{post}")
                             .access(deleterAuthorizationManager)
 
-                        .requestMatchers(HttpMethod.DELETE, "/users/panel/{boardName}/{nickname}")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/panel/{boardName}/{nickname}")
                             .access(usersAuthorizationManager)
-                        .requestMatchers(HttpMethod.POST, "/users/panel/{boardName}/add")
+                        .requestMatchers(HttpMethod.POST, "/api/users/panel/{boardName}/add")
                             .access(usersAuthorizationManager)
-                        .requestMatchers(HttpMethod.GET, "/users/panel/{boardName}")
+                        .requestMatchers(HttpMethod.GET, "/api/users/panel/{boardName}")
                             .access(usersAuthorizationManager)
 
                         .requestMatchers(HttpMethod.GET, "/api/{boardName}/img/{fileName}")

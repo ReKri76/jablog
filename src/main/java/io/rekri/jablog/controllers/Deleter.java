@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Эндпоинты с правами доступа к удалению
  * */
 @RestController
-@RequestMapping("/deleter")
+@RequestMapping("/api/deleter")
 @RequiredArgsConstructor
 public class Deleter {
 

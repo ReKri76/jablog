@@ -18,7 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 
 @Controller
-@RequestMapping("/poster")
+@RequestMapping("/api/poster")
 @RequiredArgsConstructor
 public class Poster {
 
