@@ -1,4 +1,4 @@
-package io.rekri.jablog.repository.cleaner;
+package io.rekri.jablog.repository.jpa_repository;
 
 import io.rekri.jablog.entity.Board;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -7,9 +7,12 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface BoardRepoCleaner extends JpaRepository<Board,Long> {
+public interface BoardRepo extends JpaRepository<Board,Long> {
 
     @Query("from Board b left join fetch b.users where not exists(select 1 from Threads t where t.board = b) " +
             "and b.createdAt < :oldBoard")
     List<Board> findExpiresBoards(@Param("oldBoard")long oldBoard);
+
+    @Query("select b.rules from Board b where b.name = :boardName")
+    String getRulesByBoardName(@Param("boardName") String boardName);
 }

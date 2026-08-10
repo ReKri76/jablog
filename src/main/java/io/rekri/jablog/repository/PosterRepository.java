@@ -4,10 +4,10 @@ import io.rekri.jablog.entity.Board;
 import io.rekri.jablog.entity.Posts;
 import io.rekri.jablog.entity.Threads;
 import io.rekri.jablog.entity.Users;
-import io.rekri.jablog.repository.poster.BoardRepoPoster;
-import io.rekri.jablog.repository.poster.PostRepoPoster;
-import io.rekri.jablog.repository.poster.ThreadRepoPoster;
-import io.rekri.jablog.repository.poster.UserRepoPoster;
+import io.rekri.jablog.repository.jpa_repository.BoardRepo;
+import io.rekri.jablog.repository.jpa_repository.PostRepo;
+import io.rekri.jablog.repository.jpa_repository.ThreadRepo;
+import io.rekri.jablog.repository.jpa_repository.UserRepo;
 import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +18,10 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class PosterRepository {
 
-    private final ThreadRepoPoster threadRepoPoster;
-    private final PostRepoPoster postRepoPoster;
-    private final BoardRepoPoster boardRepoPoster;
-    private final UserRepoPoster userRepoPoster;
+    private final ThreadRepo threadRepoPoster;
+    private final PostRepo postRepoPoster;
+    private final BoardRepo boardRepoPoster;
+    private final UserRepo userRepoPoster;
 
     @Transactional
     public long thread(@NotNull Threads threads) {

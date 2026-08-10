@@ -1,7 +1,7 @@
 package io.rekri.jablog.repository;
 
 import io.rekri.jablog.entity.Users;
-import io.rekri.jablog.repository.login.UserRepoLogin;
+import io.rekri.jablog.repository.jpa_repository.UserRepo;
 import jakarta.persistence.NoResultException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -10,10 +10,10 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class LoginRepository {
 
-    private final UserRepoLogin userRepoLogin;
+    private final UserRepo userRepo;
 
     public Users login(String nickname) throws NoResultException {
-        return userRepoLogin.findByNickname(nickname)
+        return userRepo.findByNickname(nickname)
                 .orElseThrow(NoResultException::new);
     }
 }

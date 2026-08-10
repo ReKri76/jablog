@@ -3,9 +3,9 @@ package io.rekri.jablog.repository;
 import io.rekri.jablog.entity.Board;
 import io.rekri.jablog.entity.Posts;
 import io.rekri.jablog.entity.Threads;
-import io.rekri.jablog.repository.cleaner.BoardRepoCleaner;
-import io.rekri.jablog.repository.cleaner.PostRepoCleaner;
-import io.rekri.jablog.repository.cleaner.ThreadRepoCleaner;
+import io.rekri.jablog.repository.jpa_repository.BoardRepo;
+import io.rekri.jablog.repository.jpa_repository.PostRepo;
+import io.rekri.jablog.repository.jpa_repository.ThreadRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,9 +20,9 @@ public class CleanerRepository {
 
     private static final long UNIX_TIME_DAY = Duration.ofDays(1).toMillis();
 
-    private final PostRepoCleaner postRepo;
-    private final ThreadRepoCleaner threadRepoCleaner;
-    private final BoardRepoCleaner boardRepoCleaner;
+    private final PostRepo postRepo;
+    private final ThreadRepo threadRepo;
+    private final BoardRepo boardRepo;
 
     @Transactional
     public List<Posts> posts() {
@@ -40,9 +40,9 @@ public class CleanerRepository {
         final long now = Instant.now().toEpochMilli();
 
 
-        final List<Threads> threads = threadRepoCleaner.findExpiresThreads(now, UNIX_TIME_DAY, oldThread);
+        final List<Threads> threads = threadRepo.findExpiresThreads(now, UNIX_TIME_DAY, oldThread);
 
-        threadRepoCleaner.deleteAll(threads);
+        threadRepo.deleteAll(threads);
 
         return threads;
     }
@@ -50,7 +50,7 @@ public class CleanerRepository {
     @Transactional
     public List<String> pics(){
 
-        final List<String> pics = threadRepoCleaner.findAllPics();
+        final List<String> pics = threadRepo.findAllPics();
         pics.addAll(postRepo.findAllPics());
 
         return pics;
@@ -59,9 +59,9 @@ public class CleanerRepository {
     @Transactional
     public List<Board> boards(long oldBoard){
 
-        final List<Board> boards = boardRepoCleaner.findExpiresBoards(oldBoard);
+        final List<Board> boards = boardRepo.findExpiresBoards(oldBoard);
 
-        boardRepoCleaner.deleteAll(boards);
+        boardRepo.deleteAll(boards);
 
         return boards;
     }

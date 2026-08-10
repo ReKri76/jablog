@@ -1,8 +1,8 @@
 package io.rekri.jablog.repository;
 
-import io.rekri.jablog.repository.security.BoardRepoSecurity;
-import io.rekri.jablog.repository.security.PostRepoSecurity;
-import io.rekri.jablog.repository.security.ThreadRepoSecurity;
+import io.rekri.jablog.repository.jpa_repository.BoardRepo;
+import io.rekri.jablog.repository.jpa_repository.PostRepo;
+import io.rekri.jablog.repository.jpa_repository.ThreadRepo;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Repository;
@@ -11,9 +11,9 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class SecurityRepository {
 
-    private final BoardRepoSecurity boardRepoSecurity;
-    private final ThreadRepoSecurity threadRepoSecurity;
-    private final PostRepoSecurity postRepo;
+    private final BoardRepo boardRepoSecurity;
+    private final ThreadRepo threadRepoSecurity;
+    private final PostRepo postRepo;
 
     @NotNull
     public String getRulesByBoardName(String boardName){

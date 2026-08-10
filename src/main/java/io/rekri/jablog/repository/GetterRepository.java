@@ -2,8 +2,8 @@ package io.rekri.jablog.repository;
 
 import io.rekri.jablog.entity.Board;
 import io.rekri.jablog.entity.Threads;
-import io.rekri.jablog.repository.getter.BoardRepoGetter;
-import io.rekri.jablog.repository.getter.ThreadRepoGetter;
+import io.rekri.jablog.repository.jpa_repository.BoardRepo;
+import io.rekri.jablog.repository.jpa_repository.ThreadRepo;
 import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +20,8 @@ public class GetterRepository {
 
     private static final int LIMIT_OF_PAGINATION = 10;
 
-    private final BoardRepoGetter boardRepoGetter;
-    private final ThreadRepoGetter threadRepoGetter;
+    private final BoardRepo boardRepoGetter;
+    private final ThreadRepo threadRepoGetter;
 
     @NotNull
     @Transactional

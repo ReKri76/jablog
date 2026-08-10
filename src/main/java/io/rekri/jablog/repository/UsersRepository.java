@@ -1,8 +1,7 @@
 package io.rekri.jablog.repository;
 
 import io.rekri.jablog.entity.Users;
-import io.rekri.jablog.repository.users.UserRepoUsers;
-import jakarta.persistence.EntityManager;
+import io.rekri.jablog.repository.jpa_repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Repository;
@@ -13,8 +12,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UsersRepository {
 
-    private final EntityManager entityManager;
-    private final UserRepoUsers userRepoUsers;
+    private final UserRepo userRepoUsers;
 
     public void addUser(@NotNull Users users){
         userRepoUsers.save(users);

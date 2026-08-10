@@ -2,8 +2,8 @@ package io.rekri.jablog.repository;
 
 import io.rekri.jablog.entity.Posts;
 import io.rekri.jablog.entity.Threads;
-import io.rekri.jablog.repository.deleter.PostRepoDeleter;
-import io.rekri.jablog.repository.deleter.ThreadRepoDeleter;
+import io.rekri.jablog.repository.jpa_repository.PostRepo;
+import io.rekri.jablog.repository.jpa_repository.ThreadRepo;
 import jakarta.persistence.NoResultException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -13,8 +13,8 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class DeleterRepository {
 
-    private final PostRepoDeleter postRepoDeleter;
-    private final ThreadRepoDeleter threadRepoDeleter;
+    private final PostRepo postRepoDeleter;
+    private final ThreadRepo threadRepoDeleter;
 
     @NotNull
     public Threads thread(long threadId){

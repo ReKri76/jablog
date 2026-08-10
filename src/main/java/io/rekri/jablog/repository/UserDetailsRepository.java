@@ -1,7 +1,7 @@
 package io.rekri.jablog.repository;
 
 import io.rekri.jablog.entity.Users;
-import io.rekri.jablog.repository.userdetails.UserRepoUserDetails;
+import io.rekri.jablog.repository.jpa_repository.UserRepo;
 import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class UserDetailsRepository {
 
-    private final UserRepoUserDetails userRepoUserDetails;
+    private final UserRepo userRepoUserDetails;
 
     @NotNull
     @Transactional
