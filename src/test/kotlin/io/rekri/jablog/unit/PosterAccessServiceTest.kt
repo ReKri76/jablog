@@ -7,7 +7,7 @@ import io.rekri.jablog.repository.SecurityRepository
 import io.rekri.jablog.repository.UserDetailsRepository
 import io.rekri.jablog.service.CustomUserDetailsService
 import io.rekri.jablog.service.SecurityData
-import io.rekri.jablog.service.security.DeleterAccessService
+import io.rekri.jablog.service.security.PosterAccessService
 import io.mockk.Called
 import io.mockk.every
 import io.mockk.mockk
@@ -18,99 +18,100 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 
-class DeleterControllerAccessServiceTest {
+class PosterAccessServiceTest {
 
     private val securityRepository = mockk<SecurityRepository>()
 
-    private val deleterAccessService = spyk(DeleterAccessService(securityRepository))
+    private val posterAccessService = spyk(PosterAccessService(securityRepository))
 
     private val customUserDetailsService = CustomUserDetailsService(mockk<UserDetailsRepository>())
 
     companion object {
         private const val DEFAULT_BOARD_NAME = "default_board_name"
-        private const val DEFAULT_POST_ID = "0"
+        private const val DEFAULT_THREAD_ID = "0"
     }
 
     @Test
     fun `canAccess happy path`() {
         val mockUser = createUserDetails(null)
 
-        val deleterData = SecurityData.Deleter(
+        val posterData = SecurityData.Poster(
             boardName = DEFAULT_BOARD_NAME,
             user = mockUser,
-            postId = null,
+            threadId = null,
         )
 
-        val result = deleterAccessService.canAccess(deleterData)
+        val result = posterAccessService.canAccess(posterData)
 
         assertTrue(result)
         verify { securityRepository wasNot Called }
     }
 
     @Test
-    fun `canAccess should return false when data is not Deleter`() {
+    fun `canAccess should return false when data is not Poster`() {
         val otherData = SecurityData.Users(
             boardName = DEFAULT_BOARD_NAME,
             user = customUserDetailsService.createDefault()
         )
 
-        val result = deleterAccessService.canAccess(otherData)
+        val result = posterAccessService.canAccess(otherData)
 
         assertFalse(result)
         verify { securityRepository wasNot Called }
     }
 
     @Test
-    fun `canAccess should return false when post is not in board`() {
-        val data = SecurityData.Deleter(
+    fun `canAccess should return false when thread is not in board`() {
+        val data = SecurityData.Poster(
             boardName = DEFAULT_BOARD_NAME,
             user = customUserDetailsService.createDefault(),
-            postId = DEFAULT_POST_ID,
-        )
-        every { securityRepository.isPostInBoard(DEFAULT_BOARD_NAME, DEFAULT_POST_ID.toLong()) } returns false
+            threadId = DEFAULT_THREAD_ID,
+            )
+        every { securityRepository.isThreadInBoard(DEFAULT_BOARD_NAME, DEFAULT_THREAD_ID.toLong()) } returns false
 
-        val result = deleterAccessService.canAccess(data)
+        val result = posterAccessService.canAccess(data)
 
         assertFalse(result)
-        verify(exactly = 1) { securityRepository.isPostInBoard(any(), any()) }
+        verify(exactly = 1) { securityRepository.isThreadInBoard(any(), any()) }
     }
 
-    @ParameterizedTest(name = "postId: ''$DEFAULT_POST_ID'', rules: ''{1}'' => expected access: {2}")
+    @ParameterizedTest(name = "threadId: ''$DEFAULT_THREAD_ID'', rules: ''{1}'' => expected access: {2}")
     @CsvSource(
         "-w-x,    false", // Нет прав на чтение
-        "r-d-,    false", // Есть чтение и удаление, нет x
-        "r-dx,    true",  // Удаление поста: есть чтение, удаление и x
+        "r--x,    false", // Есть чтение, нет записи
+        "rw--,    true",  // Запись в тред: есть чтение и запись
         "xrwd,    false"  // Просто некорректный набор символов
     )
-    fun `canAccess should validate combinations of rules by post`(
+    fun `canAccess should validate combinations of rules by thread`(
         rules: String,
         expectedResult: Boolean
     ) {
         val mockUser = createUserDetails("rwdx"+rules+"rwdx")
-        val data = SecurityData.Deleter(DEFAULT_BOARD_NAME, mockUser, DEFAULT_POST_ID)
+        val data = SecurityData.Poster(DEFAULT_BOARD_NAME, mockUser, DEFAULT_THREAD_ID)
 
-        every { securityRepository.isPostInBoard(DEFAULT_BOARD_NAME, DEFAULT_POST_ID.toLong()) } returns true
+        every { securityRepository.isThreadInBoard(DEFAULT_BOARD_NAME, DEFAULT_THREAD_ID.toLong()) } returns true
 
-        val result = deleterAccessService.canAccess(data)
+        val result = posterAccessService.canAccess(data)
 
         assertEquals(expectedResult, result)
     }
 
-    @ParameterizedTest(name = "postId: ''empty'', rules: ''{0}'' => expected access: {1}")
+    @ParameterizedTest(name = "threadId: ''empty'', rules: ''{0}'' => expected access: {1}")
     @CsvSource(
-        "r-d-,    true",  // Удаление без указания поста: есть чтение и d
-        "r-dx,    true",  // Удаление без указания поста: есть чтение, d и x
-        "--d-,    false", // Нет прав на чтение
-        "r-w-,    false"  // Нет прав на удаление
+        "rw--,    false", // Создание треда (threadId пуст): нет прав
+        "rw-x,    true",  // Создание треда (threadId пуст): есть права rw и x
+        "r--x,    false", // Создание треда: нет прав на запись
+        "xrwd,    false"  // Просто некорректный набор символов
     )
-    fun `canAccess should validate combinations of rules without post`(
+    fun `canAccess should validate combinations of rules without thread`(
         rules: String,
         expectedResult: Boolean
     ) {
         val mockUser = createUserDetails("rwdx"+rules+"rwdx")
-        val data = SecurityData.Deleter(DEFAULT_BOARD_NAME, mockUser, null)
+        val data = SecurityData.Poster(DEFAULT_BOARD_NAME, mockUser, null)
 
-        val result = deleterAccessService.canAccess(data)
+
+        val result = posterAccessService.canAccess(data)
 
         assertEquals(expectedResult, result)
     }

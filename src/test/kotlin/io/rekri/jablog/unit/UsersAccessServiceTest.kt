@@ -13,7 +13,7 @@ import io.mockk.spyk
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
-class UsersControllerAccessServiceTest {
+class UsersAccessServiceTest {
 
     private val usersAccessService = spyk(UsersAccessService())
 

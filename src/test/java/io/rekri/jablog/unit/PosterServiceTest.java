@@ -1,5 +1,6 @@
 package io.rekri.jablog.unit;
 
+import io.rekri.jablog.DTO.BoardToCreate;
 import io.rekri.jablog.DTO.Picture;
 import io.rekri.jablog.DTO.Post;
 import io.rekri.jablog.entity.Board;
@@ -28,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class PosterControllerServiceTest {
+public class PosterServiceTest {
     @Mock
     private PosterRepository posterRepository;
     @Mock
@@ -233,7 +234,15 @@ public class PosterControllerServiceTest {
 
         doNothing().when(posterRepository).board(any(Board.class), any(Users.class));
 
-        posterService.board(mockBoardName, mockPassword, mockRule, mockNickname, mockLifeCycleThreads, mockLifeCyclePosts, mockTranscription);
+        BoardToCreate boardToCreate = new BoardToCreate(mockBoardName,
+                mockRule,
+                mockPassword,
+                mockNickname,
+                mockLifeCycleThreads,
+                mockLifeCyclePosts,
+                mockTranscription);
+
+        posterService.board(boardToCreate);
 
         verify(passwordEncoder).encode(mockPassword);
         verify(posterRepository).board(boardCaptor.capture(), usersCaptor.capture());
@@ -266,7 +275,15 @@ public class PosterControllerServiceTest {
 
         doNothing().when(posterRepository).board(any(Board.class), any(Users.class));
 
-        posterService.board(mockBoardName, mockPassword, mockRule, mockNickname, mockLifeCycleThreads, mockLifeCyclePosts, null);
+        BoardToCreate boardToCreate = new BoardToCreate(mockBoardName,
+                mockRule,
+                mockPassword,
+                mockNickname,
+                mockLifeCycleThreads,
+                mockLifeCyclePosts,
+                null);
+
+        posterService.board(boardToCreate);
 
         verify(passwordEncoder).encode(mockPassword);
         verify(posterRepository).board(boardCaptor.capture(), usersCaptor.capture());
@@ -296,14 +313,15 @@ public class PosterControllerServiceTest {
         final String mockTranscription = "transcription";
 
         assertThrows(InvalidRulesException.class, () -> {
-            posterService.board(
-                    mockBoardName,
-                    mockPassword,
+            BoardToCreate boardToCreate = new BoardToCreate(mockBoardName,
                     mockRule,
+                    mockPassword,
                     mockNickname,
                     mockLifeCycleThreads,
                     mockLifeCyclePosts,
                     mockTranscription);
+
+            posterService.board(boardToCreate);
         });
     }
 
@@ -318,14 +336,15 @@ public class PosterControllerServiceTest {
         final String mockTranscription = "transcription";
 
         assertThrows(InvalidRulesException.class, () -> {
-            posterService.board(
-                    mockBoardName,
-                    mockPassword,
+            BoardToCreate boardToCreate = new BoardToCreate(mockBoardName,
                     mockRule,
+                    mockPassword,
                     mockNickname,
                     mockLifeCycleThreads,
                     mockLifeCyclePosts,
                     mockTranscription);
+
+            posterService.board(boardToCreate);
         });
     }
 
@@ -341,14 +360,15 @@ public class PosterControllerServiceTest {
         final String mockTranscription = "transcription";
 
         assertThrows(InvalidRulesException.class, () -> {
-            posterService.board(
-                    mockBoardName,
-                    mockPassword,
+            BoardToCreate boardToCreate = new BoardToCreate(mockBoardName,
                     mockRule,
+                    mockPassword,
                     mockNickname,
                     mockLifeCycleThreads,
                     mockLifeCyclePosts,
                     mockTranscription);
+
+            posterService.board(boardToCreate);
         });
     }
 
@@ -371,15 +391,15 @@ public class PosterControllerServiceTest {
         final String mockTranscription = "transcription";
 
         assertThrows(InvalidRulesException.class, () -> {
-            posterService.board(
-                    mockBoardName,
-                    mockPassword,
+            BoardToCreate boardToCreate = new BoardToCreate(mockBoardName,
                     invalidRule,
+                    mockPassword,
                     mockNickname,
                     mockLifeCycleThreads,
                     mockLifeCyclePosts,
-                    mockTranscription
-            );
+                    mockTranscription);
+
+            posterService.board(boardToCreate);
         });
     }
 }

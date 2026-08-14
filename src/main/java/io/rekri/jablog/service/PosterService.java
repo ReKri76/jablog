@@ -1,5 +1,6 @@
 package io.rekri.jablog.service;
 
+import io.rekri.jablog.DTO.BoardToCreate;
 import io.rekri.jablog.DTO.Picture;
 import io.rekri.jablog.DTO.Post;
 import io.rekri.jablog.entity.Board;
@@ -84,10 +85,16 @@ public class PosterService {
      * @see {@link Board}
      * */
     @Transactional
-    public void board(@NotNull String boardName, @NotNull String password, @NotNull String rule,
-                      @NotNull String nickname, int lifeCycleThreads , int lifeCyclePosts, @Nullable String transcription){
-
+    public void board(BoardToCreate inputBoard){
         log.info("Start creating board");
+
+        var lifeCyclePosts = inputBoard.getLifeCyclePosts();
+        var lifeCycleThreads = inputBoard.getLifeCycleThreads();
+        var rule = inputBoard.getRule();
+        var transcription = inputBoard.getTranscription();
+        var boardName = inputBoard.getBoardName();
+        var password = inputBoard.getPass();
+        var nickname = inputBoard.getNickname();
 
         if (lifeCyclePosts>=lifeCycleThreads)
             throw new InvalidRulesException("life cycle of posts cant be longer then threads");

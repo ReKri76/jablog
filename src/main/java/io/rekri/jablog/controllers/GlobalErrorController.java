@@ -1,6 +1,7 @@
 package io.rekri.jablog.controllers;
 
 import io.rekri.jablog.DTO.SimpleResponse;
+import io.rekri.jablog.errors.InvalidRulesException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestControllerAdvice
 @Slf4j
@@ -48,6 +50,32 @@ public class GlobalErrorController{
 
         ErrorResponse res = new ErrorResponse();
         res.setMessage("Invalid arguments");
+        res.setStatus(400);
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(res);
+    }
+
+    @ExceptionHandler(InvalidRulesException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidRulesException(InvalidRulesException e) {
+        log.warn("Invalid rules of board: {}", e.getMessage());
+
+        ErrorResponse res = new ErrorResponse();
+        res.setMessage("Board cant be create with this parameters.");
+        res.setStatus(400);
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(res);
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ErrorResponse> handleResponseStatusException(ResponseStatusException e) {
+        log.warn("ResponseStatusException: status ={}, message = {}", e.getStatusCode(), e.getReason());
+
+        ErrorResponse res = new ErrorResponse();
+        res.setMessage("Board cant be create with this parameters.");
         res.setStatus(400);
 
         return ResponseEntity

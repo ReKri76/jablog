@@ -28,7 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class GetterControllerServiceTest {
+public class GetterServiceTest {
 
     @Mock
     private GetterRepository getterRepository;

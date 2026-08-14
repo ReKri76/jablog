@@ -26,7 +26,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,29 +50,44 @@ class PosterControllerTest {
     private final String DEFAULT_BODY = "default_body";
     private final String DEFAULT_HEAD = "default_header";
 
+    private MockMultipartFile postPart(String head, String body) {
+        String content = String.format(
+                "{\"head\":\"%s\",\"body\":\"%s\"}",
+                head, body
+        );
+
+        return new MockMultipartFile(
+                "post", "", "application/json", content.getBytes()
+        );
+    }
+
     @Test
     void thread_Success() throws Exception {
+        MockMultipartFile post = postPart(DEFAULT_HEAD, DEFAULT_BODY);
         MockMultipartFile file = new MockMultipartFile(
                 "image", "test.png", "image/png", "dummy content".getBytes()
         );
 
         when(posterService.thread(any(Post.class), any(Picture.class), eq("b"))).thenReturn(42L);
 
-        mockMvc.perform(multipart("/poster/b")
-                        .file(file)
-                        .param("head", DEFAULT_HEAD)
-                        .param("body", DEFAULT_BODY))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/b/42"));
+        mockMvc.perform(multipart("/api/poster/b")
+                        .file(post)
+                        .file(file))
+                .andExpect(status().isOk());
 
         verify(posterService).thread(any(Post.class), any(Picture.class), eq("b"));
     }
 
     @Test
     void thread_EmptyFile_ReturnsBadRequest() throws Exception {
-        MockMultipartFile emptyFile = new MockMultipartFile("image", "", "image/png", new byte[0]);
+        MockMultipartFile post = postPart(DEFAULT_HEAD, DEFAULT_BODY);
+        MockMultipartFile emptyFile = new MockMultipartFile(
+                "image", "", "image/png", new byte[0]
+        );
 
-        mockMvc.perform(multipart("/poster/b").file(emptyFile))
+        mockMvc.perform(multipart("/api/poster/b")
+                        .file(post)
+                        .file(emptyFile))
                 .andExpect(status().isBadRequest());
 
         verifyNoInteractions(posterService);
@@ -81,11 +95,14 @@ class PosterControllerTest {
 
     @Test
     void thread_InvalidFileType_ReturnsBadRequest() throws Exception {
+        MockMultipartFile post = postPart(DEFAULT_HEAD, DEFAULT_BODY);
         MockMultipartFile pdfFile = new MockMultipartFile(
                 "image", "doc.pdf", "application/pdf", "dummy pdf".getBytes()
         );
 
-        mockMvc.perform(multipart("/poster/b").file(pdfFile))
+        mockMvc.perform(multipart("/api/poster/b")
+                        .file(post)
+                        .file(pdfFile))
                 .andExpect(status().isBadRequest());
 
         verifyNoInteractions(posterService);
@@ -93,12 +110,15 @@ class PosterControllerTest {
 
     @Test
     void thread_FileTooLarge_ReturnsBadRequest() throws Exception {
+        MockMultipartFile post = postPart(DEFAULT_HEAD, DEFAULT_BODY);
         byte[] oversizedContent = new byte[(int) PosterController.MAX_IMAGE_SIZE + 10];
         MockMultipartFile hugeFile = new MockMultipartFile(
                 "image", "huge.jpg", "image/jpeg", oversizedContent
         );
 
-        mockMvc.perform(multipart("/poster/b").file(hugeFile))
+        mockMvc.perform(multipart("/api/poster/b")
+                        .file(post)
+                        .file(hugeFile))
                 .andExpect(status().isBadRequest());
 
         verifyNoInteractions(posterService);
@@ -106,32 +126,32 @@ class PosterControllerTest {
 
     @Test
     void post_WithImage_WithoutHeader_Success() throws Exception {
+        MockMultipartFile post = postPart("", DEFAULT_BODY);
         MockMultipartFile file = new MockMultipartFile(
                 "image", "pic.jpeg", "image/jpeg", "image data".getBytes()
         );
 
-        mockMvc.perform(multipart("/poster/b/100")
-                        .file(file)
-                        .param("body", DEFAULT_BODY))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/b/100"));
+        mockMvc.perform(multipart("/api/poster/b/100")
+                        .file(post)
+                        .file(file))
+                .andExpect(status().isOk());
 
         verify(posterService).post(any(Post.class), any(Picture.class), eq(100L));
     }
 
     @Test
     void post_WithoutImage_WithHeader_Success() throws Exception {
-        mockMvc.perform(multipart("/poster/b/100")
-                        .param("head", DEFAULT_HEAD)
-                        .param("body", DEFAULT_BODY))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/b/100"));
+        MockMultipartFile post = postPart(DEFAULT_HEAD, DEFAULT_BODY);
 
-        Post post = new Post();
-        post.setBody(DEFAULT_BODY);
-        post.setHead(DEFAULT_HEAD);
+        mockMvc.perform(multipart("/api/poster/b/100")
+                        .file(post))
+                .andExpect(status().isOk());
 
-        verify(posterService).post(post, null, 100L);
+        Post expectedPost = new Post();
+        expectedPost.setBody(DEFAULT_BODY);
+        expectedPost.setHead(DEFAULT_HEAD);
+
+        verify(posterService).post(expectedPost, null, 100L);
     }
 
     @Test
@@ -141,23 +161,27 @@ class PosterControllerTest {
 
         when(customUserDetailsService.loadUserByUsername("admin")).thenReturn(mockUser);
 
-        mockMvc.perform(post("/poster/board")
-                        .session(session)
-                        .param("boardName", "tech")
-                        .param("rule", "No spam")
-                        .param("pass", "secret123")
-                        .param("nickname", "admin")
-                        .param("lifeCycleThreads", "5")
-                        .param("lifeCyclePosts", "50")
-                        .param("transcription", "Technology"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/tech"));
+        String board = """
+                {
+                    "boardName": "tec",
+                    "rule": "rwdxrwdxrwdx",
+                    "pass": "secret123",
+                    "nickname": "admin",
+                    "lifeCycleThreads": 10,
+                    "lifeCyclePosts": 5,
+                    "transcription": "Technology"
+                }
+                """;
 
-        verify(posterService, times(1)).board(
-                "tech", "secret123", "No spam", "admin", 5, 50, "Technology"
-        );
+        mockMvc.perform(post("/api/poster/board")
+                        .session(session)
+                        .contentType("application/json")
+                        .content(board))
+                .andExpect(status().isOk());
+
+        verify(posterService).board(any());
         verify(customUserDetailsService, times(1)).loadUserByUsername("admin");
 
-        assertEquals(mockUser, session.getAttribute("tech"));
+        assertEquals(mockUser, session.getAttribute("tec"));
     }
 }
