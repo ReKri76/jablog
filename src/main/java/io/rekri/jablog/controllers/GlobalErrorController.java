@@ -42,8 +42,8 @@ public class GlobalErrorController{
                 .body(res);
     }
 
-    @ExceptionHandler(IllegalAccessException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalAccessException(IllegalAccessException e) {
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
         log.warn("Invalid arguments: {}", e.getMessage());
 
         ErrorResponse res = new ErrorResponse();
