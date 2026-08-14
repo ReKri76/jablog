@@ -7,7 +7,7 @@ import io.rekri.jablog.repository.SecurityRepository
 import io.rekri.jablog.repository.UserDetailsRepository
 import io.rekri.jablog.service.CustomUserDetailsService
 import io.rekri.jablog.service.SecurityData
-import io.rekri.jablog.service.security.GetterAccessService
+import io.rekri.jablog.service.security.PosterAccessService
 import io.mockk.Called
 import io.mockk.every
 import io.mockk.mockk
@@ -18,11 +18,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 
-class GetterAccessServiceTest {
+class PosterControllerAccessServiceTest {
 
     private val securityRepository = mockk<SecurityRepository>()
 
-    private val getterAccessService = spyk(GetterAccessService(securityRepository))
+    private val posterAccessService = spyk(PosterAccessService(securityRepository))
 
     private val customUserDetailsService = CustomUserDetailsService(mockk<UserDetailsRepository>())
 
@@ -35,26 +35,26 @@ class GetterAccessServiceTest {
     fun `canAccess happy path`() {
         val mockUser = createUserDetails(null)
 
-        val getterData = SecurityData.Getter(
+        val posterData = SecurityData.Poster(
             boardName = DEFAULT_BOARD_NAME,
             user = mockUser,
             threadId = null,
         )
 
-        val result = getterAccessService.canAccess(getterData)
+        val result = posterAccessService.canAccess(posterData)
 
         assertTrue(result)
         verify { securityRepository wasNot Called }
     }
 
     @Test
-    fun `canAccess should return false when data is not Getter`() {
+    fun `canAccess should return false when data is not Poster`() {
         val otherData = SecurityData.Users(
             boardName = DEFAULT_BOARD_NAME,
             user = customUserDetailsService.createDefault()
         )
 
-        val result = getterAccessService.canAccess(otherData)
+        val result = posterAccessService.canAccess(otherData)
 
         assertFalse(result)
         verify { securityRepository wasNot Called }
@@ -62,14 +62,14 @@ class GetterAccessServiceTest {
 
     @Test
     fun `canAccess should return false when thread is not in board`() {
-        val data = SecurityData.Getter(
+        val data = SecurityData.Poster(
             boardName = DEFAULT_BOARD_NAME,
             user = customUserDetailsService.createDefault(),
             threadId = DEFAULT_THREAD_ID,
-        )
+            )
         every { securityRepository.isThreadInBoard(DEFAULT_BOARD_NAME, DEFAULT_THREAD_ID.toLong()) } returns false
 
-        val result = getterAccessService.canAccess(data)
+        val result = posterAccessService.canAccess(data)
 
         assertFalse(result)
         verify(exactly = 1) { securityRepository.isThreadInBoard(any(), any()) }
@@ -77,38 +77,41 @@ class GetterAccessServiceTest {
 
     @ParameterizedTest(name = "threadId: ''$DEFAULT_THREAD_ID'', rules: ''{1}'' => expected access: {2}")
     @CsvSource(
-        "---x,    false", // Нет прав на чтение
-        "r---,    false", // Есть чтение, но остальные флаги пустые
-        "r-d-,    true",  // Чтение треда: есть чтение и хотя бы один другой флаг не пустой
-        "rw--,    true"   // Чтение треда: есть чтение и хотя бы один другой флаг не пустой
+        "-w-x,    false", // Нет прав на чтение
+        "r--x,    false", // Есть чтение, нет записи
+        "rw--,    true",  // Запись в тред: есть чтение и запись
+        "xrwd,    false"  // Просто некорректный набор символов
     )
     fun `canAccess should validate combinations of rules by thread`(
         rules: String,
         expectedResult: Boolean
     ) {
         val mockUser = createUserDetails("rwdx"+rules+"rwdx")
-        val data = SecurityData.Getter(DEFAULT_BOARD_NAME, mockUser, DEFAULT_THREAD_ID)
+        val data = SecurityData.Poster(DEFAULT_BOARD_NAME, mockUser, DEFAULT_THREAD_ID)
 
         every { securityRepository.isThreadInBoard(DEFAULT_BOARD_NAME, DEFAULT_THREAD_ID.toLong()) } returns true
 
-        val result = getterAccessService.canAccess(data)
+        val result = posterAccessService.canAccess(data)
 
         assertEquals(expectedResult, result)
     }
 
     @ParameterizedTest(name = "threadId: ''empty'', rules: ''{0}'' => expected access: {1}")
     @CsvSource(
-        "r---,    true",  // Есть чтение, threadId пуст
-        "----,    false"  // Нет прав на чтение
+        "rw--,    false", // Создание треда (threadId пуст): нет прав
+        "rw-x,    true",  // Создание треда (threadId пуст): есть права rw и x
+        "r--x,    false", // Создание треда: нет прав на запись
+        "xrwd,    false"  // Просто некорректный набор символов
     )
     fun `canAccess should validate combinations of rules without thread`(
         rules: String,
         expectedResult: Boolean
     ) {
         val mockUser = createUserDetails("rwdx"+rules+"rwdx")
-        val data = SecurityData.Getter(DEFAULT_BOARD_NAME, mockUser, null)
+        val data = SecurityData.Poster(DEFAULT_BOARD_NAME, mockUser, null)
 
-        val result = getterAccessService.canAccess(data)
+
+        val result = posterAccessService.canAccess(data)
 
         assertEquals(expectedResult, result)
     }

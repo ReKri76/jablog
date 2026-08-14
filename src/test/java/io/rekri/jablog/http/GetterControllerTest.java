@@ -5,7 +5,7 @@ import com.jayway.jsonpath.JsonPath;
 import io.rekri.jablog.DTO.Board;
 import io.rekri.jablog.DTO.PostWithPicture;
 import io.rekri.jablog.config.security.CustomUserDetails;
-import io.rekri.jablog.controllers.Getter;
+import io.rekri.jablog.controllers.GetterController;
 import io.rekri.jablog.service.GetterService;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,13 +28,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
-public class GetterTest {
+public class GetterControllerTest {
 
     @Mock
     private GetterService getterService;
 
     @InjectMocks
-    private Getter getter;
+    private GetterController getterController;
 
     private MockMvc mockMvc;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -43,7 +43,7 @@ public class GetterTest {
 
     @BeforeEach
     public void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(getter).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(getterController).build();
     }
 
     @Test

@@ -1,6 +1,6 @@
 package io.rekri.jablog.http;
 
-import io.rekri.jablog.controllers.Deleter;
+import io.rekri.jablog.controllers.DeleterController;
 import io.rekri.jablog.service.DeleterService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,19 +18,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-public class DeleterTest {
+public class DeleterControllerTest {
 
     @Mock
     private DeleterService deleterService;
 
     @InjectMocks
-    private Deleter deleter;
+    private DeleterController deleterController;
 
     private MockMvc mockMvc;
 
     @BeforeEach
     public void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(deleter).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(deleterController).build();
     }
 
     @Test

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/deleter")
 @RequiredArgsConstructor
-public class Deleter {
+public class DeleterController {
 
     private final DeleterService deleterService;
 

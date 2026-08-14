@@ -19,7 +19,7 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/users")
-public class Users {
+public class UsersController {
 
     private final UsersService usersService;
 

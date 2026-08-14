@@ -2,7 +2,7 @@ package io.rekri.jablog.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.rekri.jablog.config.security.CustomUserDetails;
-import io.rekri.jablog.controllers.Login;
+import io.rekri.jablog.controllers.LoginController;
 import io.rekri.jablog.repository.UserDetailsRepository;
 import io.rekri.jablog.service.CustomUserDetailsService;
 import io.rekri.jablog.service.LoginService;
@@ -24,13 +24,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-public class LoginTest {
+public class LoginControllerTest {
 
     @Mock
     private LoginService loginService;
 
     @InjectMocks
-    private Login login;
+    private LoginController loginController;
 
     private MockMvc mockMvc;
 
@@ -45,7 +45,7 @@ public class LoginTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(login).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(loginController).build();
     }
 
     @Test

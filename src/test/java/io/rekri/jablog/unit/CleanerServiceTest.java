@@ -5,7 +5,7 @@ import io.rekri.jablog.entity.Posts;
 import io.rekri.jablog.entity.Threads;
 import io.rekri.jablog.entity.Users;
 import io.rekri.jablog.repository.CleanerRepository;
-import io.rekri.jablog.service.Cleaner;
+import io.rekri.jablog.service.CleanerService;
 import io.rekri.jablog.service.MinioService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +24,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class CleanerTest {
+public class CleanerServiceTest {
 
     @Mock
     private CleanerRepository cleanerRepository;
@@ -33,7 +33,7 @@ public class CleanerTest {
     private MinioService minioService;
 
     @InjectMocks
-    private Cleaner cleaner;
+    private CleanerService cleanerService;
 
     @Test
     public void cleanOldThreads_Success(){
@@ -42,7 +42,7 @@ public class CleanerTest {
                 createThread("pic2")
         ));
 
-        cleaner.cleanThreads();
+        cleanerService.cleanThreads();
 
         verify(cleanerRepository).threads(anyLong());
         verify(minioService, times(2)).deletePicture(anyString(),eq(MinioService.BUCKET));
@@ -60,7 +60,7 @@ public class CleanerTest {
                 createPost("")
         ));
 
-        cleaner.cleanPosts();
+        cleanerService.cleanPosts();
 
         verify(cleanerRepository).posts();
         verify(minioService, times(2)).deletePicture(anyString(), eq(MinioService.BUCKET));
@@ -87,7 +87,7 @@ public class CleanerTest {
                 "pic6"
         ));
 
-        cleaner.cleanPics();
+        cleanerService.cleanPics();
 
         verify(minioService).getAllFileName(MinioService.BUCKET);
         verify(cleanerRepository).pics();
@@ -102,7 +102,7 @@ public class CleanerTest {
                 crateBoard()
         ));
 
-        cleaner.cleanBoards();
+        cleanerService.cleanBoards();
 
         verify(cleanerRepository).boards(anyLong());
     }

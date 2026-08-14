@@ -2,7 +2,7 @@ package io.rekri.jablog.http;
 
 import io.rekri.jablog.DTO.Picture;
 import io.rekri.jablog.DTO.Post;
-import io.rekri.jablog.controllers.Poster;
+import io.rekri.jablog.controllers.PosterController;
 import io.rekri.jablog.service.CustomUserDetailsService;
 import io.rekri.jablog.service.PosterService;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-class PosterTest {
+class PosterControllerTest {
 
     @Mock
     private PosterService posterService;
@@ -39,7 +39,7 @@ class PosterTest {
     private CustomUserDetailsService customUserDetailsService;
 
     @InjectMocks
-    private Poster posterController;
+    private PosterController posterController;
 
     private MockMvc mockMvc;
 
@@ -93,7 +93,7 @@ class PosterTest {
 
     @Test
     void thread_FileTooLarge_ReturnsBadRequest() throws Exception {
-        byte[] oversizedContent = new byte[(int) Poster.MAX_IMAGE_SIZE + 10];
+        byte[] oversizedContent = new byte[(int) PosterController.MAX_IMAGE_SIZE + 10];
         MockMultipartFile hugeFile = new MockMultipartFile(
                 "image", "huge.jpg", "image/jpeg", oversizedContent
         );

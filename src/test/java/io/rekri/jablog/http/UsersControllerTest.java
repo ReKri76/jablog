@@ -3,7 +3,7 @@ package io.rekri.jablog.http;
 import io.rekri.jablog.DTO.Login;
 import io.rekri.jablog.config.security.CustomUserDetails;
 import io.rekri.jablog.config.security.Roles;
-import io.rekri.jablog.controllers.Users;
+import io.rekri.jablog.controllers.UsersController;
 import io.rekri.jablog.repository.UserDetailsRepository;
 import io.rekri.jablog.service.CustomUserDetailsService;
 import io.rekri.jablog.service.UsersService;
@@ -30,13 +30,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
-public class UsersTest {
+public class UsersControllerTest {
 
     @Mock
     private UsersService usersService;
 
     @InjectMocks
-    private Users users;
+    private UsersController usersController;
 
     private MockMvc mockMvc;
 
@@ -48,7 +48,7 @@ public class UsersTest {
         InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
         viewResolver.setPrefix("/WEB-INF/templates/");
         viewResolver.setSuffix(".html");
-        mockMvc = MockMvcBuilders.standaloneSetup(users).setViewResolvers(viewResolver).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(usersController).setViewResolvers(viewResolver).build();
     }
 
     @Test

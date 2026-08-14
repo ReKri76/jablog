@@ -20,7 +20,7 @@ import java.io.IOException;
 @Controller
 @RequestMapping("/api/poster")
 @RequiredArgsConstructor
-public class Poster {
+public class PosterController {
 
     public static final long MAX_IMAGE_SIZE = 1024 * 1024 * 10 - 1;
 

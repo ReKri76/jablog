@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class Cleaner {
+public class CleanerService {
 
     private final CleanerRepository cleanerRepository;
     private final MinioService minioService;
