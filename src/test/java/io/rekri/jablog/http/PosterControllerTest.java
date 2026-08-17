@@ -26,6 +26,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -73,7 +74,8 @@ class PosterControllerTest {
         mockMvc.perform(multipart("/api/poster/b")
                         .file(post)
                         .file(file))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", "/b/42"));
 
         verify(posterService).thread(any(Post.class), any(Picture.class), eq("b"));
     }
@@ -134,7 +136,8 @@ class PosterControllerTest {
         mockMvc.perform(multipart("/api/poster/b/100")
                         .file(post)
                         .file(file))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", "/b/100"));
 
         verify(posterService).post(any(Post.class), any(Picture.class), eq(100L));
     }
@@ -145,7 +148,8 @@ class PosterControllerTest {
 
         mockMvc.perform(multipart("/api/poster/b/100")
                         .file(post))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", "/b/100"));
 
         Post expectedPost = new Post();
         expectedPost.setBody(DEFAULT_BODY);
@@ -177,7 +181,8 @@ class PosterControllerTest {
                         .session(session)
                         .contentType("application/json")
                         .content(board))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", "/tec"));
 
         verify(posterService).board(any());
         verify(customUserDetailsService, times(1)).loadUserByUsername("admin");
