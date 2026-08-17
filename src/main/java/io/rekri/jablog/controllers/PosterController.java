@@ -3,13 +3,10 @@ package io.rekri.jablog.controllers;
 import io.rekri.jablog.DTO.BoardToCreate;
 import io.rekri.jablog.DTO.Picture;
 import io.rekri.jablog.DTO.Post;
-import io.rekri.jablog.DTO.SimpleResponse;
 import io.rekri.jablog.service.CustomUserDetailsService;
 import io.rekri.jablog.service.PosterService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
@@ -20,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.net.URI;
 
 @RestController
 @RequestMapping("/api/poster")
@@ -31,14 +29,8 @@ public class PosterController {
     private final PosterService posterService;
     private final CustomUserDetailsService customUserDetailsService;
 
-    @EqualsAndHashCode(callSuper = true)
-    @Data
-    public static class ThreadResponse extends SimpleResponse{
-        private long postId;
-    }
-
     @PostMapping(value = "/{boardName}", consumes = "multipart/form-data")
-    public ResponseEntity<ThreadResponse> thread(@PathVariable String boardName, @Valid @RequestPart("post") Post post,
+    public ResponseEntity<Void> thread(@PathVariable String boardName, @Valid @RequestPart("post") Post post,
                                  @RequestPart("image") @NonNull MultipartFile file) throws IOException {
 
         if (file.isEmpty())
@@ -49,14 +41,7 @@ public class PosterController {
         final Picture picture = new Picture(file);
         final long idOfPost = posterService.thread(post, picture, boardName);
 
-        final ThreadResponse res = new ThreadResponse();
-        res.setPostId(idOfPost);
-        res.setMessage("Ok");
-        res.setStatus(200);
-
-        return ResponseEntity
-                .status(200)
-                .body(res);
+        return ResponseEntity.created(URI.create("/"+boardName+"/"+idOfPost)) .build();
     }
 
     @PostMapping(value = "/{boardName}/{threadID}", consumes = "multipart/form-data")
@@ -71,7 +56,7 @@ public class PosterController {
 
         posterService.post(post, picture, threadID);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.created(URI.create("/"+boardName+"/"+threadID)).build();
     }
 
     @PostMapping(value = "/board")
@@ -80,7 +65,7 @@ public class PosterController {
         posterService.board(board);
 
         session.setAttribute(board.getBoardName(), customUserDetailsService.loadUserByUsername(board.getNickname()));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.created(URI.create("/"+board.getBoardName())).build();
     }
 
     private void chekFile(@NonNull MultipartFile file){
