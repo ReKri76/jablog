@@ -21,7 +21,7 @@ public class LoginController {
     @PostMapping("/verify")
     public ResponseEntity<Void> login(HttpSession session, @Valid @RequestBody io.rekri.jablog.DTO.Login login) {
 
-        CustomUserDetails customUserDetails = loginService.login(login);
+        final CustomUserDetails customUserDetails = loginService.login(login);
 
         final String boardName = customUserDetails.getBoardName();
 

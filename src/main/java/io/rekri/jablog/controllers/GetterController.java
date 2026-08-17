@@ -36,12 +36,12 @@ public class GetterController {
     @GetMapping("/{boardName:[^.\\/]+}/{threadId:\\d+}")
     public ResponseEntity<ThreadResponse> thread(@PathVariable long threadId, @PathVariable String boardName, HttpSession session){
 
-        ThreadResponse res = new ThreadResponse();
+        final ThreadResponse res = new ThreadResponse();
 
         final List<PostWithPicture> posts = getterService.thread(threadId);
         final CustomUserDetails customUserDetails = (CustomUserDetails) session.getAttribute(boardName);
 
-        PostWithPicture thread =  posts.getFirst();
+        final PostWithPicture thread =  posts.getFirst();
 
         res.setThread(thread);
         posts.removeFirst();
@@ -69,7 +69,7 @@ public class GetterController {
     public ResponseEntity<BoardResponse> board(@PathVariable String boardName, @RequestParam(defaultValue = "0") int page,
                         HttpSession session){
 
-        BoardResponse res = new BoardResponse();
+        final BoardResponse res = new BoardResponse();
 
         final List<PostWithPicture> threads = getterService.board(boardName, page);
         final CustomUserDetails customUserDetails = (CustomUserDetails) session.getAttribute(boardName);
@@ -102,7 +102,7 @@ public class GetterController {
     @GetMapping("/")
     public ResponseEntity<RootResponse> start(){
 
-        RootResponse res = new RootResponse();
+        final RootResponse res = new RootResponse();
 
         final List<Board> boards = getterService.start();
         res.setBoards(boards);

@@ -22,7 +22,7 @@ public class GlobalErrorController{
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> badCredentialsHandler(BadCredentialsException e){
 
-        ErrorResponse res = new ErrorResponse();
+        final ErrorResponse res = new ErrorResponse();
         res.setStatus(401);
         res.setMessage(e.getMessage());
 
@@ -35,7 +35,7 @@ public class GlobalErrorController{
     public ResponseEntity<ErrorResponse> handleValidationErrors(MethodArgumentNotValidException e) {
         log.warn("Validation error: {}", e.getMessage());
 
-        ErrorResponse res = new ErrorResponse();
+        final ErrorResponse res = new ErrorResponse();
         res.setMessage("Invalid arguments");
         res.setStatus(400);
 
@@ -48,7 +48,7 @@ public class GlobalErrorController{
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
         log.warn("Invalid arguments: {}", e.getMessage());
 
-        ErrorResponse res = new ErrorResponse();
+        final ErrorResponse res = new ErrorResponse();
         res.setMessage("Invalid arguments");
         res.setStatus(400);
 
@@ -61,7 +61,7 @@ public class GlobalErrorController{
     public ResponseEntity<ErrorResponse> handleInvalidRulesException(InvalidRulesException e) {
         log.warn("Invalid rules of board: {}", e.getMessage());
 
-        ErrorResponse res = new ErrorResponse();
+        final ErrorResponse res = new ErrorResponse();
         res.setMessage("Board cant be create with this parameters.");
         res.setStatus(400);
 
@@ -74,7 +74,7 @@ public class GlobalErrorController{
     public ResponseEntity<ErrorResponse> handleResponseStatusException(ResponseStatusException e) {
         log.warn("ResponseStatusException: status ={}, message = {}", e.getStatusCode(), e.getReason());
 
-        ErrorResponse res = new ErrorResponse();
+        final ErrorResponse res = new ErrorResponse();
         res.setMessage("Board cant be create with this parameters.");
         res.setStatus(400);
 
@@ -86,7 +86,7 @@ public class GlobalErrorController{
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> runtimeExceptionHandler(RuntimeException e){
 
-        ErrorResponse res = new ErrorResponse();
+        final ErrorResponse res = new ErrorResponse();
         res.setStatus(500);
         res.setMessage("Internal server error.");
 
