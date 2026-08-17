@@ -1,6 +1,5 @@
 package io.rekri.jablog.config;
 
-import io.rekri.jablog.config.security.*;
 import io.rekri.jablog.config.security.DeleterAuthorizationManager;
 import io.rekri.jablog.config.security.GetterAuthorizationManager;
 import io.rekri.jablog.config.security.PosterAuthorizationManager;
@@ -13,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -23,7 +23,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -42,22 +49,24 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(@NonNull HttpSecurity http) {
 
         http
+                .cors(Customizer.withDefaults())
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
 
                         .contentSecurityPolicy(csp -> csp
-                                .policyDirectives(
-                                        "default-src 'none'; " +
-                                        "script-src 'self' 'unsafe-inline'; " +
-                                        "object-src 'none'; " +
-                                        "style-src 'self' 'unsafe-inline'; " +
-                                        "img-src " + minioEndpoint + " 'self' data:; " +
-                                        "connect-src 'self'; " +
-                                        "font-src 'self'; " +
-                                        "frame-ancestors 'none'; " +
-                                        "base-uri 'self'; " +
-                                        "form-action 'self'; " +
-                                        "upgrade-insecure-requests"
+                                .policyDirectives("""
+                                        default-src 'none';
+                                        script-src 'self' 'unsafe-inline';
+                                        object-src 'none';
+                                        style-src 'self' 'unsafe-inline';
+                                        img-src " + minioEndpoint + " 'self' data:;
+                                        connect-src 'self';
+                                        font-src 'self';
+                                        frame-ancestors 'none';
+                                        base-uri 'self';
+                                        form-action 'self';
+                                        upgrade-insecure-requests;
+                                       """
                                 )
                         )
 
@@ -68,7 +77,9 @@ public class SecurityConfig {
                 )
 
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/public/**", "/", "/poster/board", "/script/**", "/styles/**", "/error")
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                        .ignoringRequestMatchers("/api/public/**", "/api/poster/board")
                 )
 
                 .sessionManagement(session ->
@@ -90,10 +101,6 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-
-                        .requestMatchers(HttpMethod.GET, "/script/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/styles/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/error").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/api/public/login/verify").permitAll()
                         .requestMatchers(HttpMethod.GET,  "/api").permitAll()
@@ -154,5 +161,18 @@ public class SecurityConfig {
     @Bean
     public HttpSessionEventPublisher httpSessionEventPublisher() {
         return new HttpSessionEventPublisher();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource(@Value("${client.host}") String frontHost) {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of(frontHost));
+        config.setAllowedMethods(List.of("GET", "POST", "PATCH", "DELETE"));
+        config.setAllowedHeaders(List.of("Content-Type", "X-XSRF-TOKEN"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 }
