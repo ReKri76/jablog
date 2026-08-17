@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface PostRepo extends JpaRepository<Posts, Long> {
 
-    @Query("from Posts p where p.createdAt < :now - p.thread.board.lifeCyclePosts * :unxtm")
+    @Query("from Posts p where p.createdAt < :now - p.thread.board.lifeCyclePosts * cast(:unxtm as long)")
     List<Posts> finExpiredPots (@Param("now")long now, @Param("unxtm") long unxtm);
 
     @Query("select p.picture from Posts p")

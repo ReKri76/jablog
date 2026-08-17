@@ -16,7 +16,7 @@ public interface ThreadRepo extends JpaRepository<Threads,Long> {
     @Query("from Threads t " +
             "where not exists(" +
             "select 1 from Posts p " +
-            "where p.createdAt >= :now - t.board.lifeCycleThreads * :unxtm " +
+            "where p.createdAt >= :now - t.board.lifeCycleThreads * cast(:unxtm as long) " +
             "and p.thread = t" +
             ") " +
             "and t.createdAt < :oldThread")
