@@ -1,5 +1,6 @@
-package io.rekri.jablog.config.security
+package io.rekri.jablog.config.security.authorizations
 
+import io.rekri.jablog.config.security.CustomUserDetails
 import io.rekri.jablog.service.SecurityData
 import io.rekri.jablog.service.security.UsersAccessService
 import org.springframework.security.authorization.AuthorizationDecision

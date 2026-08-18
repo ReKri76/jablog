@@ -1,13 +1,13 @@
 package io.rekri.jablog.config;
 
-import io.rekri.jablog.config.security.DeleterAuthorizationManager;
-import io.rekri.jablog.config.security.GetterAuthorizationManager;
-import io.rekri.jablog.config.security.PosterAuthorizationManager;
-import io.rekri.jablog.config.security.UsersAuthorizationManager;
+import io.rekri.jablog.config.security.authorizations.DeleterAuthorizationManager;
+import io.rekri.jablog.config.security.authorizations.GetterAuthorizationManager;
+import io.rekri.jablog.config.security.authorizations.PosterAuthorizationManager;
+import io.rekri.jablog.config.security.authorizations.UsersAuthorizationManager;
+import io.rekri.jablog.config.security.filters.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,11 +18,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
-import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
@@ -30,6 +30,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.time.Duration;
 import java.util.List;
 
 @Configuration
@@ -42,11 +43,11 @@ public class SecurityConfig {
     private final UsersAuthorizationManager usersAuthorizationManager;
     private final GetterAuthorizationManager getterAuthorizationManager;
 
-    @Value("${minio.endpoint}")
-    private String minioEndpoint;
+    public static final long ACCESS_EXPIRED_TIME = Duration.ofHours(1).toMillis();
+    public static final long REFRESH_EXPIRED_TIME = Duration.ofDays(7).toMillis();
 
     @Bean
-    public SecurityFilterChain securityFilterChain(@NonNull HttpSecurity http) {
+    public SecurityFilterChain securityFilterChain(@NonNull HttpSecurity http, JwtFilter jwtFilter) {
 
         http
                 .cors(Customizer.withDefaults())
@@ -59,7 +60,6 @@ public class SecurityConfig {
                                         script-src 'self' 'unsafe-inline';
                                         object-src 'none';
                                         style-src 'self' 'unsafe-inline';
-                                        img-src " + minioEndpoint + " 'self' data:;
                                         connect-src 'self';
                                         font-src 'self';
                                         frame-ancestors 'none';
@@ -83,24 +83,14 @@ public class SecurityConfig {
                 )
 
                 .sessionManagement(session ->
-
-                        session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
-
-                        .sessionConcurrency(concurrency -> concurrency
-                                .maximumSessions(1)
-                        )
-
-                        .sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::changeSessionId)
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
-                .formLogin(AbstractHttpConfigurer::disable)
-
-                .httpBasic(AbstractHttpConfigurer::disable)
 
                 .anonymous(AbstractHttpConfigurer::disable)
 
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/api/public/login/verify").permitAll()
                         .requestMatchers(HttpMethod.GET,  "/api").permitAll()

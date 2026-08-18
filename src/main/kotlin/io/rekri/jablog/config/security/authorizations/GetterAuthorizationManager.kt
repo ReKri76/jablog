@@ -1,8 +1,9 @@
-package io.rekri.jablog.config.security
+package io.rekri.jablog.config.security.authorizations
 
+import io.rekri.jablog.config.security.CustomUserDetails
 import io.rekri.jablog.service.CustomUserDetailsService
 import io.rekri.jablog.service.SecurityData
-import io.rekri.jablog.service.security.DeleterAccessService
+import io.rekri.jablog.service.security.GetterAccessService
 import org.springframework.security.authorization.AuthorizationDecision
 import org.springframework.security.authorization.AuthorizationManager
 import org.springframework.security.authorization.AuthorizationResult
@@ -12,26 +13,27 @@ import org.springframework.stereotype.Component
 import java.util.function.Supplier
 
 @Component
-class DeleterAuthorizationManager(private val deleterAccessService: DeleterAccessService,
-                                  private val customUserDetailsService: CustomUserDetailsService) :
+class GetterAuthorizationManager(private val getterAccessService: GetterAccessService,
+                                 private val customUserDetailsService: CustomUserDetailsService) :
     AuthorizationManager<RequestAuthorizationContext> {
 
-    override fun authorize(auth: Supplier<out Authentication?>, context: RequestAuthorizationContext):
-            AuthorizationResult {
-
+    override fun authorize(
+        auth: Supplier<out Authentication?>,
+        context: RequestAuthorizationContext
+    ): AuthorizationResult {
         val session = context.request.getSession(false)
 
         val boardName = context.variables["boardName"] as String
-        val postId = context.variables["post"] //может прийти запрос как на удаление треда, таки на удаление поста
+        val threadId : String? = context.variables["thread"]
         val sessionAttr = session?.getAttribute(boardName)
 
         val user = (sessionAttr ?: customUserDetailsService.createDefault()) as CustomUserDetails
 
-        val canAccess = deleterAccessService.canAccess(
-            data = SecurityData.Deleter(
+        val canAccess = getterAccessService.canAccess(
+            data = SecurityData.Getter(
                 boardName = boardName,
                 user = user,
-                postId = postId
+                threadId = threadId
             )
         )
 

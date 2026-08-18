@@ -1,8 +1,9 @@
-package io.rekri.jablog.config.security
+package io.rekri.jablog.config.security.authorizations
 
+import io.rekri.jablog.config.security.CustomUserDetails
 import io.rekri.jablog.service.CustomUserDetailsService
 import io.rekri.jablog.service.SecurityData
-import io.rekri.jablog.service.security.GetterAccessService
+import io.rekri.jablog.service.security.PosterAccessService
 import org.springframework.security.authorization.AuthorizationDecision
 import org.springframework.security.authorization.AuthorizationManager
 import org.springframework.security.authorization.AuthorizationResult
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Component
 import java.util.function.Supplier
 
 @Component
-class GetterAuthorizationManager(private val getterAccessService: GetterAccessService,
+class PosterAuthorizationManager(private val posterAccessService: PosterAccessService,
                                  private val customUserDetailsService: CustomUserDetailsService) :
     AuthorizationManager<RequestAuthorizationContext> {
 
@@ -20,6 +21,7 @@ class GetterAuthorizationManager(private val getterAccessService: GetterAccessSe
         auth: Supplier<out Authentication?>,
         context: RequestAuthorizationContext
     ): AuthorizationResult {
+
         val session = context.request.getSession(false)
 
         val boardName = context.variables["boardName"] as String
@@ -28,11 +30,12 @@ class GetterAuthorizationManager(private val getterAccessService: GetterAccessSe
 
         val user = (sessionAttr ?: customUserDetailsService.createDefault()) as CustomUserDetails
 
-        val canAccess = getterAccessService.canAccess(
-            data = SecurityData.Getter(
+        val canAccess = posterAccessService.canAccess(
+            data = SecurityData.Poster(
                 boardName = boardName,
                 user = user,
                 threadId = threadId
+
             )
         )
 
