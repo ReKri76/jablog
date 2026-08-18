@@ -56,21 +56,11 @@
 
 **Требования:** наличие `docker` и `docker-compose`.
 
-1. Склонируйте репозиторий:
-   ```bash
-   git clone https://github.com/ReKri76/jablog.git
-   ```
-2. Перейдите в папку проекта и создайте конфигурационный файл:
+> [!NOTE]
+> Не забудьте отредактировать `.env`
+
    ```bash
    cd jablog
-   touch .env
    cat .env_example > .env
-   ```
-3. Отредактируйте файл `.env`, заменив все переменные на актуальные:
-   ```bash
    vim .env
-   ```
-4. Запустите контейнеры в фоновом режиме:
-   ```bash
-   docker compose up -d
    ```
