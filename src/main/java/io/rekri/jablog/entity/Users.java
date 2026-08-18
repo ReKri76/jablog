@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name="users")
 @Getter
@@ -28,4 +31,7 @@ public class Users {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board", referencedColumnName = "name")
     private Board board;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<Records> records = new HashSet<Records>();
 }
