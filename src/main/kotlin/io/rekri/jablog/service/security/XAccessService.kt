@@ -4,9 +4,11 @@ import io.rekri.jablog.config.security.CustomUserDetails
 import io.rekri.jablog.config.security.Roles
 import io.rekri.jablog.entity.Board
 import io.rekri.jablog.repository.SecurityRepository
+import io.rekri.jablog.service.CustomUserDetailsService
 import io.rekri.jablog.service.SecurityAccessService
 
-abstract class XAccessService(private val securityRepository: SecurityRepository) : SecurityAccessService{
+abstract class XAccessService(private val securityRepository: SecurityRepository,
+    private val customUserDetailsService: CustomUserDetailsService) : SecurityAccessService{
 
     protected fun getCurrentRules(boardName : String, user : CustomUserDetails) : String{
 
@@ -28,5 +30,14 @@ abstract class XAccessService(private val securityRepository: SecurityRepository
         val currentRules = user.boardRules.substring(shift, shift + Board.SIZE_OF_GROUP)
 
         return currentRules
+    }
+
+    protected fun loadUserByAccountNameAndBoard(boardName : String, user : String?) : CustomUserDetails {
+        var res : CustomUserDetails = customUserDetailsService.createDefault()
+
+        if (user != null)
+            res = customUserDetailsService.loadUserByAccountNameAndBoard(user, boardName)
+
+        return res
     }
 }

@@ -1,6 +1,5 @@
 package io.rekri.jablog.config.security.authorizations
 
-import io.rekri.jablog.config.security.CustomUserDetails
 import io.rekri.jablog.service.SecurityData
 import io.rekri.jablog.service.security.UsersAccessService
 import org.springframework.security.authorization.AuthorizationDecision
@@ -19,11 +18,10 @@ class UsersAuthorizationManager(private val usersAccessService: UsersAccessServi
         auth: Supplier<out Authentication?>,
         context: RequestAuthorizationContext
     ): AuthorizationResult {
-        val session = context.request.getSession(false)
 
         val boardName = context.variables["boardName"] as String
 
-        val user = session.getAttribute(boardName) as? CustomUserDetails ?:
+        val user = auth.get().principal as? String ?:
             return AuthorizationDecision(false)
 
         val canAccess = usersAccessService.canAccess(

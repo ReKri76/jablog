@@ -1,11 +1,14 @@
 package io.rekri.jablog.service.security
 
+import io.rekri.jablog.config.security.CustomUserDetails
 import io.rekri.jablog.repository.SecurityRepository
+import io.rekri.jablog.service.CustomUserDetailsService
 import io.rekri.jablog.service.SecurityData
 import org.springframework.stereotype.Service
 
 @Service
-open class DeleterAccessService(private val securityRepository: SecurityRepository) : XAccessService(securityRepository) {
+open class DeleterAccessService(private val securityRepository: SecurityRepository,
+    customUserDetailsService: CustomUserDetailsService) : XAccessService(securityRepository, customUserDetailsService) {
 
     override fun canAccess(data: SecurityData): Boolean {
         return when(data){
@@ -19,7 +22,9 @@ open class DeleterAccessService(private val securityRepository: SecurityReposito
 
                 val isPost = !data.postId.isNullOrBlank()
 
-                val currentRules = getCurrentRules(boardName = data.boardName , user = data.user)
+                val user = loadUserByAccountNameAndBoard(data.boardName, data.user)
+
+                val currentRules = getCurrentRules(boardName = data.boardName , user = user)
 
                 if (currentRules[0] != 'r')
                     return false //если нету прав на чтение, то ничего не получится сделать

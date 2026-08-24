@@ -1,11 +1,13 @@
 package io.rekri.jablog.service.security
 
 import io.rekri.jablog.repository.SecurityRepository
+import io.rekri.jablog.service.CustomUserDetailsService
 import io.rekri.jablog.service.SecurityData
 import org.springframework.stereotype.Service
 
 @Service
-class GetterAccessService(private val securityRepository: SecurityRepository) : XAccessService(securityRepository) {
+class GetterAccessService(private val securityRepository: SecurityRepository,
+    customUserDetailsService: CustomUserDetailsService) : XAccessService(securityRepository, customUserDetailsService) {
 
     override fun canAccess(data: SecurityData): Boolean {
         return when(data){
@@ -19,7 +21,9 @@ class GetterAccessService(private val securityRepository: SecurityRepository) : 
 
                 val isThread = !data.threadId.isNullOrBlank()
 
-                val currentRules = getCurrentRules(boardName = data.boardName , user = data.user)
+                val user = loadUserByAccountNameAndBoard(data.boardName, data.user)
+
+                val currentRules = getCurrentRules(boardName = data.boardName , user = user)
 
                 if (currentRules[0] != 'r')
                     return false //если нету прав на чтение, то ничего не получится сделать

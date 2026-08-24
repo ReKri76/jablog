@@ -1,7 +1,5 @@
 package io.rekri.jablog.config.security.authorizations
 
-import io.rekri.jablog.config.security.CustomUserDetails
-import io.rekri.jablog.service.CustomUserDetailsService
 import io.rekri.jablog.service.SecurityData
 import io.rekri.jablog.service.security.GetterAccessService
 import org.springframework.security.authorization.AuthorizationDecision
@@ -13,21 +11,19 @@ import org.springframework.stereotype.Component
 import java.util.function.Supplier
 
 @Component
-class GetterAuthorizationManager(private val getterAccessService: GetterAccessService,
-                                 private val customUserDetailsService: CustomUserDetailsService) :
+class GetterAuthorizationManager(private val getterAccessService: GetterAccessService) :
     AuthorizationManager<RequestAuthorizationContext> {
 
     override fun authorize(
         auth: Supplier<out Authentication?>,
         context: RequestAuthorizationContext
     ): AuthorizationResult {
-        val session = context.request.getSession(false)
+
 
         val boardName = context.variables["boardName"] as String
         val threadId : String? = context.variables["thread"]
-        val sessionAttr = session?.getAttribute(boardName)
 
-        val user = (sessionAttr ?: customUserDetailsService.createDefault()) as CustomUserDetails
+        val user = auth.get().principal as String?
 
         val canAccess = getterAccessService.canAccess(
             data = SecurityData.Getter(

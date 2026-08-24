@@ -13,6 +13,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
@@ -33,6 +35,15 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
 
         return customUserDetails;
+    }
+
+    @NotNull
+    public CustomUserDetails loadUserByAccountNameAndBoard(@NotNull String accountName, @NotNull String boardName){
+        Optional<Users> user = userDetailsRepository.getUserByAccountAndBoard(accountName, boardName);
+
+        CustomUserDetails res = user.map(this::build).orElseGet(this::createDefault);
+
+        return res;
     }
 
     @NotNull
