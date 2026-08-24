@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
@@ -39,17 +40,12 @@ class JwtFilter(
 
             val username = claims.subject
 
-            val authentication = UsernamePasswordAuthenticationToken("accountName", username)
-            authentication.isAuthenticated = true
+            val authentication = UsernamePasswordAuthenticationToken(username, null, emptyList())
             authentication.details = WebAuthenticationDetailsSource().buildDetails(request)
 
             SecurityContextHolder.getContext().authentication = authentication
         } catch (e: JwtException) {
-            SecurityContextHolder.clearContext()
-            response.status = HttpServletResponse.SC_UNAUTHORIZED
-            response.contentType = "application/json"
-            response.writer.write("{\"error\": \"" + e.message + "\"}")
-            return
+            throw BadCredentialsException(e.message)
         }
 
         filterChain.doFilter(request, response)

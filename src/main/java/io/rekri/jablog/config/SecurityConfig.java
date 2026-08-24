@@ -4,6 +4,7 @@ import io.rekri.jablog.config.security.authorizations.DeleterAuthorizationManage
 import io.rekri.jablog.config.security.authorizations.GetterAuthorizationManager;
 import io.rekri.jablog.config.security.authorizations.PosterAuthorizationManager;
 import io.rekri.jablog.config.security.authorizations.UsersAuthorizationManager;
+import io.rekri.jablog.config.security.filters.ErrorsFilter;
 import io.rekri.jablog.config.security.filters.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
@@ -17,7 +18,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,19 +47,17 @@ public class SecurityConfig {
     public static final long REFRESH_EXPIRED_TIME = Duration.ofDays(7).toMillis();
 
     @Bean
-    public SecurityFilterChain securityFilterChain(@NonNull HttpSecurity http, JwtFilter jwtFilter) {
+    public SecurityFilterChain securityFilterChain(@NonNull HttpSecurity http, JwtFilter jwtFilter, ErrorsFilter errorsFilter) {
 
         http
                 .cors(Customizer.withDefaults())
                 .headers(headers -> headers
-                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
 
                         .contentSecurityPolicy(csp -> csp
                                 .policyDirectives("""
                                         default-src 'none';
-                                        script-src 'self' 'unsafe-inline';
-                                        object-src 'none';
-                                        style-src 'self' 'unsafe-inline';
+                                        script-src 'self';
+                                        style-src 'self';
                                         connect-src 'self';
                                         font-src 'self';
                                         frame-ancestors 'none';
@@ -87,6 +85,8 @@ public class SecurityConfig {
                 )
 
                 .anonymous(AbstractHttpConfigurer::disable)
+
+                .addFilterBefore(errorsFilter, JwtFilter.class)
 
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 
