@@ -1,6 +1,5 @@
 package io.rekri.jablog.config.security.filters
 
-import io.jsonwebtoken.Claims
 import io.jsonwebtoken.JwtException
 import io.rekri.jablog.service.JWTService
 import jakarta.servlet.FilterChain
@@ -9,17 +8,16 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
+import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import java.io.IOException
 
-
-class JwtFilter : OncePerRequestFilter() {
-
-    @Autowired
-    lateinit var jwtService : JWTService
+@Component
+class JwtFilter(
+    private val jwtService: JWTService
+) : OncePerRequestFilter() {
 
     @Throws(ServletException::class, IOException::class)
     override fun doFilterInternal(
