@@ -25,4 +25,4 @@ USER main
 
 EXPOSE 8080
 
-CMD ["java", "-jar", "app.war"]
+CMD ["java", "-jar", "app.jar"]
