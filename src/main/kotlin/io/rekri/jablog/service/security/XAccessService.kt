@@ -33,11 +33,9 @@ abstract class XAccessService(private val securityRepository: SecurityRepository
     }
 
     protected fun loadUserByAccountNameAndBoard(boardName : String, user : String?) : CustomUserDetails {
-        var res : CustomUserDetails = customUserDetailsService.createDefault()
-
-        if (user != null)
-            res = customUserDetailsService.loadUserByAccountNameAndBoard(user, boardName)
-
-        return res
+        return if (user != null)
+            customUserDetailsService.loadUserByAccountNameAndBoard(user, boardName)
+        else
+            customUserDetailsService.createDefault()
     }
 }

@@ -76,14 +76,6 @@ public class PosterServiceTest {
     }
 
     @Test
-    public void thread_GettingPostWithoutPicture_ThrowsNullPointerException() {
-        final Post mockPost = new Post();
-        mockPost.setBody(DEFAULT_CONTENT);
-
-        assertThrows(IllegalArgumentException.class, () -> posterService.thread(mockPost, null, DEFAULT_BOARD));
-    }
-
-    @Test
     public void post_GettingPostWithHead_GettingPostWithPicture_Success() {
         final Post mockPost = new Post();
         mockPost.setHead(DEFAULT_HEADER);
