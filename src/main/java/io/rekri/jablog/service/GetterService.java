@@ -1,7 +1,6 @@
 package io.rekri.jablog.service;
 
 import io.rekri.jablog.DTO.PostWithPicture;
-import io.rekri.jablog.config.security.CustomUserDetails;
 import io.rekri.jablog.entity.Board;
 import io.rekri.jablog.entity.Posts;
 import io.rekri.jablog.entity.Threads;
@@ -11,7 +10,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
@@ -100,15 +98,6 @@ public class GetterService {
         });
 
         return posts;
-    }
-
-    @Transactional
-    public boolean canDelete(@NotNull String boardName, @Nullable CustomUserDetails customUserDetails, @Nullable String id){
-
-        if (customUserDetails == null)
-            customUserDetails = customUserDetailsService.createDefault();
-
-        return deleterAccessService.canAccess(new SecurityData.Deleter(boardName, customUserDetails, id));
     }
 
     @NotNull

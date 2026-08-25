@@ -3,10 +3,7 @@ package io.rekri.jablog.controllers;
 import io.rekri.jablog.service.DeleterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Эндпоинты с правами доступа к удалению
@@ -32,6 +29,18 @@ public class DeleterController {
 
         deleterService.post(postId);
 
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value = "/{boardName}/{threadId}")
+    public ResponseEntity<Void> canDeleteThreads(@PathVariable(value = "boardName") String boardName,
+                                       @PathVariable("threadId") long threadId){
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value = "/{boardName}/{threadId}/{postId}")
+    public ResponseEntity<Void> canDeletePosts(@PathVariable("boardName") String boardName, @PathVariable("postId") long postId,
+                                     @PathVariable("threadId") long threadId){
         return ResponseEntity.ok().build();
     }
 }

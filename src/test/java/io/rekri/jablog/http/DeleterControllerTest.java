@@ -15,6 +15,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,5 +55,23 @@ public class DeleterControllerTest {
                 .andExpect(status().isOk());
 
         verify(deleterService).post(anyLong());
+    }
+
+    @Test
+    public void canDeleteThreads_Success() throws Exception {
+        String boardName = "placeholder";
+        String threadId = "0";
+
+        mockMvc.perform(get("/api/deleter/"+boardName+"/"+threadId+"/0"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void canDeletePosts_Success() throws Exception {
+        String boardName = "placeholder";
+        String threadId = "0";
+
+        mockMvc.perform(get("/api/deleter/"+boardName+"/"+threadId))
+                .andExpect(status().isOk());
     }
 }

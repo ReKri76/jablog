@@ -3,9 +3,7 @@ package io.rekri.jablog.controllers;
 import io.rekri.jablog.DTO.Board;
 import io.rekri.jablog.DTO.PostWithPicture;
 import io.rekri.jablog.DTO.SimpleResponse;
-import io.rekri.jablog.config.security.CustomUserDetails;
 import io.rekri.jablog.service.GetterService;
-import jakarta.servlet.http.HttpSession;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -29,17 +27,15 @@ public class GetterController {
     public static class ThreadResponse extends SimpleResponse{
         private PostWithPicture thread;
         private List<PostWithPicture> posts;
-        private boolean canDelete;
         private String boardName;
     }
 
     @GetMapping("/{boardName:[^.\\/]+}/{threadId:\\d+}")
-    public ResponseEntity<ThreadResponse> thread(@PathVariable long threadId, @PathVariable String boardName, HttpSession session){
+    public ResponseEntity<ThreadResponse> thread(@PathVariable long threadId, @PathVariable String boardName){
 
         final ThreadResponse res = new ThreadResponse();
 
         final List<PostWithPicture> posts = getterService.thread(threadId);
-        final CustomUserDetails customUserDetails = (CustomUserDetails) session.getAttribute(boardName);
 
         final PostWithPicture thread =  posts.getFirst();
 
@@ -47,7 +43,6 @@ public class GetterController {
         posts.removeFirst();
         res.setPosts(posts);
         res.setBoardName(boardName);
-        res.setCanDelete(getterService.canDelete(boardName, customUserDetails, Long.toString(thread.getId())));
 
         res.setStatus(200);
         res.setMessage("ok");
@@ -62,21 +57,17 @@ public class GetterController {
     public static class BoardResponse extends SimpleResponse{
         private List<PostWithPicture> threads;
         private String boardName;
-        private boolean canDelete;
     }
 
     @GetMapping("/{boardName:[^.\\/]+}")
-    public ResponseEntity<BoardResponse> board(@PathVariable String boardName, @RequestParam(defaultValue = "0") int page,
-                        HttpSession session){
+    public ResponseEntity<BoardResponse> board(@PathVariable String boardName, @RequestParam(defaultValue = "0") int page){
 
         final BoardResponse res = new BoardResponse();
 
         final List<PostWithPicture> threads = getterService.board(boardName, page);
-        final CustomUserDetails customUserDetails = (CustomUserDetails) session.getAttribute(boardName);
 
         res.setThreads(threads);
         res.setBoardName(boardName);
-        res.setCanDelete(getterService.canDelete(boardName, customUserDetails, null));
 
         res.setMessage("ok");
         res.setStatus(200);

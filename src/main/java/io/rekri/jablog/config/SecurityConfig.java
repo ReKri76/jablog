@@ -106,6 +106,10 @@ public class SecurityConfig {
                             .access(deleterAuthorizationManager)
                         .requestMatchers(HttpMethod.DELETE, "/api/deleter/{boardName}/{thread}/{post}")
                             .access(deleterAuthorizationManager)
+                        .requestMatchers(HttpMethod.GET, "/api/deleter/{boardName}/{thread}")
+                            .access(deleterAuthorizationManager)
+                        .requestMatchers(HttpMethod.GET, "/api/deleter/{boardName}/{thread}/{post}")
+                            .access(deleterAuthorizationManager)
 
                         .requestMatchers(HttpMethod.DELETE, "/api/users/panel/{boardName}/{nickname}")
                             .access(usersAuthorizationManager)
