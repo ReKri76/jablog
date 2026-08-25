@@ -17,4 +17,15 @@ public interface BoardRepo extends JpaRepository<Board,Long> {
     String getRulesByBoardName(@Param("boardName") String boardName);
 
     Board getReferenceByName(String boardName);
+
+    @Query("""
+        select b.name
+        from Board b
+        where exists (
+                select 1 from Records r where(
+                        r.user.board = b and r.account.username = :accountName and r.user.role
+                        )
+        )
+        """)
+    List<String> getBoardsWhereThisAccountIsAdmin(@Param("accountName") String accountName);
 }

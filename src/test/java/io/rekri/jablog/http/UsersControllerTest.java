@@ -2,13 +2,9 @@ package io.rekri.jablog.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.rekri.jablog.DTO.Login;
-import io.rekri.jablog.config.security.CustomUserDetails;
-import io.rekri.jablog.config.security.Roles;
 import io.rekri.jablog.controllers.UsersController;
-import io.rekri.jablog.repository.UserDetailsRepository;
-import io.rekri.jablog.service.CustomUserDetailsService;
 import io.rekri.jablog.service.UsersService;
-import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,11 +13,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
@@ -44,15 +43,17 @@ public class UsersControllerTest {
     private MockMvc mockMvc;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private final UserDetailsRepository userDetailsRepository = mock(UserDetailsRepository.class);
-    private final CustomUserDetailsService customUserDetails = new CustomUserDetailsService(userDetailsRepository);
-
     private static final String DEFAULT_NICKNAME = "nickname";
     private static final String DEFAULT_PASSWORD = "password";
 
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(usersController).build();
+    }
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -111,27 +112,21 @@ public class UsersControllerTest {
 
     @Test
     public void panel_Test() throws Exception {
-        MockHttpSession session = new MockHttpSession();
-        CustomUserDetails adminUser = createMockUser(Roles.ROLE_ADMIN);
-        CustomUserDetails regularUser = createMockUser(Roles.ROLE_GROUP);
-        session.setAttribute("dev", adminUser);
-        session.setAttribute("qa", adminUser);
-        session.setAttribute("nul", null);
-        session.setAttribute("longName", adminUser);
-        session.setAttribute("usr", regularUser);
+        final String accountName = "admin";
+        final List<String> boardNames = List.of("dev", "qa");
 
-        mockMvc.perform(get("/api/users/panel").session(session))
+        Authentication authentication = new UsernamePasswordAuthenticationToken(accountName, null);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        when(usersService.getBoardsWhereThisAccountIsAdmin(accountName)).thenReturn(boardNames);
+
+        mockMvc.perform(get("/api/users/panel"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.message").value("ok"))
                 .andExpect(jsonPath("$.boardNames", hasSize(2)))
                 .andExpect(jsonPath("$.boardNames", containsInAnyOrder("dev", "qa")));
-    }
 
-    @NotNull
-    private CustomUserDetails createMockUser(@NotNull Roles role) {
-        CustomUserDetails user = customUserDetails.createDefault();
-        user.setRole(role);
-        return user;
+        verify(usersService).getBoardsWhereThisAccountIsAdmin(accountName);
     }
 }

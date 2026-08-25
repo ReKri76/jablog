@@ -2,8 +2,6 @@ package io.rekri.jablog.controllers;
 
 import io.rekri.jablog.DTO.Login;
 import io.rekri.jablog.DTO.SimpleResponse;
-import io.rekri.jablog.config.security.CustomUserDetails;
-import io.rekri.jablog.config.security.Roles;
 import io.rekri.jablog.service.UsersService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -11,12 +9,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -71,23 +68,11 @@ public class UsersController {
     }
 
     @GetMapping(value = "/panel") //на этой странице есть поле для логина и для управления в залогиненных досках как админ
-    public ResponseEntity<PanelResponse> panel(Model model, HttpSession session){
+    public ResponseEntity<PanelResponse> panel(HttpSession session){
 
-        final Enumeration<String> boards = session.getAttributeNames();
-        final List<String> boardNames = new ArrayList<String>();
+        String accountName = (String) Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
 
-        while (boards.hasMoreElements()){
-            final String boardName = boards.nextElement();
-            if(boardName.length()>3)
-                continue;
-
-            final CustomUserDetails user = (CustomUserDetails) session.getAttribute(boardName);
-            if (user == null)
-                continue;
-
-            if (user.getRole().equals(Roles.ROLE_ADMIN))
-                boardNames.add(boardName);
-        }
+        final List<String> boardNames = usersService.getBoardsWhereThisAccountIsAdmin(accountName);
 
         final PanelResponse res = new PanelResponse();
         res.setBoardNames(boardNames);
