@@ -21,23 +21,29 @@ import org.junit.jupiter.params.provider.CsvSource
 class GetterAccessServiceTest {
 
     private val securityRepository = mockk<SecurityRepository>()
+    private val mockCustomUserDetailsService = mockk<CustomUserDetailsService>()
 
-    private val getterAccessService = spyk(GetterAccessService(securityRepository))
+    private val getterAccessService = spyk(GetterAccessService(securityRepository, mockCustomUserDetailsService))
 
     private val customUserDetailsService = CustomUserDetailsService(mockk<UserDetailsRepository>())
 
     companion object {
         private const val DEFAULT_BOARD_NAME = "default_board_name"
         private const val DEFAULT_THREAD_ID = "0"
+        private const val DEFAULT_USER = "default_nickname"
     }
 
     @Test
     fun `canAccess happy path`() {
         val mockUser = createUserDetails(null)
+        every {
+            mockCustomUserDetailsService
+                .loadUserByAccountNameAndBoard(DEFAULT_USER, DEFAULT_BOARD_NAME)
+        } returns mockUser
 
         val getterData = SecurityData.Getter(
             boardName = DEFAULT_BOARD_NAME,
-            user = mockUser,
+            user = DEFAULT_USER,
             threadId = null,
         )
 
@@ -51,7 +57,7 @@ class GetterAccessServiceTest {
     fun `canAccess should return false when data is not Getter`() {
         val otherData = SecurityData.Users(
             boardName = DEFAULT_BOARD_NAME,
-            user = customUserDetailsService.createDefault()
+            user = DEFAULT_USER
         )
 
         val result = getterAccessService.canAccess(otherData)
@@ -64,10 +70,12 @@ class GetterAccessServiceTest {
     fun `canAccess should return false when thread is not in board`() {
         val data = SecurityData.Getter(
             boardName = DEFAULT_BOARD_NAME,
-            user = customUserDetailsService.createDefault(),
+            user = null,
             threadId = DEFAULT_THREAD_ID,
         )
-        every { securityRepository.isThreadInBoard(DEFAULT_BOARD_NAME, DEFAULT_THREAD_ID.toLong()) } returns false
+        every {
+            securityRepository.isThreadInBoard(DEFAULT_BOARD_NAME, DEFAULT_THREAD_ID.toLong())
+        } returns false
 
         val result = getterAccessService.canAccess(data)
 
@@ -87,9 +95,16 @@ class GetterAccessServiceTest {
         expectedResult: Boolean
     ) {
         val mockUser = createUserDetails("rwdx"+rules+"rwdx")
-        val data = SecurityData.Getter(DEFAULT_BOARD_NAME, mockUser, DEFAULT_THREAD_ID)
+        every {
+            mockCustomUserDetailsService
+                .loadUserByAccountNameAndBoard(DEFAULT_USER, DEFAULT_BOARD_NAME)
+        } returns mockUser
 
-        every { securityRepository.isThreadInBoard(DEFAULT_BOARD_NAME, DEFAULT_THREAD_ID.toLong()) } returns true
+        val data = SecurityData.Getter(DEFAULT_BOARD_NAME, DEFAULT_USER, DEFAULT_THREAD_ID)
+
+        every {
+            securityRepository.isThreadInBoard(DEFAULT_BOARD_NAME, DEFAULT_THREAD_ID.toLong())
+        } returns true
 
         val result = getterAccessService.canAccess(data)
 
@@ -106,7 +121,12 @@ class GetterAccessServiceTest {
         expectedResult: Boolean
     ) {
         val mockUser = createUserDetails("rwdx"+rules+"rwdx")
-        val data = SecurityData.Getter(DEFAULT_BOARD_NAME, mockUser, null)
+        every {
+            mockCustomUserDetailsService
+                .loadUserByAccountNameAndBoard(DEFAULT_USER, DEFAULT_BOARD_NAME)
+        } returns mockUser
+
+        val data = SecurityData.Getter(DEFAULT_BOARD_NAME, DEFAULT_USER, null)
 
         val result = getterAccessService.canAccess(data)
 
@@ -120,7 +140,7 @@ class GetterAccessServiceTest {
         }
         val mockUsers = Users().apply {
             isRole = false
-            nickname = "default_nickname"
+            nickname = DEFAULT_USER
             password = "default_password"
             board = mockBoard
         }

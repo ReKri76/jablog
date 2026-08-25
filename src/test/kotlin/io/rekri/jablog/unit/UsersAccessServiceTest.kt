@@ -8,6 +8,7 @@ import io.rekri.jablog.repository.UserDetailsRepository
 import io.rekri.jablog.service.CustomUserDetailsService
 import io.rekri.jablog.service.SecurityData
 import io.rekri.jablog.service.security.UsersAccessService
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import org.junit.jupiter.api.Assertions.*
@@ -15,12 +16,15 @@ import org.junit.jupiter.api.Test
 
 class UsersAccessServiceTest {
 
-    private val usersAccessService = spyk(UsersAccessService())
+    private val mockCustomUserDetailsService = mockk<CustomUserDetailsService>()
+
+    private val usersAccessService = spyk(UsersAccessService(mockCustomUserDetailsService))
 
     private val customUserDetailsService = CustomUserDetailsService(mockk<UserDetailsRepository>())
 
     companion object {
         private const val DEFAULT_BOARD_NAME = "default_board_name"
+        private const val DEFAULT_USER = "default_nickname"
     }
 
     @Test
@@ -28,10 +32,13 @@ class UsersAccessServiceTest {
         val mockUser = createUserDetails().apply {
             role = Roles.ROLE_ADMIN
         }
+        every {
+            mockCustomUserDetailsService.loadUserByAccountNameAndBoard(DEFAULT_USER, DEFAULT_BOARD_NAME)
+        } returns mockUser
 
         val usersData = SecurityData.Users(
             boardName = DEFAULT_BOARD_NAME,
-            user = mockUser
+            user = DEFAULT_USER
         )
 
         val result = usersAccessService.canAccess(usersData)
@@ -43,7 +50,7 @@ class UsersAccessServiceTest {
     fun `canAccess should return false when data is not Users`() {
         val otherData = SecurityData.Poster(
             boardName = DEFAULT_BOARD_NAME,
-            user = customUserDetailsService.createDefault(),
+            user = DEFAULT_USER,
             threadId = null
         )
 
@@ -57,9 +64,14 @@ class UsersAccessServiceTest {
         val mockUser = createUserDetails().apply {
             role = Roles.ROLE_ADMIN
         }
+        val differentBoardName = "different_board_name"
+        every {
+            mockCustomUserDetailsService.loadUserByAccountNameAndBoard(DEFAULT_USER, differentBoardName)
+        } returns mockUser
+
         val data = SecurityData.Users(
-            boardName = "different_board_name",
-            user = mockUser
+            boardName = differentBoardName,
+            user = DEFAULT_USER
         )
 
         val result = usersAccessService.canAccess(data)
@@ -72,9 +84,13 @@ class UsersAccessServiceTest {
         val mockUser = createUserDetails().apply {
             role = Roles.ROLE_ANON
         }
+        every {
+            mockCustomUserDetailsService.loadUserByAccountNameAndBoard(DEFAULT_USER, DEFAULT_BOARD_NAME)
+        } returns mockUser
+
         val data = SecurityData.Users(
             boardName = DEFAULT_BOARD_NAME,
-            user = mockUser
+            user = DEFAULT_USER
         )
 
         val result = usersAccessService.canAccess(data)
@@ -89,7 +105,7 @@ class UsersAccessServiceTest {
         }
         val mockUsers = Users().apply {
             isRole = false
-            nickname = "default_nickname"
+            nickname = DEFAULT_USER
             password = "default_password"
             board = mockBoard
         }

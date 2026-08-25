@@ -21,23 +21,29 @@ import org.junit.jupiter.params.provider.CsvSource
 class PosterAccessServiceTest {
 
     private val securityRepository = mockk<SecurityRepository>()
+    private val mockCustomUserDetailsService = mockk<CustomUserDetailsService>()
 
-    private val posterAccessService = spyk(PosterAccessService(securityRepository))
+    private val posterAccessService = spyk(PosterAccessService(securityRepository, mockCustomUserDetailsService))
 
     private val customUserDetailsService = CustomUserDetailsService(mockk<UserDetailsRepository>())
 
     companion object {
         private const val DEFAULT_BOARD_NAME = "default_board_name"
         private const val DEFAULT_THREAD_ID = "0"
+        private const val DEFAULT_USER = "default_nickname"
     }
 
     @Test
     fun `canAccess happy path`() {
         val mockUser = createUserDetails(null)
+        every {
+            mockCustomUserDetailsService
+                .loadUserByAccountNameAndBoard(DEFAULT_USER, DEFAULT_BOARD_NAME)
+        } returns mockUser
 
         val posterData = SecurityData.Poster(
             boardName = DEFAULT_BOARD_NAME,
-            user = mockUser,
+            user = DEFAULT_USER,
             threadId = null,
         )
 
@@ -51,7 +57,7 @@ class PosterAccessServiceTest {
     fun `canAccess should return false when data is not Poster`() {
         val otherData = SecurityData.Users(
             boardName = DEFAULT_BOARD_NAME,
-            user = customUserDetailsService.createDefault()
+            user = DEFAULT_USER
         )
 
         val result = posterAccessService.canAccess(otherData)
@@ -64,10 +70,12 @@ class PosterAccessServiceTest {
     fun `canAccess should return false when thread is not in board`() {
         val data = SecurityData.Poster(
             boardName = DEFAULT_BOARD_NAME,
-            user = customUserDetailsService.createDefault(),
+            user = null,
             threadId = DEFAULT_THREAD_ID,
-            )
-        every { securityRepository.isThreadInBoard(DEFAULT_BOARD_NAME, DEFAULT_THREAD_ID.toLong()) } returns false
+        )
+        every {
+            securityRepository.isThreadInBoard(DEFAULT_BOARD_NAME, DEFAULT_THREAD_ID.toLong())
+        } returns false
 
         val result = posterAccessService.canAccess(data)
 
@@ -87,9 +95,16 @@ class PosterAccessServiceTest {
         expectedResult: Boolean
     ) {
         val mockUser = createUserDetails("rwdx"+rules+"rwdx")
-        val data = SecurityData.Poster(DEFAULT_BOARD_NAME, mockUser, DEFAULT_THREAD_ID)
+        every {
+            mockCustomUserDetailsService
+                .loadUserByAccountNameAndBoard(DEFAULT_USER, DEFAULT_BOARD_NAME)
+        } returns mockUser
 
-        every { securityRepository.isThreadInBoard(DEFAULT_BOARD_NAME, DEFAULT_THREAD_ID.toLong()) } returns true
+        val data = SecurityData.Poster(DEFAULT_BOARD_NAME, DEFAULT_USER, DEFAULT_THREAD_ID)
+
+        every {
+            securityRepository.isThreadInBoard(DEFAULT_BOARD_NAME, DEFAULT_THREAD_ID.toLong())
+        } returns true
 
         val result = posterAccessService.canAccess(data)
 
@@ -108,8 +123,12 @@ class PosterAccessServiceTest {
         expectedResult: Boolean
     ) {
         val mockUser = createUserDetails("rwdx"+rules+"rwdx")
-        val data = SecurityData.Poster(DEFAULT_BOARD_NAME, mockUser, null)
+        every {
+            mockCustomUserDetailsService
+                .loadUserByAccountNameAndBoard(DEFAULT_USER, DEFAULT_BOARD_NAME)
+        } returns mockUser
 
+        val data = SecurityData.Poster(DEFAULT_BOARD_NAME, DEFAULT_USER, null)
 
         val result = posterAccessService.canAccess(data)
 
@@ -123,7 +142,7 @@ class PosterAccessServiceTest {
         }
         val mockUsers = Users().apply {
             isRole = false
-            nickname = "default_nickname"
+            nickname = DEFAULT_USER
             password = "default_password"
             board = mockBoard
         }

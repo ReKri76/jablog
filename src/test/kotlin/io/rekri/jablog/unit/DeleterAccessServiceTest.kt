@@ -21,23 +21,29 @@ import org.junit.jupiter.params.provider.CsvSource
 class DeleterAccessServiceTest {
 
     private val securityRepository = mockk<SecurityRepository>()
+    private val mockCustomUserDetailsService = mockk<CustomUserDetailsService>()
 
-    private val deleterAccessService = spyk(DeleterAccessService(securityRepository))
+    private val deleterAccessService = spyk(DeleterAccessService(securityRepository, mockCustomUserDetailsService))
 
     private val customUserDetailsService = CustomUserDetailsService(mockk<UserDetailsRepository>())
 
     companion object {
         private const val DEFAULT_BOARD_NAME = "default_board_name"
         private const val DEFAULT_POST_ID = "0"
+        private const val DEFAULT_USER = "default_nickname"
     }
 
     @Test
     fun `canAccess happy path`() {
         val mockUser = createUserDetails(null)
+        every {
+            mockCustomUserDetailsService
+                .loadUserByAccountNameAndBoard(DEFAULT_USER, DEFAULT_BOARD_NAME)
+        } returns mockUser
 
         val deleterData = SecurityData.Deleter(
             boardName = DEFAULT_BOARD_NAME,
-            user = mockUser,
+            user = DEFAULT_USER,
             postId = null,
         )
 
@@ -51,7 +57,7 @@ class DeleterAccessServiceTest {
     fun `canAccess should return false when data is not Deleter`() {
         val otherData = SecurityData.Users(
             boardName = DEFAULT_BOARD_NAME,
-            user = customUserDetailsService.createDefault()
+            user = DEFAULT_USER
         )
 
         val result = deleterAccessService.canAccess(otherData)
@@ -64,10 +70,12 @@ class DeleterAccessServiceTest {
     fun `canAccess should return false when post is not in board`() {
         val data = SecurityData.Deleter(
             boardName = DEFAULT_BOARD_NAME,
-            user = customUserDetailsService.createDefault(),
+            user = null,
             postId = DEFAULT_POST_ID,
         )
-        every { securityRepository.isPostInBoard(DEFAULT_BOARD_NAME, DEFAULT_POST_ID.toLong()) } returns false
+        every {
+            securityRepository.isPostInBoard(DEFAULT_BOARD_NAME, DEFAULT_POST_ID.toLong())
+        } returns false
 
         val result = deleterAccessService.canAccess(data)
 
@@ -87,7 +95,12 @@ class DeleterAccessServiceTest {
         expectedResult: Boolean
     ) {
         val mockUser = createUserDetails("rwdx"+rules+"rwdx")
-        val data = SecurityData.Deleter(DEFAULT_BOARD_NAME, mockUser, DEFAULT_POST_ID)
+        every {
+            mockCustomUserDetailsService
+                .loadUserByAccountNameAndBoard(DEFAULT_USER, DEFAULT_BOARD_NAME)
+        } returns mockUser
+
+        val data = SecurityData.Deleter(DEFAULT_BOARD_NAME, DEFAULT_USER, DEFAULT_POST_ID)
 
         every { securityRepository.isPostInBoard(DEFAULT_BOARD_NAME, DEFAULT_POST_ID.toLong()) } returns true
 
@@ -108,7 +121,12 @@ class DeleterAccessServiceTest {
         expectedResult: Boolean
     ) {
         val mockUser = createUserDetails("rwdx"+rules+"rwdx")
-        val data = SecurityData.Deleter(DEFAULT_BOARD_NAME, mockUser, null)
+        every {
+            mockCustomUserDetailsService
+                .loadUserByAccountNameAndBoard(DEFAULT_USER, DEFAULT_BOARD_NAME)
+        } returns mockUser
+
+        val data = SecurityData.Deleter(DEFAULT_BOARD_NAME, DEFAULT_USER, null)
 
         val result = deleterAccessService.canAccess(data)
 
@@ -122,7 +140,7 @@ class DeleterAccessServiceTest {
         }
         val mockUsers = Users().apply {
             isRole = false
-            nickname = "default_nickname"
+            nickname = DEFAULT_USER
             password = "default_password"
             board = mockBoard
         }

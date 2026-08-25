@@ -1,6 +1,5 @@
 package io.rekri.jablog.service.security
 
-import io.rekri.jablog.config.security.CustomUserDetails
 import io.rekri.jablog.repository.SecurityRepository
 import io.rekri.jablog.service.CustomUserDetailsService
 import io.rekri.jablog.service.SecurityData
