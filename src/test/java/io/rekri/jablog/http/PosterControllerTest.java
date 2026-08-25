@@ -1,29 +1,33 @@
 package io.rekri.jablog.http;
 
+import io.rekri.jablog.DTO.BoardToCreate;
 import io.rekri.jablog.DTO.Picture;
 import io.rekri.jablog.DTO.Post;
 import io.rekri.jablog.controllers.PosterController;
-import io.rekri.jablog.service.CustomUserDetailsService;
 import io.rekri.jablog.service.PosterService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -34,9 +38,6 @@ class PosterControllerTest {
 
     @Mock
     private PosterService posterService;
-
-    @Mock
-    private CustomUserDetailsService customUserDetailsService;
 
     @InjectMocks
     private PosterController posterController;
@@ -50,6 +51,12 @@ class PosterControllerTest {
 
     private final String DEFAULT_BODY = "default_body";
     private final String DEFAULT_HEAD = "default_header";
+
+    @Captor
+    private ArgumentCaptor<BoardToCreate> boardToCreateArgumentCaptor;
+
+    @Captor
+    private ArgumentCaptor<String> stringArgumentCaptor;
 
     private MockMultipartFile postPart(String head, String body) {
         String content = String.format(
@@ -160,10 +167,22 @@ class PosterControllerTest {
 
     @Test
     void board_Success() throws Exception {
-        MockHttpSession session = new MockHttpSession();
-        UserDetails mockUser = new User("admin", "password", Collections.emptyList());
 
-        when(customUserDetailsService.loadUserByUsername("admin")).thenReturn(mockUser);
+        final String nickname = "placeholder";
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        Authentication auth = new UsernamePasswordAuthenticationToken(nickname, null, List.of());
+        context.setAuthentication(auth);
+        SecurityContextHolder.setContext(context);
+
+        BoardToCreate expectedBody = new BoardToCreate(
+                "tec",
+                "rwdxrwdxrwdx",
+                "secret123",
+                "admin",
+                10,
+                5,
+                "Technology"
+        );
 
         String board = """
                 {
@@ -177,16 +196,20 @@ class PosterControllerTest {
                 }
                 """;
 
-        mockMvc.perform(post("/api/poster/board")
-                        .session(session)
-                        .contentType("application/json")
-                        .content(board))
-                .andExpect(status().isCreated())
-                .andExpect(header().string("Location", "/tec"));
+        try {
+            mockMvc.perform(post("/api/poster/board")
+                            .with(authentication(auth))
+                            .contentType("application/json")
+                            .content(board))
+                    .andExpect(status().isCreated())
+                    .andExpect(header().string("Location", "/tec"));
 
-        verify(posterService).board(any());
-        verify(customUserDetailsService, times(1)).loadUserByUsername("admin");
+            verify(posterService).board(boardToCreateArgumentCaptor.capture(), stringArgumentCaptor.capture());
 
-        assertEquals(mockUser, session.getAttribute("tec"));
+            assertEquals(expectedBody, boardToCreateArgumentCaptor.getValue());
+            assertEquals(nickname, stringArgumentCaptor.getValue());
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
     }
 }

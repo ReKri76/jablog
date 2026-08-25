@@ -4,21 +4,18 @@ import io.rekri.jablog.DTO.BoardToCreate;
 import io.rekri.jablog.DTO.Picture;
 import io.rekri.jablog.DTO.Post;
 import io.rekri.jablog.entity.Board;
-import io.rekri.jablog.entity.Posts;
-import io.rekri.jablog.entity.Threads;
-import io.rekri.jablog.entity.Users;
 import io.rekri.jablog.errors.InvalidRulesException;
 import io.rekri.jablog.repository.PosterRepository;
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -26,33 +23,23 @@ import org.springframework.stereotype.Service;
 public class PosterService {
 
     private final PosterRepository posterRepository;
-    private final EntityManager entityManager;
     private final MinioService minioService;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public long thread(@NotNull @Valid Post post, @NotNull Picture file, @NotNull String board){
 
-        if (file == null)
-            throw new IllegalArgumentException();
-
         if (post.getHead() == null || post.getHead().isEmpty())
             post.setHead(post.getBody().substring(0,Math.min(120, post.getBody().length())));
 
-        final Board boardRef = entityManager.unwrap(Session.class)
-                .bySimpleNaturalId(Board.class)
-                .getReference(board);
-
         final String name = file.getName();
 
-        final Threads threads = new Threads();
-        threads.setContent(post.getBody());
-        threads.setHeader(post.getHead());
-        threads.setCarma(0);
-        threads.setPicture(name);
-        threads.setBoard(boardRef);
-
-        final long idOfThread = posterRepository.thread(threads);
+        final long idOfThread = posterRepository.thread(
+                post.getBody(),
+                post.getHead(),
+                name,
+                board
+        );
 
         minioService.savePicture(file, MinioService.BUCKET);
 
@@ -69,13 +56,12 @@ public class PosterService {
             savePic = true;
         }
 
-        final Posts posts = new Posts();
-        posts.setContent(post.getBody());
-        posts.setHeader(post.getHead());
-        posts.setThread(posterRepository.getThreadsById(threadId));
-        posts.setPicture(name);
-
-        posterRepository.post(posts);
+        posterRepository.post(
+                post.getBody(),
+                post.getHead(),
+                name,
+                threadId
+        );
 
         if (savePic)
             minioService.savePicture(file, MinioService.BUCKET);
@@ -85,16 +71,12 @@ public class PosterService {
      * @see {@link Board}
      * */
     @Transactional
-    public void board(BoardToCreate inputBoard){
+    public void board(@NotNull BoardToCreate inputBoard, @Nullable String accountName){
         log.info("Start creating board");
 
-        var lifeCyclePosts = inputBoard.getLifeCyclePosts();
-        var lifeCycleThreads = inputBoard.getLifeCycleThreads();
-        var rule = inputBoard.getRule();
-        var transcription = inputBoard.getTranscription();
-        var boardName = inputBoard.getBoardName();
-        var password = inputBoard.getPass();
-        var nickname = inputBoard.getNickname();
+        long lifeCyclePosts = inputBoard.getLifeCyclePosts();
+        long lifeCycleThreads = inputBoard.getLifeCycleThreads();
+        String rule = inputBoard.getRule();
 
         if (lifeCyclePosts>=lifeCycleThreads)
             throw new InvalidRulesException("life cycle of posts cant be longer then threads");
@@ -129,24 +111,11 @@ public class PosterService {
             }
         }
 
-        if (transcription == null || transcription.isEmpty())
-            transcription=boardName;
+        if (inputBoard.getTranscription() == null || inputBoard.getTranscription().isEmpty())
+            inputBoard.setTranscription(inputBoard.getBoardName());
 
-        final Board board = new Board();
-        board.setName(boardName);
-        board.setRules(rule);
-        board.setLifeCyclePosts(lifeCyclePosts);
-        board.setLifeCycleThreads(lifeCycleThreads);
-        board.setTranscription(transcription);
+        posterRepository.board(inputBoard, Objects.requireNonNull(passwordEncoder.encode(inputBoard.getPass())),  accountName);
 
-        final Users users = new Users();
-        users.setBoard(board);
-        users.setRole(true);
-        users.setPassword(passwordEncoder.encode(password));
-        users.setNickname(nickname);
-
-        posterRepository.board(board, users);
-
-        log.info("Board {} is created", boardName);
+        log.info("Board {} is created", inputBoard.getBoardName());
     }
 }

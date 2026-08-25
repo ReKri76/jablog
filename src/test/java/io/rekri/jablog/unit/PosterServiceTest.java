@@ -4,22 +4,14 @@ import io.rekri.jablog.DTO.BoardToCreate;
 import io.rekri.jablog.DTO.Picture;
 import io.rekri.jablog.DTO.Post;
 import io.rekri.jablog.entity.Board;
-import io.rekri.jablog.entity.Posts;
-import io.rekri.jablog.entity.Threads;
-import io.rekri.jablog.entity.Users;
 import io.rekri.jablog.errors.InvalidRulesException;
 import io.rekri.jablog.repository.PosterRepository;
 import io.rekri.jablog.service.MinioService;
 import io.rekri.jablog.service.PosterService;
-import jakarta.persistence.EntityManager;
-import org.hibernate.Session;
-import org.hibernate.SimpleNaturalIdLoadAccess;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -33,8 +25,6 @@ public class PosterServiceTest {
     @Mock
     private PosterRepository posterRepository;
     @Mock
-    private EntityManager entityManager;
-    @Mock
     private MinioService minioService;
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -46,15 +36,7 @@ public class PosterServiceTest {
     final private static String DEFAULT_CONTENT = "content_default";
     final private static String DEFAULT_PICTURE = "picture_default";
     final private static String DEFAULT_BOARD = "board_default";
-
-    @Captor
-    private final ArgumentCaptor<Threads> threadsCaptor = ArgumentCaptor.forClass(Threads.class);
-    @Captor
-    private final ArgumentCaptor<Posts> postsCaptor = ArgumentCaptor.forClass(Posts.class);
-    @Captor
-    private final ArgumentCaptor<Board> boardCaptor = ArgumentCaptor.forClass(Board.class);
-    @Captor
-    private final ArgumentCaptor<Users> usersCaptor = ArgumentCaptor.forClass(Users.class);
+    final private static String DEFAULT_ACCOUNT = "account_default";
 
     @Test
     public void thread_GettingPostWithHead_Success() {
@@ -62,30 +44,17 @@ public class PosterServiceTest {
         mockPost.setHead(DEFAULT_HEADER);
         mockPost.setBody(DEFAULT_CONTENT);
 
-        final Board mockBoard = new Board();
-        mockBoard.setName(DEFAULT_BOARD);
-        final Session mockSession = mock(Session.class);
-        final SimpleNaturalIdLoadAccess naturalIdLoadAccess = mock(SimpleNaturalIdLoadAccess.class);
-
-        when(entityManager.unwrap(Session.class)).thenReturn(mockSession);
-        when(mockSession.bySimpleNaturalId(Board.class)).thenReturn(naturalIdLoadAccess);
-        when(naturalIdLoadAccess.getReference(DEFAULT_BOARD)).thenReturn(mockBoard);
-
         final Picture mockPicture = new Picture();
         mockPicture.setName(DEFAULT_PICTURE);
+
+        when(posterRepository.thread(DEFAULT_CONTENT, DEFAULT_HEADER, DEFAULT_PICTURE, DEFAULT_BOARD)).thenReturn(1L);
         doNothing().when(minioService).savePicture(mockPicture, MinioService.BUCKET);
 
-        when(posterRepository.thread(any(Threads.class))).thenReturn(0L);
+        long result = posterService.thread(mockPost, mockPicture, DEFAULT_BOARD);
 
-        posterService.thread(mockPost, mockPicture, DEFAULT_BOARD);
-
+        assertEquals(1L, result);
+        verify(posterRepository).thread(DEFAULT_CONTENT, DEFAULT_HEADER, DEFAULT_PICTURE, DEFAULT_BOARD);
         verify(minioService).savePicture(mockPicture, MinioService.BUCKET);
-        verify(posterRepository).thread(threadsCaptor.capture());
-        final Threads threads = threadsCaptor.getValue();
-        assertEquals(DEFAULT_HEADER, threads.getHeader());
-        assertEquals(DEFAULT_CONTENT, threads.getContent());
-        assertEquals(DEFAULT_PICTURE, threads.getPicture());
-        assertEquals(DEFAULT_BOARD, threads.getBoard().getName());
     }
 
     @Test
@@ -93,34 +62,21 @@ public class PosterServiceTest {
         final Post mockPost = new Post();
         mockPost.setBody(DEFAULT_CONTENT);
 
-        final Board mockBoard = new Board();
-        mockBoard.setName(DEFAULT_BOARD);
-        final Session mockSession = mock(Session.class);
-        final SimpleNaturalIdLoadAccess naturalIdLoadAccess = mock(SimpleNaturalIdLoadAccess.class);
-
-        when(entityManager.unwrap(Session.class)).thenReturn(mockSession);
-        when(mockSession.bySimpleNaturalId(Board.class)).thenReturn(naturalIdLoadAccess);
-        when(naturalIdLoadAccess.getReference(DEFAULT_BOARD)).thenReturn(mockBoard);
-
         final Picture mockPicture = new Picture();
         mockPicture.setName(DEFAULT_PICTURE);
+
+        when(posterRepository.thread(DEFAULT_CONTENT, DEFAULT_CONTENT, DEFAULT_PICTURE, DEFAULT_BOARD)).thenReturn(1L);
         doNothing().when(minioService).savePicture(mockPicture, MinioService.BUCKET);
 
-        when(posterRepository.thread(any(Threads.class))).thenReturn(0L);
+        long result = posterService.thread(mockPost, mockPicture, DEFAULT_BOARD);
 
-        posterService.thread(mockPost, mockPicture, DEFAULT_BOARD);
-
+        assertEquals(1L, result);
+        verify(posterRepository).thread(DEFAULT_CONTENT, DEFAULT_CONTENT, DEFAULT_PICTURE, DEFAULT_BOARD);
         verify(minioService).savePicture(mockPicture, MinioService.BUCKET);
-        verify(posterRepository).thread(threadsCaptor.capture());
-        final Threads threads = threadsCaptor.getValue();
-        assertEquals(DEFAULT_CONTENT, threads.getHeader());
-        assertEquals(DEFAULT_CONTENT, threads.getContent());
-        assertEquals(DEFAULT_PICTURE, threads.getPicture());
-        assertEquals(DEFAULT_BOARD, threads.getBoard().getName());
     }
 
     @Test
-    public void thread_GettingPostWithoutPicture_ThrowsIllegalArgumentException() {
+    public void thread_GettingPostWithoutPicture_ThrowsNullPointerException() {
         final Post mockPost = new Post();
         mockPost.setBody(DEFAULT_CONTENT);
 
@@ -135,22 +91,13 @@ public class PosterServiceTest {
 
         final Picture mockPicture = new Picture();
         mockPicture.setName(DEFAULT_PICTURE);
-        doNothing().when(minioService).savePicture(mockPicture, MinioService.BUCKET);
 
-        final long threadId = 0L;
-        Threads mockThread = new Threads();
-        when(posterRepository.getThreadsById(threadId)).thenReturn(mockThread);
-        doNothing().when(posterRepository).post(any(Posts.class));
+        final long threadId = 1L;
 
         posterService.post(mockPost, mockPicture, threadId);
 
+        verify(posterRepository).post(DEFAULT_CONTENT, DEFAULT_HEADER, DEFAULT_PICTURE, threadId);
         verify(minioService).savePicture(mockPicture, MinioService.BUCKET);
-        verify(posterRepository).post(postsCaptor.capture());
-        final Posts posts = postsCaptor.getValue();
-        assertEquals(DEFAULT_HEADER, posts.getHeader());
-        assertEquals(DEFAULT_CONTENT, posts.getContent());
-        assertEquals(DEFAULT_PICTURE, posts.getPicture());
-        assertEquals(mockThread, posts.getThread());
     }
 
     @Test
@@ -160,22 +107,13 @@ public class PosterServiceTest {
 
         final Picture mockPicture = new Picture();
         mockPicture.setName(DEFAULT_PICTURE);
-        doNothing().when(minioService).savePicture(mockPicture, MinioService.BUCKET);
 
-        final long threadId = 0L;
-        Threads mockThread = new Threads();
-        when(posterRepository.getThreadsById(threadId)).thenReturn(mockThread);
-        doNothing().when(posterRepository).post(any(Posts.class));
+        final long threadId = 1L;
 
         posterService.post(mockPost, mockPicture, threadId);
 
+        verify(posterRepository).post(DEFAULT_CONTENT, null, DEFAULT_PICTURE, threadId);
         verify(minioService).savePicture(mockPicture, MinioService.BUCKET);
-        verify(posterRepository).post(postsCaptor.capture());
-        final Posts posts = postsCaptor.getValue();
-        assertNull(posts.getHeader());
-        assertEquals(DEFAULT_CONTENT, posts.getContent());
-        assertEquals(DEFAULT_PICTURE, posts.getPicture());
-        assertEquals(mockThread, posts.getThread());
     }
 
     @Test
@@ -184,19 +122,12 @@ public class PosterServiceTest {
         mockPost.setHead(DEFAULT_HEADER);
         mockPost.setBody(DEFAULT_CONTENT);
 
-        final long threadId = 0L;
-        Threads mockThread = new Threads();
-        when(posterRepository.getThreadsById(threadId)).thenReturn(mockThread);
-        doNothing().when(posterRepository).post(any(Posts.class));
+        final long threadId = 1L;
 
         posterService.post(mockPost, null, threadId);
 
-        verify(posterRepository).post(postsCaptor.capture());
-        final Posts posts = postsCaptor.getValue();
-        assertEquals(DEFAULT_HEADER, posts.getHeader());
-        assertEquals(DEFAULT_CONTENT, posts.getContent());
-        assertEquals("", posts.getPicture());
-        assertEquals(mockThread, posts.getThread());
+        verify(posterRepository).post(DEFAULT_CONTENT, DEFAULT_HEADER, "", threadId);
+        verify(minioService, never()).savePicture(any(), any());
     }
 
     @Test
@@ -204,19 +135,12 @@ public class PosterServiceTest {
         final Post mockPost = new Post();
         mockPost.setBody(DEFAULT_CONTENT);
 
-        final long threadId = 0L;
-        Threads mockThread = new Threads();
-        when(posterRepository.getThreadsById(threadId)).thenReturn(mockThread);
-        doNothing().when(posterRepository).post(any(Posts.class));
+        final long threadId = 1L;
 
         posterService.post(mockPost, null, threadId);
 
-        verify(posterRepository).post(postsCaptor.capture());
-        final Posts posts = postsCaptor.getValue();
-        assertNull(posts.getHeader());
-        assertEquals(DEFAULT_CONTENT, posts.getContent());
-        assertEquals("", posts.getPicture());
-        assertEquals(mockThread, posts.getThread());
+        verify(posterRepository).post(DEFAULT_CONTENT, null, "", threadId);
+        verify(minioService, never()).savePicture(any(), any());
     }
 
     @Test
@@ -228,11 +152,9 @@ public class PosterServiceTest {
         final int mockLifeCycleThreads = 14;
         final int mockLifeCyclePosts = 7;
         final String mockTranscription = "transcription";
-
         final String mockEncodedPassword = "encodedPassword";
-        when(passwordEncoder.encode(mockPassword)).thenReturn(mockEncodedPassword);
 
-        doNothing().when(posterRepository).board(any(Board.class), any(Users.class));
+        when(passwordEncoder.encode(mockPassword)).thenReturn(mockEncodedPassword);
 
         BoardToCreate boardToCreate = new BoardToCreate(mockBoardName,
                 mockRule,
@@ -242,23 +164,10 @@ public class PosterServiceTest {
                 mockLifeCyclePosts,
                 mockTranscription);
 
-        posterService.board(boardToCreate);
+        posterService.board(boardToCreate, DEFAULT_ACCOUNT);
 
         verify(passwordEncoder).encode(mockPassword);
-        verify(posterRepository).board(boardCaptor.capture(), usersCaptor.capture());
-
-        final Board board = boardCaptor.getValue();
-        assertEquals(mockBoardName, board.getName());
-        assertEquals(mockRule, board.getRules());
-        assertEquals(mockLifeCyclePosts, board.getLifeCyclePosts());
-        assertEquals(mockTranscription, board.getTranscription());
-        assertEquals(mockLifeCycleThreads, board.getLifeCycleThreads());
-
-        final Users users = usersCaptor.getValue();
-        assertEquals(mockEncodedPassword, users.getPassword());
-        assertEquals(mockNickname, users.getNickname());
-        assertEquals(board, users.getBoard());
-        assertTrue(users.isRole());
+        verify(posterRepository).board(boardToCreate, mockEncodedPassword, DEFAULT_ACCOUNT);
     }
 
     @Test
@@ -269,11 +178,9 @@ public class PosterServiceTest {
         final String mockNickname = "nickname";
         final int mockLifeCycleThreads = 14;
         final int mockLifeCyclePosts = 7;
-
         final String mockEncodedPassword = "encodedPassword";
-        when(passwordEncoder.encode(mockPassword)).thenReturn(mockEncodedPassword);
 
-        doNothing().when(posterRepository).board(any(Board.class), any(Users.class));
+        when(passwordEncoder.encode(mockPassword)).thenReturn(mockEncodedPassword);
 
         BoardToCreate boardToCreate = new BoardToCreate(mockBoardName,
                 mockRule,
@@ -283,23 +190,11 @@ public class PosterServiceTest {
                 mockLifeCyclePosts,
                 null);
 
-        posterService.board(boardToCreate);
+        posterService.board(boardToCreate, DEFAULT_ACCOUNT);
 
         verify(passwordEncoder).encode(mockPassword);
-        verify(posterRepository).board(boardCaptor.capture(), usersCaptor.capture());
-
-        final Board board = boardCaptor.getValue();
-        assertEquals(mockBoardName, board.getName());
-        assertEquals(mockRule, board.getRules());
-        assertEquals(mockLifeCyclePosts, board.getLifeCyclePosts());
-        assertEquals(mockBoardName, board.getTranscription());
-        assertEquals(mockLifeCycleThreads, board.getLifeCycleThreads());
-
-        final Users users = usersCaptor.getValue();
-        assertEquals(mockEncodedPassword, users.getPassword());
-        assertEquals(mockNickname, users.getNickname());
-        assertEquals(board, users.getBoard());
-        assertTrue(users.isRole());
+        assertEquals(mockBoardName, boardToCreate.getTranscription());
+        verify(posterRepository).board(boardToCreate, mockEncodedPassword, DEFAULT_ACCOUNT);
     }
 
     @Test
@@ -312,17 +207,15 @@ public class PosterServiceTest {
         final int mockLifeCyclePosts = 14;
         final String mockTranscription = "transcription";
 
-        assertThrows(InvalidRulesException.class, () -> {
-            BoardToCreate boardToCreate = new BoardToCreate(mockBoardName,
-                    mockRule,
-                    mockPassword,
-                    mockNickname,
-                    mockLifeCycleThreads,
-                    mockLifeCyclePosts,
-                    mockTranscription);
+        BoardToCreate boardToCreate = new BoardToCreate(mockBoardName,
+                mockRule,
+                mockPassword,
+                mockNickname,
+                mockLifeCycleThreads,
+                mockLifeCyclePosts,
+                mockTranscription);
 
-            posterService.board(boardToCreate);
-        });
+        assertThrows(InvalidRulesException.class, () -> posterService.board(boardToCreate, DEFAULT_ACCOUNT));
     }
 
     @Test
@@ -335,17 +228,15 @@ public class PosterServiceTest {
         final int mockLifeCyclePosts = -14;
         final String mockTranscription = "transcription";
 
-        assertThrows(InvalidRulesException.class, () -> {
-            BoardToCreate boardToCreate = new BoardToCreate(mockBoardName,
-                    mockRule,
-                    mockPassword,
-                    mockNickname,
-                    mockLifeCycleThreads,
-                    mockLifeCyclePosts,
-                    mockTranscription);
+        BoardToCreate boardToCreate = new BoardToCreate(mockBoardName,
+                mockRule,
+                mockPassword,
+                mockNickname,
+                mockLifeCycleThreads,
+                mockLifeCyclePosts,
+                mockTranscription);
 
-            posterService.board(boardToCreate);
-        });
+        assertThrows(InvalidRulesException.class, () -> posterService.board(boardToCreate, DEFAULT_ACCOUNT));
     }
 
 
@@ -359,17 +250,15 @@ public class PosterServiceTest {
         final int mockLifeCyclePosts = 7;
         final String mockTranscription = "transcription";
 
-        assertThrows(InvalidRulesException.class, () -> {
-            BoardToCreate boardToCreate = new BoardToCreate(mockBoardName,
-                    mockRule,
-                    mockPassword,
-                    mockNickname,
-                    mockLifeCycleThreads,
-                    mockLifeCyclePosts,
-                    mockTranscription);
+        BoardToCreate boardToCreate = new BoardToCreate(mockBoardName,
+                mockRule,
+                mockPassword,
+                mockNickname,
+                mockLifeCycleThreads,
+                mockLifeCyclePosts,
+                mockTranscription);
 
-            posterService.board(boardToCreate);
-        });
+        assertThrows(InvalidRulesException.class, () -> posterService.board(boardToCreate, DEFAULT_ACCOUNT));
     }
 
     @ParameterizedTest(name = "{0} - rule: {1}")
@@ -380,7 +269,7 @@ public class PosterServiceTest {
             "Without rights to reading for group, rwdx-wdxrwdx",
             "Without rights to reading for anons, rwdxrwdx-wdx",
             "Invalid characters, abcdefghijkl",
-            "Random gibberish, !@#$%^&*()_+",
+            "Random gibberish, !@#$%^&*()_+"
     })
     public void board_WithInvalidRules_ThrowsInvalidRulesException(String description, String invalidRule) {
         final String mockBoardName = DEFAULT_BOARD;
@@ -390,16 +279,14 @@ public class PosterServiceTest {
         final int mockLifeCyclePosts = 7;
         final String mockTranscription = "transcription";
 
-        assertThrows(InvalidRulesException.class, () -> {
-            BoardToCreate boardToCreate = new BoardToCreate(mockBoardName,
-                    invalidRule,
-                    mockPassword,
-                    mockNickname,
-                    mockLifeCycleThreads,
-                    mockLifeCyclePosts,
-                    mockTranscription);
+        BoardToCreate boardToCreate = new BoardToCreate(mockBoardName,
+                invalidRule,
+                mockPassword,
+                mockNickname,
+                mockLifeCycleThreads,
+                mockLifeCyclePosts,
+                mockTranscription);
 
-            posterService.board(boardToCreate);
-        });
+        assertThrows(InvalidRulesException.class, () -> posterService.board(boardToCreate, DEFAULT_ACCOUNT));
     }
 }

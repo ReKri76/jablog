@@ -3,15 +3,15 @@ package io.rekri.jablog.controllers;
 import io.rekri.jablog.DTO.BoardToCreate;
 import io.rekri.jablog.DTO.Picture;
 import io.rekri.jablog.DTO.Post;
-import io.rekri.jablog.service.CustomUserDetailsService;
 import io.rekri.jablog.service.PosterService;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -27,7 +27,6 @@ public class PosterController {
     public static final long MAX_IMAGE_SIZE = 1024 * 1024 * 10 - 1;
 
     private final PosterService posterService;
-    private final CustomUserDetailsService customUserDetailsService;
 
     @PostMapping(value = "/{boardName}", consumes = "multipart/form-data")
     public ResponseEntity<Void> thread(@PathVariable String boardName, @Valid @RequestPart("post") Post post,
@@ -60,11 +59,16 @@ public class PosterController {
     }
 
     @PostMapping(value = "/board")
-    public ResponseEntity<Void> board(@Valid @RequestBody BoardToCreate board, HttpSession session){
+    public ResponseEntity<Void> board(@Valid @RequestBody BoardToCreate board){
 
-        posterService.board(board);
+        String accountName = null;
+        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        session.setAttribute(board.getBoardName(), customUserDetailsService.loadUserByUsername(board.getNickname()));
+        if (auth!=null)
+            accountName = (String) auth.getPrincipal();
+
+        posterService.board(board, accountName);
+
         return ResponseEntity.created(URI.create("/"+board.getBoardName())).build();
     }
 
