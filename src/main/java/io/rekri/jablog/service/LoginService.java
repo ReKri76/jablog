@@ -1,10 +1,12 @@
 package io.rekri.jablog.service;
 
 import io.rekri.jablog.DTO.Login;
+import io.rekri.jablog.DTO.Tokens;
 import io.rekri.jablog.config.security.CustomUserDetails;
 import io.rekri.jablog.entity.Users;
 import io.rekri.jablog.repository.LoginRepository;
 import jakarta.persistence.NoResultException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -20,9 +22,11 @@ public class LoginService {
     private final LoginRepository loginRepository;
     private final PasswordEncoder passwordEncoder;
     private final CustomUserDetailsService customUserDetailsService;
+    private final JWTService jwtService;
 
     @NotNull
-    public CustomUserDetails login (@NotNull Login login) throws NoResultException {
+    @Transactional
+    public CustomUserDetails login (@NotNull Login login, @NotNull String accountName) throws NoResultException {
 
         log.info("User {} is starting login", login.getNickname());
 
@@ -40,8 +44,33 @@ public class LoginService {
             throw new BadCredentialsException("Invalid user or password.");
         }
 
-        log.info("User {} is log in", login.getNickname());
+        loginRepository.extendAccount(user, accountName);
+
+        log.info("User {} is log in by {} account", login.getNickname(), accountName);
 
         return customUserDetailsService.build(user);
+    }
+
+    @NotNull
+    @Transactional
+    public Tokens createAccount(@NotNull Login login){
+
+        log.info("Start adding {} account", login.getNickname());
+
+        if (loginRepository.isAccountNameAlreadyUsed(login.getNickname()))
+            throw new
+
+        login.setPassword(passwordEncoder.encode(login.getPassword()));
+
+        loginRepository.createAccount(login);
+
+        Tokens res = new Tokens(
+            jwtService.generateAccessToken(login.getNickname()),
+            jwtService.generateRefreshToken(login.getNickname())
+        );
+
+        log.info("Account {} was created", login.getNickname());
+
+        return res;
     }
 }

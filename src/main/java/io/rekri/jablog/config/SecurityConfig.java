@@ -93,7 +93,8 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers(HttpMethod.POST, "/api/login/verify").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/login/extend-accont").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/login/create-account").permitAll()
                         .requestMatchers(HttpMethod.GET,  "/api/getter/index").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/poster/board").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users/panel").permitAll()
