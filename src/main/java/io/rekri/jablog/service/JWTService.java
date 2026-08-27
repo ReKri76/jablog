@@ -5,6 +5,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.rekri.jablog.config.SecurityConfig;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,12 +17,21 @@ import java.util.Date;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class JWTService {
 
     @Value("${jwt.key}")
     private String secretBase64;
 
-    private final SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretBase64));
+    private SecretKey key;
+
+    @PostConstruct
+    private void init() {
+        // @Value fields are only populated after construction, so the key
+        // must be built here (or lazily) rather than in a field initializer -
+        // building it inline made `secretBase64` null at construction time.
+        this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretBase64));
+    }
 
     @NotNull
     public String generateAccessToken(@NotNull String accountName){

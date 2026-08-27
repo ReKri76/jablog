@@ -52,4 +52,15 @@ public class LoginRepository {
         Optional<Accounts> accounts = accountRepo.findByUsername(accountName);
         return accounts.isPresent();
     }
+
+    @Transactional
+    public Optional<Accounts> findAccountByUsername(@NotNull String username){
+        return accountRepo.findByUsername(username);
+    }
+
+    @Transactional
+    public void updateRefreshExpiredTime(@NotNull Accounts account, long newExpiredTime){
+        account.setRefreshExpiredTime(newExpiredTime);
+        accountRepo.save(account);
+    }
 }

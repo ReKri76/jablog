@@ -16,12 +16,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Instant;
+import java.time.Duration;
 
 @RestController
 @RequestMapping("/api/login")
@@ -61,7 +62,7 @@ public class LoginController {
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
-                .maxAge(SecurityConfig.REFRESH_EXPIRED_TIME + Instant.now().toEpochMilli())
+                .maxAge(Duration.ofMillis(SecurityConfig.REFRESH_EXPIRED_TIME))
                 .sameSite("Lax")
                 .build();
 
@@ -72,6 +73,34 @@ public class LoginController {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .body(res);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<createAccountResponse> refresh(
+            @CookieValue(name = "refreshToken", required = false) String refreshToken) {
+
+        if (refreshToken == null)
+            throw new BadCredentialsException("Refresh token is missing");
+
+        Tokens tokens = loginService.refresh(refreshToken);
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokens.getRefreshToken())
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(Duration.ofMillis(SecurityConfig.REFRESH_EXPIRED_TIME))
+                .sameSite("Lax")
+                .build();
+
+        createAccountResponse res = new createAccountResponse();
+        res.setToken(tokens.getAccessToken());
+        res.setStatus(200);
+        res.setMessage("ok");
+
+        return ResponseEntity
+                .ok()
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
                 .body(res);
     }

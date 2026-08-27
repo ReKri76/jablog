@@ -2,6 +2,7 @@ package io.rekri.jablog.controllers;
 
 import io.rekri.jablog.DTO.SimpleResponse;
 import io.rekri.jablog.errors.InvalidRulesException;
+import io.rekri.jablog.errors.NicknameAlreadyUsedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -75,11 +76,24 @@ public class GlobalErrorController{
         log.warn("ResponseStatusException: status ={}, message = {}", e.getStatusCode(), e.getReason());
 
         final ErrorResponse res = new ErrorResponse();
-        res.setMessage("Board cant be create with this parameters.");
-        res.setStatus(400);
+        res.setMessage(e.getReason());
+        res.setStatus(e.getStatusCode().value());
 
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(e.getStatusCode())
+                .body(res);
+    }
+
+    @ExceptionHandler(NicknameAlreadyUsedException.class)
+    public ResponseEntity<ErrorResponse> handleNicknameAlreadyUsedException(NicknameAlreadyUsedException e) {
+        log.warn("NicknameAlreadyUsedException:{}", e.getMessage());
+
+        final ErrorResponse res = new ErrorResponse();
+        res.setMessage("This nickname is already used.");
+        res.setStatus(409);
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
                 .body(res);
     }
 
