@@ -1,30 +1,37 @@
 package io.rekri.jablog.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.rekri.jablog.config.security.CustomUserDetails;
+import io.rekri.jablog.DTO.Login;
+import io.rekri.jablog.DTO.Tokens;
 import io.rekri.jablog.controllers.LoginController;
-import io.rekri.jablog.repository.UserDetailsRepository;
-import io.rekri.jablog.service.CustomUserDetailsService;
 import io.rekri.jablog.service.LoginService;
-import jakarta.servlet.http.HttpSession;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import jakarta.servlet.http.Cookie;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-public class LoginControllerTest {
+class LoginControllerTest {
 
     @Mock
     private LoginService loginService;
@@ -33,44 +40,111 @@ public class LoginControllerTest {
     private LoginController loginController;
 
     private MockMvc mockMvc;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    UserDetailsRepository  userDetailsRepository = Mockito.mock(UserDetailsRepository.class);
-    private final CustomUserDetailsService customUserDetailsService = new CustomUserDetailsService(userDetailsRepository);
-
-    private final String DEFAULT_LOGIN = "default_login";
-    private final String DEFAULT_PASSWORD = "default_password";
+    private static final String DEFAULT_NICKNAME = "default_login";
+    private static final String DEFAULT_PASSWORD = "default_password";
+    private static final String DEFAULT_ACCOUNT_NAME = "board1";
 
     @Captor
-    private ArgumentCaptor<io.rekri.jablog.DTO.Login> loginCaptor;
+    private ArgumentCaptor<Login> loginCaptor;
 
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(loginController).build();
     }
 
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
+
     @Test
-    public void login_Success() throws Exception {
-        final CustomUserDetails mockCustomUserDetails = customUserDetailsService.createDefault();
+    void login_WithAuthentication_ReturnsOk() throws Exception {
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(DEFAULT_ACCOUNT_NAME, null)
+        );
 
-        when(loginService.login(any(io.rekri.jablog.DTO.Login.class))).thenReturn(mockCustomUserDetails);
-
-        io.rekri.jablog.DTO.Login req = new io.rekri.jablog.DTO.Login();
-        req.setNickname(DEFAULT_LOGIN);
+        Login req = new Login();
+        req.setNickname(DEFAULT_NICKNAME);
         req.setPassword(DEFAULT_PASSWORD);
 
-        mockMvc.perform(post("/api/login/verify")
+        mockMvc.perform(post("/api/login/extend-accont")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(req))
-                )
-                .andExpect(status().isOk())
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk());
+
+        verify(loginService).login(loginCaptor.capture(), eq(DEFAULT_ACCOUNT_NAME));
+        Login captured = loginCaptor.getValue();
+        assertEquals(DEFAULT_NICKNAME, captured.getNickname());
+        assertEquals(DEFAULT_PASSWORD, captured.getPassword());
+    }
+
+    @Test
+    void login_WithoutAuthentication_Throws() {
+        SecurityContextHolder.clearContext();
+
+        Login req = new Login();
+        req.setNickname(DEFAULT_NICKNAME);
+        req.setPassword(DEFAULT_PASSWORD);
+
+        assertThrows(Exception.class, () -> mockMvc.perform(post("/api/login/extend-accont")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(req))));
+    }
+
+    @Test
+    void createAccount_Success() throws Exception {
+        Login req = new Login();
+        req.setNickname("newUser");
+        req.setPassword("rawPassword");
+
+        Tokens tokens = new Tokens("access-token", "refresh-token");
+        when(loginService.createAccount(any(Login.class))).thenReturn(tokens);
+
+        mockMvc.perform(post("/api/login/create-account")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isCreated())
                 .andExpect(result -> {
-                    HttpSession session = result.getRequest().getSession(false);
-                    assertEquals(mockCustomUserDetails, session.getAttribute(mockCustomUserDetails.getBoardName()));
+                    Cookie cookie = result.getResponse().getCookie("refreshToken");
+                    assertNotNull(cookie, "refreshToken cookie should be set");
+                    assertEquals("refresh-token", cookie.getValue());
+                    assertTrue(cookie.isHttpOnly());
+                })
+                .andExpect(result -> {
+                    String body = result.getResponse().getContentAsString();
+                    assertTrue(body.contains("access-token"));
+                    assertTrue(body.contains("\"status\":201"));
                 });
 
-        verify(loginService).login(loginCaptor.capture());
-        io.rekri.jablog.DTO.Login login = loginCaptor.getValue();
-        assertEquals(DEFAULT_LOGIN,  login.getNickname());
-        assertEquals(DEFAULT_PASSWORD, login.getPassword());
+        verify(loginService).createAccount(loginCaptor.capture());
+        assertEquals("newUser", loginCaptor.getValue().getNickname());
+    }
+
+    @Test
+    void refresh_WithValidCookie_ReturnsOk() throws Exception {
+        Tokens tokens = new Tokens("new-access-token", "new-refresh-token");
+        when(loginService.refresh("old-refresh-token")).thenReturn(tokens);
+
+        mockMvc.perform(post("/api/login/refresh")
+                        .cookie(new Cookie("refreshToken", "old-refresh-token")))
+                .andExpect(status().isOk())
+                .andExpect(result -> {
+                    Cookie cookie = result.getResponse().getCookie("refreshToken");
+                    assertNotNull(cookie);
+                    assertEquals("new-refresh-token", cookie.getValue());
+                })
+                .andExpect(result -> {
+                    String body = result.getResponse().getContentAsString();
+                    assertTrue(body.contains("new-access-token"));
+                });
+
+        verify(loginService).refresh("old-refresh-token");
+    }
+
+    @Test
+    void refresh_WithoutCookie_Throws() {
+        assertThrows(Exception.class, () -> mockMvc.perform(post("/api/login/refresh")));
     }
 }
