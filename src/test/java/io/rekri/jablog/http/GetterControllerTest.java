@@ -55,7 +55,7 @@ public class GetterControllerTest {
         PostWithPicture expectedThread = originalPosts.getFirst();
         List<PostWithPicture> expectedReplies = originalPosts.subList(1, originalPosts.size());
 
-        mockMvc.perform(get("/api/" + DEFAULT_BOARD_NAME + "/" + threadId)
+        mockMvc.perform(get("/api/getter/" + DEFAULT_BOARD_NAME + "/" + threadId)
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
@@ -74,7 +74,7 @@ public class GetterControllerTest {
             posts.add(createPostWithPicture(i));
         when(getterService.board(DEFAULT_BOARD_NAME, 0)).thenReturn(posts);
 
-        mockMvc.perform(get("/api/" + DEFAULT_BOARD_NAME)
+        mockMvc.perform(get("/api/getter/" + DEFAULT_BOARD_NAME)
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
@@ -92,7 +92,7 @@ public class GetterControllerTest {
             boards.add(createBoard(Integer.toString(i)));
         when(getterService.start()).thenReturn(boards);
 
-        mockMvc.perform(get("/api/"))
+        mockMvc.perform(get("/api/getter/index"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.message").value("ok"))

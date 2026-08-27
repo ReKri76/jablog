@@ -93,8 +93,8 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers(HttpMethod.POST, "/api/public/login/verify").permitAll()
-                        .requestMatchers(HttpMethod.GET,  "/api").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/login/verify").permitAll()
+                        .requestMatchers(HttpMethod.GET,  "/api/getter/index").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/poster/board").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users/panel").permitAll()
 
@@ -119,16 +119,16 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/users/panel/{boardName}")
                             .access(usersAuthorizationManager)
 
-                        .requestMatchers(HttpMethod.GET, "/api/{boardName}/img/{fileName}")
+                        .requestMatchers(HttpMethod.GET, "/api/getter/{boardName}/img/{fileName}")
                             .access(getterAuthorizationManager)
-                        .requestMatchers(HttpMethod.GET, "/api/{boardName}/{thread}")
+                        .requestMatchers(HttpMethod.GET, "/api/getter/{boardName}/{thread}")
                             .access(getterAuthorizationManager)
-                        .requestMatchers(HttpMethod.GET, "/api/{boardName}")
+                        .requestMatchers(HttpMethod.GET, "/api/getter/{boardName}")
                             .access(getterAuthorizationManager)
 
-                        .requestMatchers(HttpMethod.PATCH, "/api/carma/plus/{boardName}/{thread}")
+                        .requestMatchers(HttpMethod.PATCH, "/api/getter/carma/plus/{boardName}/{thread}")
                             .access(getterAuthorizationManager)
-                        .requestMatchers(HttpMethod.PATCH, "/api/carma/minus/{boardName}/{thread}")
+                        .requestMatchers(HttpMethod.PATCH, "/api/getter/carma/minus/{boardName}/{thread}")
                             .access(getterAuthorizationManager)
 
                         .anyRequest().denyAll()

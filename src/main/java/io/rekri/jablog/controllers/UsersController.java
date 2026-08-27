@@ -3,17 +3,17 @@ package io.rekri.jablog.controllers;
 import io.rekri.jablog.DTO.Login;
 import io.rekri.jablog.DTO.SimpleResponse;
 import io.rekri.jablog.service.UsersService;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -68,11 +68,14 @@ public class UsersController {
     }
 
     @GetMapping(value = "/panel") //на этой странице есть поле для логина и для управления в залогиненных досках как админ
-    public ResponseEntity<PanelResponse> panel(HttpSession session){
+    public ResponseEntity<PanelResponse> panel(){
 
-        String accountName = (String) Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
+        List<String> boardNames = Collections.emptyList();
 
-        final List<String> boardNames = usersService.getBoardsWhereThisAccountIsAdmin(accountName);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth!=null)
+            boardNames = usersService.getBoardsWhereThisAccountIsAdmin((String) auth.getPrincipal());
 
         final PanelResponse res = new PanelResponse();
         res.setBoardNames(boardNames);

@@ -16,7 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/getter")
 @RequiredArgsConstructor
 public class GetterController {
 
@@ -90,7 +90,7 @@ public class GetterController {
         private List<Board> boards;
     }
 
-    @GetMapping("/")
+    @GetMapping("/index")
     public ResponseEntity<RootResponse> start(){
 
         final RootResponse res = new RootResponse();
