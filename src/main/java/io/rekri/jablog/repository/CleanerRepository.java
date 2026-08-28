@@ -1,8 +1,10 @@
 package io.rekri.jablog.repository;
 
+import io.rekri.jablog.entity.Accounts;
 import io.rekri.jablog.entity.Board;
 import io.rekri.jablog.entity.Posts;
 import io.rekri.jablog.entity.Threads;
+import io.rekri.jablog.repository.jpa_repository.AccountRepo;
 import io.rekri.jablog.repository.jpa_repository.BoardRepo;
 import io.rekri.jablog.repository.jpa_repository.PostRepo;
 import io.rekri.jablog.repository.jpa_repository.ThreadRepo;
@@ -23,6 +25,7 @@ public class CleanerRepository {
     private final PostRepo postRepo;
     private final ThreadRepo threadRepo;
     private final BoardRepo boardRepo;
+    private final AccountRepo accountRepo;
 
     @Transactional
     public List<Posts> posts() {
@@ -38,7 +41,6 @@ public class CleanerRepository {
     @Transactional
     public List<Threads> threads(long oldThread){
         final long now = Instant.now().toEpochMilli();
-
 
         final List<Threads> threads = threadRepo.findExpiresThreads(now, UNIX_TIME_DAY, oldThread);
 
@@ -64,5 +66,14 @@ public class CleanerRepository {
         boardRepo.deleteAll(boards);
 
         return boards;
+    }
+
+    @Transactional
+    public List<Accounts> accounts(long oldAccount){
+        final List<Accounts> res = accountRepo.findExpiredAccounts(oldAccount);
+
+        accountRepo.deleteAll(res);
+
+        return res;
     }
 }

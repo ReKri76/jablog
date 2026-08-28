@@ -1,5 +1,6 @@
 package io.rekri.jablog.service;
 
+import io.rekri.jablog.entity.Accounts;
 import io.rekri.jablog.entity.Board;
 import io.rekri.jablog.entity.Posts;
 import io.rekri.jablog.entity.Threads;
@@ -89,5 +90,20 @@ public class CleanerService {
 
         log.info("{} boards deleted.", deletedBoards.size());
 
+    }
+
+    @Scheduled(cron = "0 0 3 30 * Sun")
+    public void cleanAccounts(){
+        log.info("start to clean accounts");
+
+        final long oldAccount = Instant.now().toEpochMilli()-Duration.ofDays(1).toMillis();
+
+        final List<Accounts> deletedAccounts = cleanerRepository.accounts(oldAccount);
+
+        deletedAccounts.forEach(account -> {
+            log.info("{} account was deleted. This account has a {} records", account.getUsername(), account.getRecords().size());
+        });
+
+        log.info("end to clean accounts");
     }
 }
