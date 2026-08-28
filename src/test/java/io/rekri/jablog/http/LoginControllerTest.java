@@ -73,7 +73,7 @@ class LoginControllerTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
-        verify(loginService).login(loginCaptor.capture(), eq(DEFAULT_ACCOUNT_NAME));
+        verify(loginService).extendAccount(loginCaptor.capture(), eq(DEFAULT_ACCOUNT_NAME));
         Login captured = loginCaptor.getValue();
         assertEquals(DEFAULT_NICKNAME, captured.getNickname());
         assertEquals(DEFAULT_PASSWORD, captured.getPassword());
@@ -147,5 +147,49 @@ class LoginControllerTest {
     void refresh_WithoutCookie_Throws() throws Exception {
         mockMvc.perform(post("/api/login/refresh"))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void logIn_Success() throws Exception {
+        Login req = new Login();
+        req.setNickname(DEFAULT_NICKNAME);
+        req.setPassword(DEFAULT_PASSWORD);
+
+        Tokens tokens = new Tokens("access-token", "refresh-token");
+        when(loginService.login(any(Login.class))).thenReturn(tokens);
+
+        mockMvc.perform(post("/api/login/log-in")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(result -> {
+                    Cookie cookie = result.getResponse().getCookie("refreshToken");
+                    assertNotNull(cookie, "refreshToken cookie should be set");
+                    assertEquals("refresh-token", cookie.getValue());
+                    assertTrue(cookie.isHttpOnly());
+                })
+                .andExpect(result -> {
+                    String body = result.getResponse().getContentAsString();
+                    assertTrue(body.contains("access-token"));
+                    assertTrue(body.contains("\"status\":200"));
+                });
+
+        verify(loginService).login(loginCaptor.capture());
+        assertEquals(DEFAULT_NICKNAME, loginCaptor.getValue().getNickname());
+    }
+
+    @Test
+    void logIn_InvalidCredentials_PropagatesException() throws Exception {
+        Login req = new Login();
+        req.setNickname(DEFAULT_NICKNAME);
+        req.setPassword("wrongPassword");
+
+        when(loginService.login(any(Login.class)))
+                .thenThrow(new IllegalArgumentException("Invalid name or password"));
+
+        assertThrows(Exception.class, () ->
+                mockMvc.perform(post("/api/login/log-in")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req))));
     }
 }

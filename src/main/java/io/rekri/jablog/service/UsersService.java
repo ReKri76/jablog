@@ -6,7 +6,6 @@ import io.rekri.jablog.repository.UsersRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.exception.ConstraintViolationException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,14 +26,13 @@ public class UsersService {
 
         log.info("Start add user.");
 
+        if (usersRepository.isUserNameAlreadyUsed(login.getNickname()))
+            throw new NicknameAlreadyUsedException("Недопустимые значения создания пользователя.\n" +
+                "Вероятнее всего пользователь с таким никнеймом уже существует, либо никнейм слишком длинный.");
+
         String password = Objects.requireNonNull(passwordEncoder.encode(login.getPassword()));
 
-        try {
-            usersRepository.addUser(boardName, login.getNickname(), password);
-        } catch(ConstraintViolationException e){
-            throw new NicknameAlreadyUsedException("Недопустимые значения создания пользователя.\n" +
-                    "Вероятнее всего пользователь с таким никнеймом уже существует, либо никнейм слишком длинный.");
-        }
+        usersRepository.addUser(boardName, login.getNickname(), password);
 
         log.info("User {} was added.", login.getNickname());
     }

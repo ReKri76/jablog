@@ -4,14 +4,11 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.MalformedJwtException;
 import io.rekri.jablog.DTO.Login;
 import io.rekri.jablog.DTO.Tokens;
-import io.rekri.jablog.config.security.CustomUserDetails;
-import io.rekri.jablog.config.security.Roles;
 import io.rekri.jablog.entity.Accounts;
 import io.rekri.jablog.entity.Board;
 import io.rekri.jablog.entity.Users;
 import io.rekri.jablog.errors.NicknameAlreadyUsedException;
 import io.rekri.jablog.repository.LoginRepository;
-import io.rekri.jablog.service.CustomUserDetailsService;
 import io.rekri.jablog.service.JWTService;
 import io.rekri.jablog.service.LoginService;
 import jakarta.persistence.NoResultException;
@@ -42,16 +39,13 @@ class LoginServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private CustomUserDetailsService customUserDetailsService;
-
-    @Mock
     private JWTService jwtService;
 
     @InjectMocks
     private LoginService loginService;
 
     @Test
-    void login_Success() {
+    void extend_Success() {
         Login login = new Login();
         login.setNickname("testUser");
         login.setPassword("correctPassword");
@@ -62,35 +56,24 @@ class LoginServiceTest {
         mockUser.setPassword("encodedPasswordFromDB");
         mockUser.setBoard(boardMock);
 
-        CustomUserDetails mockCustomUserDetails = new CustomUserDetails(
-                "board",
-                "rwdxrwdxrwdx",
-                "password",
-                "nickname",
-                Roles.ROLE_GROUP
-        );
-
         when(loginRepository.login("testUser")).thenReturn(mockUser);
         when(passwordEncoder.matches("correctPassword", "encodedPasswordFromDB")).thenReturn(true);
-        when(customUserDetailsService.build(mockUser)).thenReturn(mockCustomUserDetails);
 
-        CustomUserDetails result = loginService.login(login, DEFAULT_ACCOUNT_NAME);
+        loginService.extendAccount(login, DEFAULT_ACCOUNT_NAME);
 
-        assertNotNull(result);
-        assertEquals(mockCustomUserDetails, result);
         verify(loginRepository).login("testUser");
         verify(passwordEncoder).matches("correctPassword", "encodedPasswordFromDB");
         verify(loginRepository).extendAccount(mockUser, DEFAULT_ACCOUNT_NAME);
     }
 
     @Test
-    void login_UserNotFound_ThrowsBadCredentialsException() {
+    void extend_UserNotFound_ThrowsBadCredentialsException() {
         Login login = new Login();
         login.setNickname("unknownUser");
 
         when(loginRepository.login("unknownUser")).thenThrow(new NoResultException("User not found"));
 
-        assertThrows(BadCredentialsException.class, () -> loginService.login(login, DEFAULT_ACCOUNT_NAME));
+        assertThrows(BadCredentialsException.class, () -> loginService.extendAccount(login, DEFAULT_ACCOUNT_NAME));
 
         verify(loginRepository).login("unknownUser");
         verifyNoInteractions(passwordEncoder);
@@ -98,7 +81,7 @@ class LoginServiceTest {
     }
 
     @Test
-    void login_WrongPassword_ThrowsBadCredentialsException() {
+    void extend_WrongPassword_ThrowsBadCredentialsException() {
         Login login = new Login();
         login.setNickname("testUser");
         login.setPassword("incorrectPassword");
@@ -113,7 +96,7 @@ class LoginServiceTest {
         when(loginRepository.login("testUser")).thenReturn(mockUser);
         when(passwordEncoder.matches("incorrectPassword", "encodedPasswordFromDB")).thenReturn(false);
 
-        assertThrows(BadCredentialsException.class, () -> loginService.login(login, DEFAULT_ACCOUNT_NAME));
+        assertThrows(BadCredentialsException.class, () -> loginService.extendAccount(login, DEFAULT_ACCOUNT_NAME));
 
         verify(loginRepository).login("testUser");
         verify(passwordEncoder).matches("incorrectPassword", "encodedPasswordFromDB");
@@ -205,6 +188,62 @@ class LoginServiceTest {
 
         assertThrows(BadCredentialsException.class, () -> loginService.refresh(refreshToken));
 
+        verify(loginRepository, never()).updateRefreshExpiredTime(any(), anyLong());
+    }
+
+    @Test
+    void login_Success() {
+        Login login = new Login();
+        login.setNickname("testUser");
+        login.setPassword("correctPassword");
+
+        Accounts account = new Accounts();
+        account.setUsername("testUser");
+        account.setPassword("encodedPasswordFromDB");
+
+        when(loginRepository.findAccountByUsername("testUser")).thenReturn(Optional.of(account));
+        when(passwordEncoder.matches("correctPassword", "encodedPasswordFromDB")).thenReturn(true);
+        when(jwtService.generateAccessToken("testUser")).thenReturn("access-token");
+        when(jwtService.generateRefreshToken("testUser")).thenReturn("refresh-token");
+
+        Tokens result = loginService.login(login);
+
+        assertNotNull(result);
+        assertEquals("access-token", result.getAccessToken());
+        assertEquals("refresh-token", result.getRefreshToken());
+        verify(loginRepository).updateRefreshExpiredTime(eq(account), anyLong());
+    }
+
+    @Test
+    void login_UserNotFound_ThrowsIllegalArgumentException() {
+        Login login = new Login();
+        login.setNickname("ghostUser");
+        login.setPassword("whatever");
+
+        when(loginRepository.findAccountByUsername("ghostUser")).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> loginService.login(login));
+
+        verifyNoInteractions(jwtService);
+        verify(loginRepository, never()).updateRefreshExpiredTime(any(), anyLong());
+    }
+
+    @Test
+    void login_WrongPassword_ThrowsIllegalArgumentException() {
+        Login login = new Login();
+        login.setNickname("testUser");
+        login.setPassword("wrongPassword");
+
+        Accounts account = new Accounts();
+        account.setUsername("testUser");
+        account.setPassword("encodedPasswordFromDB");
+
+        when(loginRepository.findAccountByUsername("testUser")).thenReturn(Optional.of(account));
+        when(passwordEncoder.matches("wrongPassword", "encodedPasswordFromDB")).thenReturn(false);
+
+        assertThrows(IllegalArgumentException.class, () -> loginService.login(login));
+
+        verifyNoInteractions(jwtService);
         verify(loginRepository, never()).updateRefreshExpiredTime(any(), anyLong());
     }
 

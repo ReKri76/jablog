@@ -28,7 +28,7 @@ public class LoginController {
     private final LoginService loginService;
 
     @PostMapping("/extend-accont")
-    public ResponseEntity<Void> login(@Valid @RequestBody Login login) {
+    public ResponseEntity<Void> extendAccount(@Valid @RequestBody Login login) {
 
         String accountName;
         final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -38,19 +38,19 @@ public class LoginController {
         else
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Access token must be not null");
 
-        loginService.login(login, accountName);
+        loginService.extendAccount(login, accountName);
 
         return ResponseEntity.ok().build();
     }
 
     @Data
     @EqualsAndHashCode(callSuper = true)
-    public static class createAccountResponse extends SimpleResponse{
+    public static class AccountResponse extends SimpleResponse{
         private String token;
     }
 
     @PostMapping("/create-account")
-    public ResponseEntity<createAccountResponse> createAccount(@Valid @RequestBody Login login){
+    public ResponseEntity<AccountResponse> createAccount(@Valid @RequestBody Login login){
 
         Tokens tokens = loginService.createAccount(login);
 
@@ -62,7 +62,7 @@ public class LoginController {
                 .sameSite("Lax")
                 .build();
 
-        createAccountResponse res = new createAccountResponse();
+        AccountResponse res = new AccountResponse();
         res.setToken(tokens.getAccessToken());
         res.setStatus(201);
         res.setMessage("ok");
@@ -74,8 +74,7 @@ public class LoginController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<createAccountResponse> refresh(
-            @CookieValue(name = "refreshToken", required = false) String refreshToken) {
+    public ResponseEntity<AccountResponse> refresh(@CookieValue(name = "refreshToken", required = false) String refreshToken) {
 
         if (refreshToken == null)
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token must be not null");
@@ -90,13 +89,37 @@ public class LoginController {
                 .sameSite("Lax")
                 .build();
 
-        createAccountResponse res = new createAccountResponse();
+        AccountResponse res = new AccountResponse();
         res.setToken(tokens.getAccessToken());
         res.setStatus(200);
         res.setMessage("ok");
 
         return ResponseEntity
-                .ok()
+                .status(HttpStatus.OK)
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .body(res);
+    }
+
+    @PostMapping("/log-in")
+    public ResponseEntity<AccountResponse> login(@Valid @RequestBody Login login){
+
+        Tokens tokens = loginService.login(login);
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokens.getRefreshToken())
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(Duration.ofMillis(SecurityConfig.REFRESH_EXPIRED_TIME))
+                .sameSite("Lax")
+                .build();
+
+        AccountResponse res = new AccountResponse();
+        res.setToken(tokens.getAccessToken());
+        res.setStatus(200);
+        res.setMessage("ok");
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
                 .body(res);
     }

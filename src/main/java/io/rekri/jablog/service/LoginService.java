@@ -5,7 +5,6 @@ import io.jsonwebtoken.JwtException;
 import io.rekri.jablog.DTO.Login;
 import io.rekri.jablog.DTO.Tokens;
 import io.rekri.jablog.config.SecurityConfig;
-import io.rekri.jablog.config.security.CustomUserDetails;
 import io.rekri.jablog.entity.Accounts;
 import io.rekri.jablog.entity.Users;
 import io.rekri.jablog.errors.NicknameAlreadyUsedException;
@@ -20,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,12 +28,10 @@ public class LoginService {
 
     private final LoginRepository loginRepository;
     private final PasswordEncoder passwordEncoder;
-    private final CustomUserDetailsService customUserDetailsService;
     private final JWTService jwtService;
 
-    @NotNull
     @Transactional
-    public CustomUserDetails login (@NotNull Login login, @NotNull String accountName) throws NoResultException {
+    public void extendAccount (@NotNull Login login, @NotNull String accountName) throws NoResultException {
 
         log.info("User {} is starting login", login.getNickname());
 
@@ -54,8 +52,6 @@ public class LoginService {
         loginRepository.extendAccount(user, accountName);
 
         log.info("User {} is log in by {} account", login.getNickname(), accountName);
-
-        return customUserDetailsService.build(user);
     }
 
     @NotNull
@@ -114,5 +110,32 @@ public class LoginService {
         log.info("Tokens for account {} were refreshed", nickname);
 
         return newTokens;
+    }
+
+    @NotNull
+    @Transactional
+    public Tokens login(Login login){
+
+        log.info("Start log-in user {}", login.getNickname());
+
+        Optional<Accounts> accounts = loginRepository.findAccountByUsername(login.getNickname());
+
+        if (accounts.isEmpty())
+            throw new IllegalArgumentException("Invalid name or password");
+
+        if (!passwordEncoder.matches(login.getPassword(), accounts.get().getPassword()))
+            throw new IllegalArgumentException("Invalid name or password");
+
+        loginRepository.updateRefreshExpiredTime(accounts.get(),
+                SecurityConfig.REFRESH_EXPIRED_TIME + Instant.now().toEpochMilli());
+
+        Tokens res = new Tokens(
+                jwtService.generateAccessToken(login.getNickname()),
+                jwtService.generateRefreshToken(login.getNickname())
+        );
+
+        log.info("End log-in user {}", login.getNickname());
+
+        return res;
     }
 }

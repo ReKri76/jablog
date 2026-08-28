@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -47,5 +48,11 @@ public class UsersRepository {
     @NotNull
     public List<String> getBoardsWhereThisAccountIsAdmin(@NotNull String accountName){
         return boardRepo.getBoardsWhereThisAccountIsAdmin(accountName);
+    }
+
+    @Transactional
+    public boolean isUserNameAlreadyUsed(@NotNull String accountName){
+        Optional<Users> accounts = userRepoUsers.findByNickname(accountName);
+        return accounts.isPresent();
     }
 }
