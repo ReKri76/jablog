@@ -1,6 +1,7 @@
 package io.rekri.jablog.unit;
 
 import io.rekri.jablog.DTO.Login;
+import io.rekri.jablog.errors.NicknameAlreadyUsedException;
 import io.rekri.jablog.repository.UsersRepository;
 import io.rekri.jablog.service.UsersService;
 import org.hibernate.exception.ConstraintViolationException;
@@ -10,11 +11,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -53,7 +54,7 @@ class UserServiceTest {
         doThrow(ConstraintViolationException.class)
                 .when(usersRepository).addUser(boardName, "testUser", "encodedPassword");
 
-        assertThrows(ResponseStatusException.class, () -> usersService.addUser(boardName, login));
+        assertThrows(NicknameAlreadyUsedException.class, () -> usersService.addUser(boardName, login));
     }
 
     @Test

@@ -63,7 +63,7 @@ public class GlobalErrorController{
         log.warn("Invalid rules of board: {}", e.getMessage());
 
         final ErrorResponse res = new ErrorResponse();
-        res.setMessage("Board cant be create with this parameters.");
+        res.setMessage(e.getMessage());
         res.setStatus(400);
 
         return ResponseEntity

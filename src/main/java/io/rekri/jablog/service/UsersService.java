@@ -1,16 +1,15 @@
 package io.rekri.jablog.service;
 
 import io.rekri.jablog.DTO.Login;
+import io.rekri.jablog.errors.NicknameAlreadyUsedException;
 import io.rekri.jablog.repository.UsersRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Objects;
@@ -33,7 +32,7 @@ public class UsersService {
         try {
             usersRepository.addUser(boardName, login.getNickname(), password);
         } catch(ConstraintViolationException e){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Недопустимые значения создания пользователя.\n" +
+            throw new NicknameAlreadyUsedException("Недопустимые значения создания пользователя.\n" +
                     "Вероятнее всего пользователь с таким никнеймом уже существует, либо никнейм слишком длинный.");
         }
 

@@ -39,8 +39,8 @@ public class DeleterController {
     }
 
     @GetMapping(value = "/{boardName}/{threadId}/{postId}")
-    public ResponseEntity<Void> canDeletePosts(@PathVariable("boardName") String boardName, @PathVariable("postId") long postId,
-                                     @PathVariable("threadId") long threadId){
+    public ResponseEntity<Void> canDeletePosts(@PathVariable("boardName") String boardName,
+                                               @PathVariable("postId") long postId, @PathVariable("threadId") long threadId){
         return ResponseEntity.ok().build();
     }
 }

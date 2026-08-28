@@ -5,6 +5,7 @@ import io.rekri.jablog.DTO.Login;
 import io.rekri.jablog.DTO.Tokens;
 import io.rekri.jablog.controllers.LoginController;
 import io.rekri.jablog.service.LoginService;
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,8 +20,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import jakarta.servlet.http.Cookie;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -81,16 +80,17 @@ class LoginControllerTest {
     }
 
     @Test
-    void login_WithoutAuthentication_Throws() {
+    void login_WithoutAuthentication_Throws() throws Exception {
         SecurityContextHolder.clearContext();
 
         Login req = new Login();
         req.setNickname(DEFAULT_NICKNAME);
         req.setPassword(DEFAULT_PASSWORD);
 
-        assertThrows(Exception.class, () -> mockMvc.perform(post("/api/login/extend-accont")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req))));
+        mockMvc.perform(post("/api/login/extend-accont")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -144,7 +144,8 @@ class LoginControllerTest {
     }
 
     @Test
-    void refresh_WithoutCookie_Throws() {
-        assertThrows(Exception.class, () -> mockMvc.perform(post("/api/login/refresh")));
+    void refresh_WithoutCookie_Throws() throws Exception {
+        mockMvc.perform(post("/api/login/refresh"))
+                .andExpect(status().isUnauthorized());
     }
 }
