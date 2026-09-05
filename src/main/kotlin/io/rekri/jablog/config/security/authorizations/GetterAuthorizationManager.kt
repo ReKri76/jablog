@@ -19,7 +19,6 @@ class GetterAuthorizationManager(private val getterAccessService: GetterAccessSe
         context: RequestAuthorizationContext
     ): AuthorizationResult {
 
-
         val boardName = context.variables["boardName"] as String
         val threadId : String? = context.variables["thread"]
 

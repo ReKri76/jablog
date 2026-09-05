@@ -12,9 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -24,7 +22,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -78,7 +75,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-                        .ignoringRequestMatchers("/api/public/**", "/api/poster/board")
+                        .ignoringRequestMatchers(
+                                "/api/login/**", "api/getter/index")
                 )
 
                 .sessionManagement(session ->
@@ -93,13 +91,15 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers(HttpMethod.POST, "/api/login/extend-accont").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/login/create-account").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/login/refresh").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/login/log-in").permitAll()
                         .requestMatchers(HttpMethod.GET,  "/api/getter/index").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/poster/board").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/users/panel").permitAll()
+
+                        .requestMatchers(HttpMethod.POST, "/api/login/extend-accont").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/users/panel").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/poster/board").authenticated()
+
 
                         .requestMatchers(HttpMethod.POST, "/api/poster/{boardName}/{thread}")
                             .access(posterAuthorizationManager)
@@ -146,21 +146,11 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config){
-        return config.getAuthenticationManager();
-    }
-
-    @Bean
-    public HttpSessionEventPublisher httpSessionEventPublisher() {
-        return new HttpSessionEventPublisher();
-    }
-
-    @Bean
     public CorsConfigurationSource corsConfigurationSource(@Value("${client.host}") String frontHost) {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(frontHost));
         config.setAllowedMethods(List.of("GET", "POST", "PATCH", "DELETE"));
-        config.setAllowedHeaders(List.of("Content-Type", "X-XSRF-TOKEN"));
+        config.setAllowedHeaders(List.of("Content-Type", "X-XSRF-TOKEN", "Authorization"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
