@@ -67,7 +67,7 @@ public class UsersController {
         private List<String> boardNames;
     }
 
-    @GetMapping(value = "/panel") //на этой странице есть поле для логина и для управления в залогиненных досках как админ
+    @GetMapping(value = "/panel")
     public ResponseEntity<PanelResponse> panel(){
 
         List<String> boardNames = Collections.emptyList();
