@@ -27,9 +27,6 @@ public class JWTService {
 
     @PostConstruct
     private void init() {
-        // @Value fields are only populated after construction, so the key
-        // must be built here (or lazily) rather than in a field initializer -
-        // building it inline made `secretBase64` null at construction time.
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretBase64));
     }
 
